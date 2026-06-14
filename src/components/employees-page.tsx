@@ -105,12 +105,12 @@ export function EmployeesPage({ data, actions }: EmployeesPageProps) {
 
   return (
     <motion.section className="page employees-page" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2, ease: "easeOut" }}>
-      <div className="locations-header">
+      <div className="employees-header">
         <div>
           <h1>Mitarbeiter</h1>
           <p>Verwalten Sie Mitarbeitende, Rollen, Standorte und Einladungen Ihres Pflegedienstes.</p>
         </div>
-        <div className="locations-header-actions">
+        <div className="employees-header-actions">
           <EmployeeModal action={actions.inviteEmployee} buttonLabel="Mitarbeiter einladen" mode="invite" locations={data.locations} />
           <EmployeeModal action={actions.createEmployee} buttonLabel="Mitarbeiter hinzufügen" mode="create" locations={data.locations} />
           <button className="button secondary" disabled type="button" title="Export wird vorbereitet."><Download size={16} />Mitarbeiter exportieren</button>

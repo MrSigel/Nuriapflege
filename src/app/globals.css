@@ -736,6 +736,19 @@ p {
   gap: 18px;
 }
 
+.employees-header {
+  display: grid;
+  gap: 14px;
+}
+
+.employees-header-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+  justify-content: flex-start;
+}
+
 .employee-stats-grid {
   display: grid;
   gap: 12px;
@@ -744,7 +757,8 @@ p {
 
 .employees-list {
   display: grid;
-  gap: 14px;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .employee-card {
@@ -752,8 +766,8 @@ p {
   border: 1px solid var(--line);
   border-radius: 8px;
   display: grid;
-  gap: 16px;
-  padding: 18px;
+  gap: 12px;
+  padding: 14px;
 }
 
 .employee-card-header {
@@ -764,14 +778,14 @@ p {
 }
 
 .employee-card-header h2 {
-  font-size: 18px;
+  font-size: 16px;
   margin: 0 0 4px;
 }
 
 .employee-details-grid {
   display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  grid-template-columns: 1fr;
 }
 
 .employee-details-grid div {
@@ -779,8 +793,8 @@ p {
   border: 1px solid var(--line);
   border-radius: 8px;
   display: grid;
-  gap: 5px;
-  padding: 12px;
+  gap: 4px;
+  padding: 10px;
 }
 
 .employee-details-grid span {
@@ -789,7 +803,7 @@ p {
 }
 
 .employee-details-grid strong {
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.25;
 }
 
@@ -967,6 +981,7 @@ p {
 
   .location-stats-grid,
   .employee-stats-grid,
+  .employees-list,
   .location-details-grid,
   .employee-details-grid,
   .location-form {
@@ -981,7 +996,12 @@ p {
     justify-content: stretch;
   }
 
+  .employees-header-actions {
+    display: grid;
+  }
+
   .locations-header-actions .button,
+  .employees-header-actions .button,
   .location-actions,
   .location-actions details,
   .location-actions form,
