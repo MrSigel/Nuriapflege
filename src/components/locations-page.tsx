@@ -1,4 +1,5 @@
-import { Building2, Download, Eye, MapPin, Pencil, Plus, Users, UserRound } from "lucide-react";
+import { Building2, Download, Eye, MapPin, Pencil, Users, UserRound } from "lucide-react";
+import { LocationCreateModal } from "@/components/location-create-modal";
 import {
   createLocation,
   toggleLocationStatus,
@@ -197,13 +198,7 @@ export function LocationsPage({ data }: LocationsPageProps) {
           <p>Verwalten Sie alle Standorte Ihres Pflegedienstes.</p>
         </div>
         <div className="locations-header-actions">
-          <details className="location-create-details">
-            <summary className="button">
-              <Plus size={16} />
-              Standort hinzufügen
-            </summary>
-            <LocationForm action={createLocation} submitLabel="Standort hinzufügen" />
-          </details>
+          <LocationCreateModal action={createLocation} buttonLabel="Standort hinzufügen" submitLabel="Standort hinzufügen" />
           <button className="button secondary" disabled type="button" title="Export wird vorbereitet.">
             <Download size={16} />
             Standorte exportieren
@@ -259,13 +254,7 @@ export function LocationsPage({ data }: LocationsPageProps) {
         <div className="empty-state">
           <strong>Noch keine Standorte vorhanden.</strong>
           <p>Es werden keine Demo-Daten, Mock-Daten oder Beispielstandorte angezeigt.</p>
-          <details className="location-create-details">
-            <summary className="button">
-              <Plus size={16} />
-              Ersten Standort hinzufügen
-            </summary>
-            <LocationForm action={createLocation} submitLabel="Ersten Standort hinzufügen" />
-          </details>
+          <LocationCreateModal action={createLocation} buttonLabel="Ersten Standort hinzufügen" submitLabel="Ersten Standort hinzufügen" />
         </div>
       )}
     </section>

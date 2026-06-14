@@ -203,7 +203,7 @@ function formatTime(value: Date) {
 
 export function DashboardShell({ role, title, routes, children }: DashboardShellProps) {
   const pathname = usePathname();
-  const isOverviewPage = pathname === "/dashboard" || pathname === "/mitarbeiter/dashboard" || pathname === "/admin";
+  const hideTopbarMeta = pathname === "/dashboard" || pathname === "/dashboard/standorte" || pathname === "/mitarbeiter/dashboard" || pathname === "/admin";
   const [open, setOpen] = useState(false);
   const [now, setNow] = useState<Date | null>(null);
   const allowedPaths = useMemo(() => new Set(routes.map((route) => route.path)), [routes]);
@@ -359,8 +359,8 @@ export function DashboardShell({ role, title, routes, children }: DashboardShell
           <button className="menu-button" onClick={() => setOpen(true)} aria-label="Navigation öffnen">
             <Menu size={19} />
           </button>
-          {isOverviewPage ? <span /> : <strong>{title}</strong>}
-          {isOverviewPage ? <span /> : <span className="badge">{roleLabels[role]}</span>}
+          {hideTopbarMeta ? <span /> : <strong>{title}</strong>}
+          {hideTopbarMeta ? <span /> : <span className="badge">{roleLabels[role]}</span>}
         </header>
         {children}
       </main>
