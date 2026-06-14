@@ -4,12 +4,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
-import type { DashboardRoute, Role } from "@/lib/nuria-config";
+import type { Role } from "@/lib/nuria-config";
+
+export type NavigationRoute = {
+  path: string;
+  title: string;
+};
 
 type DashboardShellProps = {
   role: Role;
   title: string;
-  routes: DashboardRoute[];
+  routes: NavigationRoute[];
   children: React.ReactNode;
 };
 
@@ -38,7 +43,6 @@ export function DashboardShell({ role, title, routes, children }: DashboardShell
         </div>
         <nav className="nav-scroll">
           {routes.map((route) => {
-            const Icon = route.icon;
             const active = pathname === route.path;
             return (
               <Link
@@ -47,7 +51,6 @@ export function DashboardShell({ role, title, routes, children }: DashboardShell
                 key={route.path}
                 onClick={() => setOpen(false)}
               >
-                <Icon size={17} />
                 <span>{route.title}</span>
               </Link>
             );

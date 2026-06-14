@@ -17,7 +17,11 @@ export default async function CompanyDashboardPage({ params }: PageProps) {
   }
 
   return (
-    <DashboardShell role="inhaber" title={route.title} routes={appRoutes}>
+    <DashboardShell
+      role="inhaber"
+      title={route.title}
+      routes={appRoutes.map(({ path, title }) => ({ path, title }))}
+    >
       <DashboardPage route={route} context="company" />
     </DashboardShell>
   );

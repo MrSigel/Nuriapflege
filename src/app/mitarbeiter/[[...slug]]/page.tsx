@@ -22,7 +22,11 @@ export default async function StaffDashboardPage({ params }: PageProps) {
   }
 
   return (
-    <DashboardShell role="mitarbeiter" title={route.title} routes={staffRoutes}>
+    <DashboardShell
+      role="mitarbeiter"
+      title={route.title}
+      routes={staffRoutes.map(({ path, title }) => ({ path, title }))}
+    >
       <DashboardPage route={route} context="staff" />
     </DashboardShell>
   );

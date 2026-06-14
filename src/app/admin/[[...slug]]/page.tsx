@@ -17,7 +17,11 @@ export default async function AdminDashboardPage({ params }: PageProps) {
   }
 
   return (
-    <DashboardShell role="admin" title={route.title} routes={adminRoutes}>
+    <DashboardShell
+      role="admin"
+      title={route.title}
+      routes={adminRoutes.map(({ path, title }) => ({ path, title }))}
+    >
       <DashboardPage route={route} context="admin" />
     </DashboardShell>
   );
