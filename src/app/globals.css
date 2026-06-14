@@ -745,7 +745,7 @@ p {
   align-items: center;
   display: flex;
   flex-wrap: nowrap;
-  gap: 10px;
+  gap: 16px;
   justify-content: flex-start;
 }
 
