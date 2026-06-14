@@ -14,7 +14,7 @@ export function DashboardPage({ route, context }: DashboardPageProps) {
   return (
     <section className="page">
       <div className="page-header">
-        <div className="eyebrow">{context === "admin" ? "Systemweit" : context === "staff" ? "Persoenlich" : "Mandant"}</div>
+        <div className="eyebrow">{context === "admin" ? "Systemweit" : context === "staff" ? "Persönlich" : "Mandant"}</div>
         <h1>{route.title}</h1>
         <p>{route.description}</p>
       </div>
@@ -25,7 +25,7 @@ export function DashboardPage({ route, context }: DashboardPageProps) {
             <Icon size={19} />
             Arbeitsbereich
           </div>
-          <p>{route.restricted ?? "Die Seite ist fuer die berechtigte Rolle vorbereitet."}</p>
+          <p>{route.restricted ?? "Die Seite ist für die berechtigte Rolle vorbereitet."}</p>
         </div>
         <div className="card">
           <div className="card-title">
@@ -93,7 +93,7 @@ export function DashboardPage({ route, context }: DashboardPageProps) {
             </button>
           ))}
           <button className="button secondary" type="button">
-            Berechtigungen pruefen
+            Berechtigungen prüfen
           </button>
         </div>
       </div>

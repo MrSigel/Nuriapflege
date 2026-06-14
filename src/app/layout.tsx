@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Nuria Pflege",
-  description: "Dashboard-Grundgeruest fuer ambulante Pflegedienste",
+  description: "Dashboard-Grundgerüst für ambulante Pflegedienste",
 };
 
 export default function RootLayout({
