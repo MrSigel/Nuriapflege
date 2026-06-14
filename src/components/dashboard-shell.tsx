@@ -270,6 +270,26 @@ export function DashboardShell({ role, title, routes, children }: DashboardShell
           {visibleGroups.map((group) => {
             const expanded = expandedGroups.includes(group.title);
             const groupActive = group.routes.some((route) => route.path === pathname);
+            const directRoute = group.title === "Übersicht" ? group.routes[0] : null;
+
+            if (directRoute) {
+              const Icon = iconByPath[directRoute.path as keyof typeof iconByPath] ?? LayoutDashboard;
+
+              return (
+                <Link
+                  className={`nav-link nav-link-direct ${pathname === directRoute.path ? "active" : ""}`}
+                  href={directRoute.path}
+                  key={group.title}
+                  onClick={() => setOpen(false)}
+                >
+                  <Icon size={15} />
+                  <span>{directRoute.title}</span>
+                  {pathname === directRoute.path ? (
+                    <motion.span className="active-pill" layoutId="active-nav-pill" transition={{ duration: 0.18 }} />
+                  ) : null}
+                </Link>
+              );
+            }
 
             return (
               <div className="nav-group" key={group.title}>
@@ -323,8 +343,7 @@ export function DashboardShell({ role, title, routes, children }: DashboardShell
         <div className="sidebar-bottom">
           <div className="sidebar-role">{roleLabels[role]}</div>
           <div className="sidebar-date">
-            <span>{now ? formatDate(now) : "\u00a0"}</span>
-            <span>{now ? `${formatTime(now)} Uhr` : "\u00a0"}</span>
+            <span>{now ? `${formatDate(now)} · ${formatTime(now)} Uhr` : "\u00a0"}</span>
           </div>
           <div className="sidebar-divider" />
           <button className="logout-button" type="button">
