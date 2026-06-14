@@ -203,7 +203,12 @@ function formatTime(value: Date) {
 
 export function DashboardShell({ role, title, routes, children }: DashboardShellProps) {
   const pathname = usePathname();
-  const hideTopbarMeta = pathname === "/dashboard" || pathname === "/dashboard/standorte" || pathname === "/mitarbeiter/dashboard" || pathname === "/admin";
+  const hideTopbarMeta =
+    pathname === "/dashboard" ||
+    pathname === "/dashboard/standorte" ||
+    pathname === "/dashboard/mitarbeiter" ||
+    pathname === "/mitarbeiter/dashboard" ||
+    pathname === "/admin";
   const [open, setOpen] = useState(false);
   const [now, setNow] = useState<Date | null>(null);
   const allowedPaths = useMemo(() => new Set(routes.map((route) => route.path)), [routes]);

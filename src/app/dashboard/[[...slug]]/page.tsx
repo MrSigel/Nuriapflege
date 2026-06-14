@@ -2,8 +2,11 @@ import { notFound } from "next/navigation";
 import { DashboardOverview } from "@/components/dashboard-overview";
 import { DashboardPage } from "@/components/dashboard-page";
 import { DashboardShell } from "@/components/dashboard-shell";
+import { EmployeesPage } from "@/components/employees-page";
 import { LocationsPage } from "@/components/locations-page";
 import { getDashboardOverview } from "@/lib/dashboard-overview";
+import { createEmployee, inviteEmployee, toggleEmployeeStatus, updateEmployee } from "@/lib/employee-actions";
+import { getEmployeesData } from "@/lib/employees";
 import { getLocationsData } from "@/lib/locations";
 import { appRoutes, routeByPath } from "@/lib/nuria-config";
 
@@ -22,6 +25,7 @@ export default async function CompanyDashboardPage({ params }: PageProps) {
 
   const overview = path === "/dashboard" ? await getDashboardOverview("inhaber") : null;
   const locations = path === "/dashboard/standorte" ? await getLocationsData() : null;
+  const employees = path === "/dashboard/mitarbeiter" ? await getEmployeesData() : null;
 
   return (
     <DashboardShell
@@ -31,7 +35,13 @@ export default async function CompanyDashboardPage({ params }: PageProps) {
     >
       {overview ? <DashboardOverview data={overview} role="inhaber" /> : null}
       {locations ? <LocationsPage data={locations} /> : null}
-      {!overview && !locations ? <DashboardPage route={route} context="company" /> : null}
+      {employees ? (
+        <EmployeesPage
+          data={employees}
+          actions={{ inviteEmployee, createEmployee, updateEmployee, toggleEmployeeStatus }}
+        />
+      ) : null}
+      {!overview && !locations && !employees ? <DashboardPage route={route} context="company" /> : null}
     </DashboardShell>
   );
 }

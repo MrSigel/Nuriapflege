@@ -731,6 +731,106 @@ p {
   grid-column: 1 / -1;
 }
 
+.employees-page {
+  display: grid;
+  gap: 18px;
+}
+
+.employee-stats-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.employees-list {
+  display: grid;
+  gap: 14px;
+}
+
+.employee-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+}
+
+.employee-card-header {
+  align-items: flex-start;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.employee-card-header h2 {
+  font-size: 18px;
+  margin: 0 0 4px;
+}
+
+.employee-details-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.employee-details-grid div {
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+}
+
+.employee-details-grid span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.employee-details-grid strong {
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.employee-location-fieldset {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 12px;
+}
+
+.employee-location-fieldset legend {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0 5px;
+}
+
+.employee-location-options {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.employee-location-options label {
+  align-items: center;
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: row;
+  font-weight: 600;
+  gap: 8px;
+  padding: 9px;
+}
+
+.employee-location-options input {
+  min-height: auto;
+  width: auto;
+}
+
 .modal-backdrop {
   align-items: center;
   background: rgba(16, 24, 40, 0.52);
@@ -866,7 +966,9 @@ p {
   }
 
   .location-stats-grid,
+  .employee-stats-grid,
   .location-details-grid,
+  .employee-details-grid,
   .location-form {
     grid-template-columns: 1fr;
   }
@@ -886,6 +988,14 @@ p {
   .location-actions summary,
   .location-actions .button {
     width: 100%;
+  }
+
+  .employee-card-header {
+    display: grid;
+  }
+
+  .employee-location-options {
+    grid-template-columns: 1fr;
   }
 
   .section-heading-row,
