@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
+import { DashboardOverview } from "@/components/dashboard-overview";
 import { DashboardPage } from "@/components/dashboard-page";
 import { DashboardShell } from "@/components/dashboard-shell";
+import { getDashboardOverview } from "@/lib/dashboard-overview";
 import { appRoutes, routeByPath } from "@/lib/nuria-config";
 
 type PageProps = {
@@ -16,13 +18,15 @@ export default async function CompanyDashboardPage({ params }: PageProps) {
     notFound();
   }
 
+  const overview = path === "/dashboard" ? await getDashboardOverview("inhaber") : null;
+
   return (
     <DashboardShell
       role="inhaber"
       title={route.title}
       routes={appRoutes.map(({ path, title }) => ({ path, title }))}
     >
-      <DashboardPage route={route} context="company" />
+      {overview ? <DashboardOverview data={overview} role="inhaber" /> : <DashboardPage route={route} context="company" />}
     </DashboardShell>
   );
 }
