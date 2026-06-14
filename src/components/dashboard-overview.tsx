@@ -1,10 +1,46 @@
+"use client";
+
 import Link from "next/link";
-import { ArrowRight, MessageCircle, Newspaper, Plus } from "lucide-react";
+import { motion } from "framer-motion";
+import {
+  ArrowRight,
+  BriefcaseBusiness,
+  CalendarDays,
+  CheckSquare,
+  Clock,
+  FileUp,
+  FolderOpen,
+  MessageCircle,
+  Newspaper,
+  Plus,
+  Receipt,
+  Route,
+  Stethoscope,
+  Timer,
+  UserRound,
+  Users,
+} from "lucide-react";
 import type { DashboardOverviewData } from "@/lib/dashboard-overview";
 
 type DashboardOverviewProps = {
   data: DashboardOverviewData;
   role: "inhaber" | "pdl" | "verwaltung" | "mitarbeiter" | "admin";
+};
+
+const statIcons = {
+  clients_total: Stethoscope,
+  employees_total: Users,
+  today_shifts: CalendarDays,
+  today_tours: Route,
+  assigned_clients: UserRound,
+  open_tasks: CheckSquare,
+  open_documents: FolderOpen,
+  new_messages: MessageCircle,
+  open_billing: Receipt,
+  open_qm: FileUp,
+  open_applicants: BriefcaseBusiness,
+  open_website_leads: Newspaper,
+  tracked_time_today: Timer,
 };
 
 export function DashboardOverview({ data, role }: DashboardOverviewProps) {
@@ -13,7 +49,6 @@ export function DashboardOverview({ data, role }: DashboardOverviewProps) {
   return (
     <section className="page overview-page">
       <div className="page-header">
-        <div className="eyebrow">Übersicht</div>
         <h1>{role === "mitarbeiter" ? "Mein Dashboard" : "Dashboard"}</h1>
         <p>Aktuelle Zahlen, Schnellaktionen, neue Nachrichten und News von Nuria Pflege.</p>
       </div>
@@ -21,12 +56,30 @@ export function DashboardOverview({ data, role }: DashboardOverviewProps) {
       <section className="overview-section" aria-labelledby="overview-stats">
         <h2 id="overview-stats">Zahlen</h2>
         <div className="stats-grid">
-          {data.stats.map((stat) => (
-            <article className="stat-card" key={stat.key}>
-              <span>{stat.label}</span>
-              <strong>{stat.value}</strong>
-            </article>
-          ))}
+          {data.stats.map((stat, index) => {
+            const Icon = statIcons[stat.key] ?? Clock;
+
+            return (
+              <motion.article
+                animate={{ opacity: 1, y: 0 }}
+                className="stat-card"
+                initial={{ opacity: 0, y: 8 }}
+                key={stat.key}
+                transition={{ delay: index * 0.025, duration: 0.18, ease: "easeOut" }}
+              >
+                <motion.div
+                  animate={{ scale: 1, rotate: 0 }}
+                  className="stat-icon"
+                  initial={{ scale: 0.92, rotate: -3 }}
+                  transition={{ delay: index * 0.025, duration: 0.2, ease: "easeOut" }}
+                >
+                  <Icon size={18} />
+                </motion.div>
+                <span>{stat.label}</span>
+                <strong>{stat.value}</strong>
+              </motion.article>
+            );
+          })}
         </div>
       </section>
 

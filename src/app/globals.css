@@ -359,6 +359,7 @@ p {
 }
 
 .stat-card {
+  align-content: start;
   background: #f8fafc;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -366,6 +367,19 @@ p {
   gap: 8px;
   min-height: 92px;
   padding: 14px;
+}
+
+.stat-icon {
+  align-items: center;
+  background: #e6f5f2;
+  border: 1px solid #b7e4dc;
+  border-radius: 8px;
+  color: var(--accent-strong);
+  display: flex;
+  height: 34px;
+  justify-content: center;
+  margin-bottom: 2px;
+  width: 34px;
 }
 
 .stat-card span {
