@@ -217,7 +217,7 @@ a {
 }
 
 .public-hero {
-  align-items: center;
+  align-items: start;
   display: grid;
   gap: 36px;
   grid-template-columns: minmax(0, 1.02fr) minmax(360px, 0.88fr);
@@ -666,7 +666,8 @@ a {
 }
 
 .public-hero-copy {
-  gap: 20px;
+  gap: 18px;
+  padding-top: 18px;
 }
 
 .public-eyebrow {
@@ -677,15 +678,17 @@ a {
   color: #0f766e;
   display: inline-flex;
   justify-self: start;
-  padding: 7px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 9px;
   text-transform: none;
 }
 
 .public-hero h1,
 .public-subhero h1 {
   color: #071b2f;
-  font-size: clamp(48px, 7.2vw, 88px);
-  font-weight: 900;
+  font-size: clamp(46px, 6.7vw, 80px);
+  font-weight: 760;
   letter-spacing: 0;
   line-height: 0.98;
 }
@@ -701,14 +704,18 @@ a {
 .public-cta p {
   color: #526579;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 400;
   line-height: 1.62;
 }
 
 .public-hero-copy > p {
   color: #344860;
-  font-size: clamp(17px, 1.7vw, 20px);
-  max-width: 760px;
+  font-size: clamp(16px, 1.45vw, 18px);
+  max-width: 700px;
+}
+
+.public-hero .public-button {
+  font-weight: 560;
 }
 
 .public-hero-points {
@@ -728,7 +735,7 @@ a {
   color: #1f3349;
   display: flex;
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 500;
   gap: 9px;
   min-height: 44px;
   padding: 10px 12px;
@@ -755,15 +762,16 @@ a {
     0 34px 90px rgba(11, 31, 51, 0.16),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
   gap: 16px;
+  margin-top: clamp(58px, 8vw, 96px);
   padding: 20px;
 }
 
 .preview-topline {
-  align-items: center;
+  align-items: start;
   border-bottom: 1px solid rgba(15, 118, 110, 0.12);
   display: flex;
   gap: 14px;
-  justify-content: space-between;
+  justify-content: flex-start;
   padding-bottom: 16px;
 }
 
@@ -775,12 +783,13 @@ a {
 .preview-topline strong {
   color: #071b2f;
   font-size: 18px;
+  font-weight: 680;
 }
 
 .preview-topline span {
   color: #66788c;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 500;
 }
 
 .preview-status {
@@ -1108,6 +1117,10 @@ a {
     grid-template-columns: 1fr;
   }
 
+  .public-dashboard-preview {
+    margin-top: 0;
+  }
+
   .public-mini-grid,
   .public-problem-grid,
   .public-card-grid,
@@ -1125,7 +1138,7 @@ a {
 
   .public-hero h1,
   .public-subhero h1 {
-    font-size: clamp(42px, 13vw, 56px);
+    font-size: clamp(39px, 12vw, 52px);
   }
 
   .public-hero-points,

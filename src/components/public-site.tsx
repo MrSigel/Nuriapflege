@@ -215,7 +215,6 @@ function Hero() {
             <strong>Nuria Pflege</strong>
             <span>Organisationsansicht</span>
           </div>
-          <span className="preview-status">Intern</span>
         </div>
         <motion.div className="preview-grid" initial="hidden" variants={staggerContainer} whileInView="visible" viewport={motionViewport}>
           {previewModules.map(([title, text, Icon]) => (
