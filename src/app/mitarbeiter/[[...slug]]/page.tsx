@@ -3,6 +3,7 @@ import { DashboardOverview } from "@/components/dashboard-overview";
 import { DashboardPage } from "@/components/dashboard-page";
 import { DashboardShell } from "@/components/dashboard-shell";
 import { StaffSchedulePage } from "@/components/staff-schedule-page";
+import { StaffTourPage } from "@/components/staff-tour-page";
 import { getDashboardOverview } from "@/lib/dashboard-overview";
 import { routeByPath, staffRoutes } from "@/lib/nuria-config";
 
@@ -33,8 +34,9 @@ export default async function StaffDashboardPage({ params }: PageProps) {
       routes={staffRoutes.map(({ path, title }) => ({ path, title }))}
     >
       {path === "/mitarbeiter/dienstplan" ? <StaffSchedulePage /> : null}
+      {path === "/mitarbeiter/tour" ? <StaffTourPage /> : null}
       {overview ? <DashboardOverview data={overview} role="mitarbeiter" /> : null}
-      {!overview && path !== "/mitarbeiter/dienstplan" ? <DashboardPage route={route} context="staff" /> : null}
+      {!overview && path !== "/mitarbeiter/dienstplan" && path !== "/mitarbeiter/tour" ? <DashboardPage route={route} context="staff" /> : null}
     </DashboardShell>
   );
 }
