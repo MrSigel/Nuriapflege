@@ -20,11 +20,14 @@ import {
   UserRound,
   Users,
 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import type { DashboardOverviewData } from "@/lib/dashboard-overview";
+import { routeByPath, type Role } from "@/lib/nuria-config";
+import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 
 type DashboardOverviewProps = {
   data: DashboardOverviewData;
-  role: "inhaber" | "pdl" | "verwaltung" | "mitarbeiter" | "admin";
+  role: Role;
 };
 
 const statIcons = {
@@ -44,19 +47,49 @@ const statIcons = {
 };
 
 export function DashboardOverview({ data, role }: DashboardOverviewProps) {
-  const messagesHref = role === "mitarbeiter" ? "/mitarbeiter/kommunikation" : "/dashboard/kommunikation";
+  const [profileRole, setProfileRole] = useState<Role | null>(null);
+  const activeRole = profileRole ?? role;
+  const messagesHref = activeRole === "mitarbeiter" || activeRole === "pflegefachkraft" ? "/mitarbeiter/kommunikation" : "/dashboard/kommunikation";
+  const visibleActions = useMemo(
+    () => data.quickActions.filter((action) => routeByPath(action.href)?.roles.includes(activeRole)),
+    [activeRole, data.quickActions],
+  );
+  const visibleStats = useMemo(
+    () => data.stats.filter((stat) => activeRole === "inhaber" || (stat.key !== "open_billing" && stat.key !== "open_website_leads")),
+    [activeRole, data.stats],
+  );
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadProfileRole() {
+      const supabase = getSupabaseBrowserClient();
+      if (!supabase) return;
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!active || !user) return;
+      const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
+      if (active && profile?.role) setProfileRole(profile.role as Role);
+    }
+
+    loadProfileRole();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <section className="page overview-page">
       <div className="page-header">
-        <h1>{role === "mitarbeiter" ? "Mein Dashboard" : "Dashboard"}</h1>
+        <h1>{activeRole === "mitarbeiter" || activeRole === "pflegefachkraft" ? "Mein Dashboard" : "Dashboard"}</h1>
         <p>Aktuelle Zahlen, Schnellaktionen, neue Nachrichten und News von Nuria Pflege.</p>
       </div>
 
       <section className="overview-section" aria-labelledby="overview-stats">
         <h2 id="overview-stats">Zahlen</h2>
         <div className="stats-grid">
-          {data.stats.map((stat, index) => {
+          {visibleStats.map((stat, index) => {
             const Icon = statIcons[stat.key] ?? Clock;
 
             return (
@@ -86,7 +119,7 @@ export function DashboardOverview({ data, role }: DashboardOverviewProps) {
       <section className="overview-section" aria-labelledby="overview-actions">
         <h2 id="overview-actions">Schnellaktionen</h2>
         <div className="quick-actions">
-          {data.quickActions.map((action) => (
+          {visibleActions.map((action) => (
             <Link className="quick-action" href={action.href} key={action.href}>
               <Plus size={16} />
               <span>{action.label}</span>

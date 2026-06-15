@@ -71,7 +71,7 @@ function dashboardForRole(role?: string | null) {
     return "/dashboard";
   }
 
-  if (role === "mitarbeiter") {
+  if (role === "mitarbeiter" || role === "pflegefachkraft") {
     return "/mitarbeiter/dashboard";
   }
 

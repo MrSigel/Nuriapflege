@@ -60,7 +60,7 @@ type QueryContext = {
 type SupabaseQuery = any;
 
 const openStatuses = ["open", "pending", "planned", "missing"];
-const employeeRoles = ["inhaber", "pdl", "verwaltung", "mitarbeiter"];
+const employeeRoles = ["inhaber", "pdl", "verwaltung", "mitarbeiter", "pflegefachkraft"];
 
 function todayIsoDate() {
   return new Date().toISOString().slice(0, 10);

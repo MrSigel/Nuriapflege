@@ -35,7 +35,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
-import type { Role } from "@/lib/nuria-config";
+import { routeByPath, type Role } from "@/lib/nuria-config";
 
 export type NavigationRoute = {
   path: string;
@@ -60,7 +60,10 @@ const roleLabels: Record<Role, string> = {
   pdl: "Pflegedienstleitung",
   verwaltung: "Verwaltung",
   mitarbeiter: "Mitarbeiter",
+  pflegefachkraft: "Pflegefachkraft",
 };
+
+const validRoles: Role[] = ["admin", "inhaber", "pdl", "verwaltung", "mitarbeiter", "pflegefachkraft"];
 
 const iconByPath = {
   "/dashboard": LayoutDashboard,
@@ -179,7 +182,7 @@ function groupsForRole(role: Role) {
     return adminGroups;
   }
 
-  if (role === "mitarbeiter") {
+  if (role === "mitarbeiter" || role === "pflegefachkraft") {
     return staffGroups;
   }
 
@@ -206,10 +209,23 @@ export function DashboardShell({ role, routes, children }: DashboardShellProps) 
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [now, setNow] = useState<Date | null>(null);
-  const allowedPaths = useMemo(() => new Set(routes.map((route) => route.path)), [routes]);
+  const [profileRole, setProfileRole] = useState<Role | null>(null);
+  const [profileError, setProfileError] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const activeRole = profileRole;
+  const allowedPaths = useMemo(
+    () =>
+      new Set(
+        routes
+          .filter((route) => !activeRole || routeByPath(route.path)?.roles.includes(activeRole))
+          .map((route) => route.path),
+      ),
+    [activeRole, routes],
+  );
   const visibleGroups = useMemo(
     () =>
-      groupsForRole(role)
+      activeRole
+        ? groupsForRole(activeRole)
         .map((group) => ({
           ...group,
           routes: group.paths
@@ -217,8 +233,9 @@ export function DashboardShell({ role, routes, children }: DashboardShellProps) 
             .map((path) => routes.find((route) => route.path === path))
             .filter((route): route is NavigationRoute => Boolean(route)),
         }))
-        .filter((group) => group.routes.length > 0),
-    [allowedPaths, role, routes],
+        .filter((group) => group.routes.length > 0)
+        : [],
+    [activeRole, allowedPaths, routes],
   );
   const activeGroupTitles = useMemo(
     () =>
@@ -234,6 +251,90 @@ export function DashboardShell({ role, routes, children }: DashboardShellProps) 
     const interval = window.setInterval(() => setNow(new Date()), 30_000);
     return () => window.clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadProfileRole() {
+      const supabase = getSupabaseBrowserClient();
+
+      if (!supabase) {
+        if (active) {
+          setProfileError(true);
+          setProfileLoading(false);
+        }
+        return;
+      }
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!active) {
+        return;
+      }
+
+      if (!user) {
+        window.location.assign("/login");
+        return;
+      }
+
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .select("role, company_id")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (!active) {
+        return;
+      }
+
+      const loadedRole = profile?.role;
+
+      if (error || !loadedRole || !validRoles.includes(loadedRole as Role) || !profile.company_id) {
+        setProfileError(true);
+        setProfileLoading(false);
+        return;
+      }
+
+      setProfileRole(loadedRole as Role);
+      setProfileLoading(false);
+    }
+
+    loadProfileRole();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!profileRole) {
+      return;
+    }
+
+    const route = routeByPath(pathname);
+    const allowed = route?.roles.includes(profileRole) ?? false;
+
+    if (profileRole === "admin" && !pathname.startsWith("/admin")) {
+      window.location.replace("/admin");
+      return;
+    }
+
+    if ((profileRole === "mitarbeiter" || profileRole === "pflegefachkraft") && !pathname.startsWith("/mitarbeiter")) {
+      window.location.replace("/mitarbeiter/dashboard");
+      return;
+    }
+
+    if (["inhaber", "pdl", "verwaltung"].includes(profileRole) && pathname.startsWith("/mitarbeiter")) {
+      window.location.replace("/dashboard");
+      return;
+    }
+
+    if (!allowed) {
+      window.location.replace(profileRole === "admin" ? "/admin" : profileRole === "mitarbeiter" || profileRole === "pflegefachkraft" ? "/mitarbeiter/dashboard" : "/dashboard");
+    }
+  }, [pathname, profileRole]);
 
   useEffect(() => {
     setExpandedGroups((current) => Array.from(new Set([...current, ...activeGroupTitles])));
@@ -278,6 +379,10 @@ export function DashboardShell({ role, routes, children }: DashboardShellProps) 
 
     window.location.assign("/login");
   }
+
+  const currentRoute = routeByPath(pathname);
+  const routeAllowed = Boolean(activeRole && currentRoute?.roles.includes(activeRole));
+  const shouldHideContent = profileLoading || profileError || !routeAllowed;
 
   return (
     <div className="dashboard-shell">
@@ -376,7 +481,7 @@ export function DashboardShell({ role, routes, children }: DashboardShellProps) 
         </nav>
 
         <div className="sidebar-bottom">
-          <div className="sidebar-role">{roleLabels[role]}</div>
+          <div className="sidebar-role">{activeRole ? roleLabels[activeRole] : "\u00a0"}</div>
           <div className="sidebar-date">
             <span>{now ? `${formatDate(now)} · ${formatTime(now)} Uhr` : "\u00a0"}</span>
           </div>
@@ -394,7 +499,18 @@ export function DashboardShell({ role, routes, children }: DashboardShellProps) 
             <Menu size={19} />
           </button>
         </header>
-        {children}
+        {profileError ? (
+          <section className="empty-state">
+            <h2>Benutzerprofil nicht geladen</h2>
+            <p>Ihr Benutzerprofil konnte nicht geladen werden. Bitte melden Sie sich erneut an oder kontaktieren Sie den Support.</p>
+          </section>
+        ) : profileLoading ? (
+          <section className="empty-state">
+            <h2>Profil wird geladen</h2>
+          </section>
+        ) : shouldHideContent ? null : (
+          children
+        )}
       </main>
     </div>
   );

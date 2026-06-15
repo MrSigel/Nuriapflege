@@ -22,7 +22,7 @@ import {
   Users,
 } from "lucide-react";
 
-export type Role = "admin" | "inhaber" | "pdl" | "verwaltung" | "mitarbeiter";
+export type Role = "admin" | "inhaber" | "pdl" | "verwaltung" | "mitarbeiter" | "pflegefachkraft";
 
 export type PaymentStatus =
   | "pending_payment"
@@ -319,16 +319,16 @@ export const adminRoutes: DashboardRoute[] = [
 ];
 
 export const staffRoutes: DashboardRoute[] = [
-  { path: "/mitarbeiter/dashboard", title: "Mein Dashboard", description: "Persönliche Arbeitsübersicht für eigene und zugewiesene Bereiche.", emptyText: "Noch keine Einträge vorhanden.", actions: ["Eintrag anlegen"], icon: Gauge, roles: ["mitarbeiter"] },
-  { path: "/mitarbeiter/dienstplan", title: "Mein Dienstplan", description: "Persönlicher Dienstplan.", emptyText: "Noch keine Dienste geplant.", actions: ["Dienst anzeigen"], icon: CalendarDays, roles: ["mitarbeiter"] },
-  { path: "/mitarbeiter/tour", title: "Meine Tour", description: "Mobile Tourstruktur mit Patient, Aufgaben, Hinweisen und Dokumentenstatus.", emptyText: "Noch keine Tour zugewiesen.", actions: ["Nächster Patient"], icon: Route, roles: ["mitarbeiter"] },
-  { path: "/mitarbeiter/patienten", title: "Meine Patienten / Klienten", description: "Nur aktuell oder kürzlich zugewiesene Klienten.", emptyText: "Noch keine Klienten zugewiesen.", actions: ["Zuweisung anzeigen"], icon: Stethoscope, roles: ["mitarbeiter"] },
-  { path: "/mitarbeiter/notizen", title: "Notizen / Übergaben", description: "Freitextbereich für Notizen und Übergaben zu zugewiesenen Einsätzen.", emptyText: "Noch keine Notizen vorhanden.", actions: ["Notiz anlegen"], icon: FileText, roles: ["mitarbeiter"] },
-  { path: "/mitarbeiter/dokumente-hochladen", title: "Dokumente hochladen", description: "Uploadstruktur für Dokumente und Verordnungen bei zugewiesenen Klienten.", emptyText: "Noch keine Dokumente hochgeladen.", actions: ["Dokument hochladen"], icon: Upload, roles: ["mitarbeiter"] },
-  { path: "/mitarbeiter/zeiterfassung", title: "Meine Zeiterfassung", description: "Persönliche Arbeitszeitstruktur.", emptyText: "Noch keine Zeiten erfasst.", actions: ["Zeit erfassen"], icon: Clock3, roles: ["mitarbeiter"] },
-  { path: "/mitarbeiter/kommunikation", title: "Kommunikation", description: "Persönlicher Kommunikationsbereich.", emptyText: "Noch keine Nachrichten vorhanden.", actions: ["Nachricht erstellen"], icon: MessageSquare, roles: ["mitarbeiter"] },
-  { path: "/mitarbeiter/profil", title: "Mein Profil", description: "Persönliche Profilstruktur.", emptyText: "Noch keine Profildaten hinterlegt.", actions: ["Profil bearbeiten"], icon: UserCog, roles: ["mitarbeiter"] },
-  { path: "/mitarbeiter/abwesenheiten", title: "Meine Abwesenheiten / Urlaub", description: "Persönliche Abwesenheitsstruktur.", emptyText: "Noch keine Abwesenheiten vorhanden.", actions: ["Abwesenheit anlegen"], icon: CalendarDays, roles: ["mitarbeiter"] },
+  { path: "/mitarbeiter/dashboard", title: "Mein Dashboard", description: "Persönliche Arbeitsübersicht für eigene und zugewiesene Bereiche.", emptyText: "Noch keine Einträge vorhanden.", actions: ["Eintrag anlegen"], icon: Gauge, roles: ["mitarbeiter", "pflegefachkraft"] },
+  { path: "/mitarbeiter/dienstplan", title: "Mein Dienstplan", description: "Persönlicher Dienstplan.", emptyText: "Noch keine Dienste geplant.", actions: ["Dienst anzeigen"], icon: CalendarDays, roles: ["mitarbeiter", "pflegefachkraft"] },
+  { path: "/mitarbeiter/tour", title: "Meine Tour", description: "Mobile Tourstruktur mit Patient, Aufgaben, Hinweisen und Dokumentenstatus.", emptyText: "Noch keine Tour zugewiesen.", actions: ["Nächster Patient"], icon: Route, roles: ["mitarbeiter", "pflegefachkraft"] },
+  { path: "/mitarbeiter/patienten", title: "Meine Patienten / Klienten", description: "Nur aktuell oder kürzlich zugewiesene Klienten.", emptyText: "Noch keine Klienten zugewiesen.", actions: ["Zuweisung anzeigen"], icon: Stethoscope, roles: ["mitarbeiter", "pflegefachkraft"] },
+  { path: "/mitarbeiter/notizen", title: "Notizen / Übergaben", description: "Freitextbereich für Notizen und Übergaben zu zugewiesenen Einsätzen.", emptyText: "Noch keine Notizen vorhanden.", actions: ["Notiz anlegen"], icon: FileText, roles: ["mitarbeiter", "pflegefachkraft"] },
+  { path: "/mitarbeiter/dokumente-hochladen", title: "Dokumente hochladen", description: "Uploadstruktur für Dokumente und Verordnungen bei zugewiesenen Klienten.", emptyText: "Noch keine Dokumente hochgeladen.", actions: ["Dokument hochladen"], icon: Upload, roles: ["mitarbeiter", "pflegefachkraft"] },
+  { path: "/mitarbeiter/zeiterfassung", title: "Meine Zeiterfassung", description: "Persönliche Arbeitszeitstruktur.", emptyText: "Noch keine Zeiten erfasst.", actions: ["Zeit erfassen"], icon: Clock3, roles: ["mitarbeiter", "pflegefachkraft"] },
+  { path: "/mitarbeiter/kommunikation", title: "Kommunikation", description: "Persönlicher Kommunikationsbereich.", emptyText: "Noch keine Nachrichten vorhanden.", actions: ["Nachricht erstellen"], icon: MessageSquare, roles: ["mitarbeiter", "pflegefachkraft"] },
+  { path: "/mitarbeiter/profil", title: "Mein Profil", description: "Persönliche Profilstruktur.", emptyText: "Noch keine Profildaten hinterlegt.", actions: ["Profil bearbeiten"], icon: UserCog, roles: ["mitarbeiter", "pflegefachkraft"] },
+  { path: "/mitarbeiter/abwesenheiten", title: "Meine Abwesenheiten / Urlaub", description: "Persönliche Abwesenheitsstruktur.", emptyText: "Noch keine Abwesenheiten vorhanden.", actions: ["Abwesenheit anlegen"], icon: CalendarDays, roles: ["mitarbeiter", "pflegefachkraft"] },
 ];
 
 export function routeByPath(path: string) {
