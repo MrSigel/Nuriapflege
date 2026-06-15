@@ -149,7 +149,7 @@ async function countRows(
   table: string,
   applyFilters: (query: SupabaseQuery) => SupabaseQuery,
 ) {
-  const query = applyFilters(supabase.from(table)).select("id", { count: "exact", head: true });
+  const query = applyFilters(supabase.from(table).select("id", { count: "exact", head: true }));
   const { count, error } = await query;
 
   if (error) {
