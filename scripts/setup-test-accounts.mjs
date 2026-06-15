@@ -155,7 +155,7 @@ async function ensurePrimaryLocation(supabase, companyId) {
     .from("company_locations")
     .select("id")
     .eq("company_id", companyId)
-    .eq("name", "Hauptstandort")
+    .eq("is_primary", true)
     .maybeSingle();
 
   if (existingError) {
