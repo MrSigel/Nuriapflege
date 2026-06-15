@@ -15,6 +15,24 @@
   --warning: #b54708;
 }
 
+.profile-card-main {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+  min-width: 0;
+}
+
+.profile-card-main .conversation-avatar {
+  flex: 0 0 auto;
+}
+
+.staff-profile-page .client-details-grid strong {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+  min-width: 0;
+}
+
 html[data-theme="dark"] {
   --background: #0f172a;
   --foreground: #f8fafc;
