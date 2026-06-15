@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "setup:test-accounts": "node scripts/setup-test-accounts.mjs",
+    "supabase:schema": "node scripts/build-supabase-schema.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.1",

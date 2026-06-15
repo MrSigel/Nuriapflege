@@ -137,16 +137,7 @@ export function EmployeesPage({ data, actions }: EmployeesPageProps) {
             />
           ))}
         </div>
-      ) : (
-        <motion.div className="empty-state" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <strong>Noch keine Mitarbeiter angelegt.</strong>
-          <p>Es werden keine Demo-Daten, Mock-Daten oder Beispielmitarbeiter angezeigt.</p>
-          <div className="actions">
-            <EmployeeModal action={actions.inviteEmployee} buttonLabel="Mitarbeiter einladen" mode="invite" locations={data.locations} />
-            <EmployeeModal action={actions.createEmployee} buttonLabel="Mitarbeiter hinzufügen" mode="create" locations={data.locations} />
-          </div>
-        </motion.div>
-      )}
+      ) : null}
     </motion.section>
   );
 }

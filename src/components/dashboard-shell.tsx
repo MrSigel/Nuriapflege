@@ -34,6 +34,7 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import type { Role } from "@/lib/nuria-config";
 
 export type NavigationRoute = {
@@ -201,14 +202,8 @@ function formatTime(value: Date) {
   }).format(value);
 }
 
-export function DashboardShell({ role, title, routes, children }: DashboardShellProps) {
+export function DashboardShell({ role, routes, children }: DashboardShellProps) {
   const pathname = usePathname();
-  const hideTopbarMeta =
-    pathname === "/dashboard" ||
-    pathname === "/dashboard/standorte" ||
-    pathname === "/dashboard/mitarbeiter" ||
-    pathname === "/mitarbeiter/dashboard" ||
-    pathname === "/admin";
   const [open, setOpen] = useState(false);
   const [now, setNow] = useState<Date | null>(null);
   const allowedPaths = useMemo(() => new Set(routes.map((route) => route.path)), [routes]);
@@ -244,10 +239,44 @@ export function DashboardShell({ role, title, routes, children }: DashboardShell
     setExpandedGroups((current) => Array.from(new Set([...current, ...activeGroupTitles])));
   }, [activeGroupTitles]);
 
+  useEffect(() => {
+    function handleSubmit(event: SubmitEvent) {
+      const submitter = event.submitter as HTMLElement | null;
+      const submitterText = submitter?.textContent?.replace(/\s+/g, " ").trim() ?? "";
+      const formText = (event.target as HTMLElement | null)?.textContent?.replace(/\s+/g, " ").trim() ?? "";
+      const actionText = submitterText || formText;
+      const confirmations: Array<[RegExp, string]> = [
+        [/zahlung best.tigen|überweisung.*markieren|ueberweisung.*markieren/i, "Möchtest du diese Zahlung wirklich bestätigen?"],
+        [/l.schen|entfernen/i, "Möchtest du diesen Eintrag wirklich löschen?"],
+        [/archivieren/i, "Möchtest du diesen Eintrag wirklich archivieren?"],
+        [/stornieren|kündigen|kuendigen/i, "Möchtest du diese Aktion wirklich ausführen?"],
+        [/speichern|aktualisieren/i, "Möchtest du die Änderungen speichern?"],
+      ];
+      const confirmation = confirmations.find(([pattern]) => pattern.test(actionText));
+
+      if (confirmation && !window.confirm(confirmation[1])) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    }
+
+    document.addEventListener("submit", handleSubmit, true);
+    return () => document.removeEventListener("submit", handleSubmit, true);
+  }, []);
+
   function toggleGroup(groupTitle: string) {
     setExpandedGroups((current) =>
       current.includes(groupTitle) ? current.filter((title) => title !== groupTitle) : [...current, groupTitle],
     );
+  }
+
+  async function handleLogout() {
+    const supabase = getSupabaseBrowserClient();
+    if (supabase) {
+      await supabase.auth.signOut();
+    }
+
+    window.location.assign("/login");
   }
 
   return (
@@ -352,7 +381,7 @@ export function DashboardShell({ role, title, routes, children }: DashboardShell
             <span>{now ? `${formatDate(now)} · ${formatTime(now)} Uhr` : "\u00a0"}</span>
           </div>
           <div className="sidebar-divider" />
-          <button className="logout-button" type="button">
+          <button className="logout-button" onClick={handleLogout} type="button">
             <LogOut size={16} />
             <span>Abmelden</span>
           </button>
@@ -360,12 +389,10 @@ export function DashboardShell({ role, title, routes, children }: DashboardShell
       </motion.aside>
 
       <main className="content">
-        <header className="topbar">
+        <header className="topbar" aria-label="Mobile Navigation">
           <button className="menu-button" onClick={() => setOpen(true)} aria-label="Navigation öffnen">
             <Menu size={19} />
           </button>
-          {hideTopbarMeta ? <span /> : <strong>{title}</strong>}
-          {hideTopbarMeta ? <span /> : <span className="badge">{roleLabels[role]}</span>}
         </header>
         {children}
       </main>

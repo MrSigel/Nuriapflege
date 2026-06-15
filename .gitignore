@@ -2,6 +2,7 @@
 node_modules/
 out/
 .env*.local
+daten.md
 *.tsbuildinfo
 npm-debug.log*
 yarn-debug.log*

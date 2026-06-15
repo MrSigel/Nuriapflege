@@ -250,13 +250,7 @@ export function LocationsPage({ data }: LocationsPageProps) {
             <LocationCard key={location.id} location={location} />
           ))}
         </div>
-      ) : (
-        <div className="empty-state">
-          <strong>Noch keine Standorte vorhanden.</strong>
-          <p>Es werden keine Demo-Daten, Mock-Daten oder Beispielstandorte angezeigt.</p>
-          <LocationCreateModal action={createLocation} buttonLabel="Ersten Standort hinzufügen" submitLabel="Ersten Standort hinzufügen" />
-        </div>
-      )}
+      ) : null}
     </section>
   );
 }

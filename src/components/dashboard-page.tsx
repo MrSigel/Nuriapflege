@@ -1,4 +1,4 @@
-import { AlertCircle, Plus } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { pricingModel, tenantAccessModel, type DashboardRoute } from "@/lib/nuria-config";
 
 type DashboardPageProps = {
@@ -85,17 +85,6 @@ export function DashboardPage({ route, context }: DashboardPageProps) {
       <div className="empty-state">
         <strong>{route.emptyText}</strong>
         <p>Es werden keine Demo-Daten, Mock-Daten oder Beispielinhalte angezeigt.</p>
-        <div className="actions">
-          {route.actions.map((action) => (
-            <button className="button" key={action} type="button">
-              <Plus size={16} />
-              {action}
-            </button>
-          ))}
-          <button className="button secondary" type="button">
-            Berechtigungen prüfen
-          </button>
-        </div>
       </div>
     </section>
   );
