@@ -101,20 +101,20 @@ a {
 
 .public-site {
   background: #f7faf9;
-  color: #102033;
+  color: #0b3551;
   min-height: 100vh;
   overflow-x: hidden;
 }
 
 .public-nav {
   align-items: center;
-  background: rgba(255, 255, 255, 0.92);
-  border-bottom: 1px solid #dbe7e4;
+  background: rgba(255, 255, 255, 0.9);
+  border-bottom: 1px solid rgba(15, 118, 110, 0.14);
   display: flex;
-  gap: 24px;
+  gap: 22px;
   justify-content: space-between;
-  min-height: 72px;
-  padding: 0 clamp(18px, 5vw, 72px);
+  min-height: 60px;
+  padding: 0 clamp(16px, 5vw, 64px);
   position: sticky;
   top: 0;
   z-index: 50;
@@ -129,8 +129,8 @@ a {
 
 .public-brand img {
   display: block;
-  height: clamp(42px, 5vw, 56px);
-  max-width: min(220px, 46vw);
+  height: clamp(34px, 4.2vw, 44px);
+  max-width: min(188px, 44vw);
   object-fit: contain;
   width: auto;
 }
@@ -138,14 +138,15 @@ a {
 .public-nav nav {
   align-items: center;
   display: flex;
-  gap: 22px;
+  gap: 24px;
   justify-content: center;
 }
 
 .public-nav nav a {
-  color: #475467;
+  color: #31536b;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 500;
+  letter-spacing: 0;
 }
 
 .public-nav-cta,
@@ -168,8 +169,8 @@ a {
 
 .public-nav-cta:hover,
 .public-button:hover {
-  background: #115e59;
-  border-color: #115e59;
+  background: #0b3551;
+  border-color: #0b3551;
   transform: translateY(-1px);
 }
 
@@ -474,8 +475,8 @@ a {
   .public-nav {
     align-items: stretch;
     display: grid;
-    gap: 12px;
-    padding-block: 14px;
+    gap: 10px;
+    padding-block: 10px;
   }
 
   .public-nav nav {
@@ -537,9 +538,9 @@ a {
 
 .public-nav {
   backdrop-filter: blur(16px);
-  background: rgba(255, 255, 255, 0.82);
-  border-bottom-color: rgba(15, 118, 110, 0.14);
-  box-shadow: 0 14px 38px rgba(11, 31, 51, 0.055);
+  background: rgba(255, 255, 255, 0.86);
+  border-bottom-color: rgba(15, 118, 110, 0.16);
+  box-shadow: 0 10px 24px rgba(11, 53, 81, 0.045);
 }
 
 .public-brand {
@@ -548,18 +549,19 @@ a {
 
 .public-menu-button {
   background: #fff;
-  border: 1px solid #d6e5e2;
+  border: 1px solid rgba(15, 118, 110, 0.18);
   border-radius: 8px;
-  color: #0b1f33;
+  color: #0b3551;
   cursor: pointer;
   display: none;
-  font-weight: 900;
-  min-height: 40px;
-  padding: 8px 12px;
+  font-weight: 600;
+  min-height: 36px;
+  padding: 7px 11px;
 }
 
 .public-nav nav a {
-  color: #425466;
+  color: #31536b;
+  font-weight: 500;
   position: relative;
 }
 
@@ -580,7 +582,7 @@ a {
 }
 
 .public-nav nav a:hover {
-  color: #0b1f33;
+  color: #0b3551;
 }
 
 .public-nav nav a:hover::after {
@@ -590,9 +592,9 @@ a {
 
 .public-nav-cta,
 .public-button {
-  box-shadow: 0 14px 28px rgba(15, 118, 110, 0.18);
-  min-height: 46px;
-  padding-inline: 18px;
+  box-shadow: 0 12px 24px rgba(15, 118, 110, 0.16);
+  min-height: 42px;
+  padding-inline: 17px;
 }
 
 .public-button.secondary {
@@ -1067,10 +1069,12 @@ a {
 
   .public-nav nav.open a {
     background: #fff;
-    border: 1px solid #dbe7e4;
+    border: 1px solid rgba(15, 118, 110, 0.14);
     border-radius: 8px;
-    min-height: 42px;
-    padding: 10px 12px;
+    color: #31536b;
+    font-weight: 500;
+    min-height: 40px;
+    padding: 9px 12px;
   }
 
   .public-nav-cta {
@@ -1091,6 +1095,11 @@ a {
 }
 
 @media (max-width: 640px) {
+  .public-brand img {
+    height: 34px;
+    max-width: 154px;
+  }
+
   .public-hero h1,
   .public-subhero h1 {
     font-size: clamp(42px, 13vw, 56px);

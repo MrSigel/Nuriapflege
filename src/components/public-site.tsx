@@ -135,10 +135,9 @@ function PublicNav() {
         <Link href="/funktionen" onClick={() => setOpen(false)}>Funktionen</Link>
         <Link href="/tarifdetails" onClick={() => setOpen(false)}>Tarifdetails</Link>
         <Link href="/kontakt" onClick={() => setOpen(false)}>Kontakt</Link>
-        <Link href="/login" onClick={() => setOpen(false)}>Login</Link>
       </nav>
-      <Link className="public-nav-cta" href="/registrieren">
-        Registrieren
+      <Link className="public-nav-cta" href="/login">
+        Anmelden
       </Link>
     </header>
   );
