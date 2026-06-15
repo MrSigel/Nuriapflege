@@ -167,11 +167,28 @@ a {
     transform 160ms ease;
 }
 
+.public-nav-cta {
+  background: #ffffff;
+  border-color: rgba(15, 118, 110, 0.24);
+  box-shadow: 0 8px 18px rgba(11, 53, 81, 0.06);
+  color: #0b3551;
+  font-size: 14px;
+  font-weight: 500;
+  min-height: 36px;
+  padding: 8px 14px;
+}
+
 .public-nav-cta:hover,
 .public-button:hover {
   background: #0b3551;
   border-color: #0b3551;
   transform: translateY(-1px);
+}
+
+.public-nav-cta:hover {
+  background: #e8f6f3;
+  border-color: rgba(15, 118, 110, 0.34);
+  color: #0f766e;
 }
 
 .public-button.secondary {
@@ -595,6 +612,12 @@ a {
   box-shadow: 0 12px 24px rgba(15, 118, 110, 0.16);
   min-height: 42px;
   padding-inline: 17px;
+}
+
+.public-nav-cta {
+  box-shadow: 0 8px 18px rgba(11, 53, 81, 0.06);
+  min-height: 36px;
+  padding-inline: 14px;
 }
 
 .public-button.secondary {
