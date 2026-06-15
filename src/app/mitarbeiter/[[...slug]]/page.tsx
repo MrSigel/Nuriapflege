@@ -3,6 +3,7 @@ import { DashboardOverview } from "@/components/dashboard-overview";
 import { DashboardPage } from "@/components/dashboard-page";
 import { DashboardShell } from "@/components/dashboard-shell";
 import { StaffClientsPage } from "@/components/staff-clients-page";
+import { StaffDocumentsPage } from "@/components/staff-documents-page";
 import { StaffNotesPage } from "@/components/staff-notes-page";
 import { StaffSchedulePage } from "@/components/staff-schedule-page";
 import { StaffTourPage } from "@/components/staff-tour-page";
@@ -39,8 +40,9 @@ export default async function StaffDashboardPage({ params }: PageProps) {
       {path === "/mitarbeiter/tour" ? <StaffTourPage /> : null}
       {path === "/mitarbeiter/patienten" ? <StaffClientsPage /> : null}
       {path === "/mitarbeiter/notizen" ? <StaffNotesPage /> : null}
+      {path === "/mitarbeiter/dokumente-hochladen" ? <StaffDocumentsPage /> : null}
       {overview ? <DashboardOverview data={overview} role="mitarbeiter" /> : null}
-      {!overview && path !== "/mitarbeiter/dienstplan" && path !== "/mitarbeiter/tour" && path !== "/mitarbeiter/patienten" && path !== "/mitarbeiter/notizen" ? <DashboardPage route={route} context="staff" /> : null}
+      {!overview && path !== "/mitarbeiter/dienstplan" && path !== "/mitarbeiter/tour" && path !== "/mitarbeiter/patienten" && path !== "/mitarbeiter/notizen" && path !== "/mitarbeiter/dokumente-hochladen" ? <DashboardPage route={route} context="staff" /> : null}
     </DashboardShell>
   );
 }
