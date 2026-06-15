@@ -123,20 +123,16 @@ a {
 .public-brand {
   align-items: center;
   display: inline-flex;
-  font-weight: 900;
-  gap: 10px;
+  flex: 0 0 auto;
   white-space: nowrap;
 }
 
-.public-brand span {
-  align-items: center;
-  background: #0f766e;
-  border-radius: 8px;
-  color: #fff;
-  display: inline-flex;
-  height: 34px;
-  justify-content: center;
-  width: 34px;
+.public-brand img {
+  display: block;
+  height: clamp(42px, 5vw, 56px);
+  max-width: min(220px, 46vw);
+  object-fit: contain;
+  width: auto;
 }
 
 .public-nav nav {
@@ -547,13 +543,7 @@ a {
 }
 
 .public-brand {
-  color: #0b1f33;
-  font-size: 16px;
-}
-
-.public-brand span {
-  background: linear-gradient(135deg, #0f766e, #0b8f88);
-  box-shadow: 0 10px 24px rgba(15, 118, 110, 0.24);
+  min-width: 0;
 }
 
 .public-menu-button {

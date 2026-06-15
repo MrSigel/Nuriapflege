@@ -126,8 +126,7 @@ function PublicNav() {
   return (
     <header className="public-nav">
       <Link className="public-brand" href="/">
-        <span>N</span>
-        <strong>Nuria Pflege</strong>
+        <img alt="Nuria Pflege" src="/logo_transparent.png" />
       </Link>
       <button className="public-menu-button" onClick={() => setOpen((current) => !current)} type="button">
         Menü
