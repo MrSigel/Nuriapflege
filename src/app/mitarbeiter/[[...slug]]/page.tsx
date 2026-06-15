@@ -2,6 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import { DashboardOverview } from "@/components/dashboard-overview";
 import { DashboardPage } from "@/components/dashboard-page";
 import { DashboardShell } from "@/components/dashboard-shell";
+import { StaffAbsencePage } from "@/components/staff-absence-page";
 import { StaffClientsPage } from "@/components/staff-clients-page";
 import { StaffCommunicationPage } from "@/components/staff-communication-page";
 import { StaffDocumentsPage } from "@/components/staff-documents-page";
@@ -47,8 +48,9 @@ export default async function StaffDashboardPage({ params }: PageProps) {
       {path === "/mitarbeiter/zeiterfassung" ? <StaffTimePage /> : null}
       {path === "/mitarbeiter/kommunikation" ? <StaffCommunicationPage /> : null}
       {path === "/mitarbeiter/profil" ? <StaffProfilePage /> : null}
+      {path === "/mitarbeiter/abwesenheiten" ? <StaffAbsencePage /> : null}
       {overview ? <DashboardOverview data={overview} role="mitarbeiter" /> : null}
-      {!overview && path !== "/mitarbeiter/dienstplan" && path !== "/mitarbeiter/tour" && path !== "/mitarbeiter/patienten" && path !== "/mitarbeiter/notizen" && path !== "/mitarbeiter/dokumente-hochladen" && path !== "/mitarbeiter/zeiterfassung" && path !== "/mitarbeiter/kommunikation" && path !== "/mitarbeiter/profil" ? <DashboardPage route={route} context="staff" /> : null}
+      {!overview && path !== "/mitarbeiter/dienstplan" && path !== "/mitarbeiter/tour" && path !== "/mitarbeiter/patienten" && path !== "/mitarbeiter/notizen" && path !== "/mitarbeiter/dokumente-hochladen" && path !== "/mitarbeiter/zeiterfassung" && path !== "/mitarbeiter/kommunikation" && path !== "/mitarbeiter/profil" && path !== "/mitarbeiter/abwesenheiten" ? <DashboardPage route={route} context="staff" /> : null}
     </DashboardShell>
   );
 }

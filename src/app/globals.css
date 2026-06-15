@@ -2081,6 +2081,211 @@ p {
   }
 }
 
+.content .staff-schedule-page,
+.content .staff-tour-page,
+.content .staff-clients-page,
+.content .staff-notes-page,
+.content .staff-documents-page,
+.content .staff-time-page,
+.content .staff-communication-page,
+.content .staff-profile-page,
+.content .staff-absence-page {
+  display: grid;
+  gap: 16px;
+  max-width: 1440px;
+  min-width: 0;
+  width: 100%;
+}
+
+.content .staff-schedule-page *,
+.content .staff-tour-page *,
+.content .staff-clients-page *,
+.content .staff-notes-page *,
+.content .staff-documents-page *,
+.content .staff-time-page *,
+.content .staff-communication-page *,
+.content .staff-profile-page *,
+.content .staff-absence-page * {
+  min-width: 0;
+}
+
+.content .staff-schedule-page .button,
+.content .staff-tour-page .button,
+.content .staff-clients-page .button,
+.content .staff-notes-page .button,
+.content .staff-documents-page .button,
+.content .staff-time-page .button,
+.content .staff-communication-page .button,
+.content .staff-profile-page .button,
+.content .staff-absence-page .button {
+  min-height: 40px;
+  white-space: nowrap;
+}
+
+.content .staff-schedule-page .button.danger,
+.content .staff-tour-page .button.danger,
+.content .staff-clients-page .button.danger,
+.content .staff-notes-page .button.danger,
+.content .staff-documents-page .button.danger,
+.content .staff-time-page .button.danger,
+.content .staff-communication-page .button.danger,
+.content .staff-profile-page .button.danger,
+.content .staff-absence-page .button.danger {
+  background: #fef3f2;
+  border-color: #fecdca;
+  color: #b42318;
+}
+
+.content .staff-schedule-page .settings-tabs,
+.content .staff-tour-page .settings-tabs,
+.content .staff-clients-page .settings-tabs,
+.content .staff-notes-page .settings-tabs,
+.content .staff-documents-page .settings-tabs,
+.content .staff-time-page .settings-tabs,
+.content .staff-communication-page .settings-tabs,
+.content .staff-profile-page .settings-tabs,
+.content .staff-absence-page .settings-tabs,
+.content .staff-tabs {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px;
+}
+
+.content .staff-schedule-page .settings-tab,
+.content .staff-tour-page .settings-tab,
+.content .staff-clients-page .settings-tab,
+.content .staff-notes-page .settings-tab,
+.content .staff-documents-page .settings-tab,
+.content .staff-time-page .settings-tab,
+.content .staff-communication-page .settings-tab,
+.content .staff-profile-page .settings-tab,
+.content .staff-absence-page .settings-tab {
+  flex: 0 0 auto;
+  min-height: 38px;
+  white-space: nowrap;
+}
+
+.content .staff-schedule-page .client-filter-panel,
+.content .staff-tour-page .client-filter-panel,
+.content .staff-clients-page .client-filter-panel,
+.content .staff-notes-page .client-filter-panel,
+.content .staff-documents-page .documents-filter-panel,
+.content .staff-time-page .time-filter-panel,
+.content .staff-absence-page .client-filter-panel {
+  align-items: end;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(220px, 1.5fr) repeat(auto-fit, minmax(150px, 1fr)) auto;
+  padding: 14px;
+}
+
+.content .staff-schedule-page .stat-card,
+.content .staff-tour-page .stat-card,
+.content .staff-clients-page .stat-card,
+.content .staff-notes-page .stat-card,
+.content .staff-documents-page .stat-card,
+.content .staff-time-page .stat-card,
+.content .staff-profile-page .stat-card,
+.content .staff-absence-page .stat-card,
+.content .staff-communication-page .communication-stat-card {
+  display: grid;
+  gap: 7px;
+  min-height: 112px;
+}
+
+.content .staff-schedule-page .client-stats-grid,
+.content .staff-tour-page .tour-stats-grid,
+.content .staff-clients-page .client-stats-grid,
+.content .staff-notes-page .client-stats-grid,
+.content .staff-documents-page .documents-stats-grid,
+.content .staff-time-page .time-stats-grid,
+.content .staff-profile-page .client-stats-grid,
+.content .staff-absence-page .client-stats-grid,
+.content .staff-communication-page .communication-stats-grid {
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.content .staff-schedule-page .client-card,
+.content .staff-tour-page .tour-card,
+.content .staff-clients-page .client-card,
+.content .staff-notes-page .client-card,
+.content .staff-documents-page .document-card,
+.content .staff-time-page .time-card,
+.content .staff-profile-page .client-card,
+.content .staff-absence-page .client-card {
+  padding: 16px;
+}
+
+.content .staff-schedule-page .location-actions,
+.content .staff-tour-page .location-actions,
+.content .staff-clients-page .location-actions,
+.content .staff-notes-page .location-actions,
+.content .staff-documents-page .location-actions,
+.content .staff-time-page .location-actions,
+.content .staff-profile-page .location-actions,
+.content .staff-absence-page .location-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.content .staff-schedule-page .client-modal-panel,
+.content .staff-tour-page .client-modal-panel,
+.content .staff-clients-page .client-modal-panel,
+.content .staff-notes-page .client-modal-panel,
+.content .staff-documents-page .client-modal-panel,
+.content .staff-time-page .client-modal-panel,
+.content .staff-profile-page .client-modal-panel,
+.content .staff-absence-page .client-modal-panel {
+  max-width: min(720px, calc(100vw - 32px));
+}
+
+@media (max-width: 900px) {
+  .content .staff-schedule-page,
+  .content .staff-tour-page,
+  .content .staff-clients-page,
+  .content .staff-notes-page,
+  .content .staff-documents-page,
+  .content .staff-time-page,
+  .content .staff-communication-page,
+  .content .staff-profile-page,
+  .content .staff-absence-page {
+    gap: 14px;
+  }
+
+  .content .staff-schedule-page .client-filter-panel,
+  .content .staff-tour-page .client-filter-panel,
+  .content .staff-clients-page .client-filter-panel,
+  .content .staff-notes-page .client-filter-panel,
+  .content .staff-documents-page .documents-filter-panel,
+  .content .staff-time-page .time-filter-panel,
+  .content .staff-absence-page .client-filter-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .content .staff-schedule-page .client-filter-panel .button,
+  .content .staff-tour-page .client-filter-panel .button,
+  .content .staff-clients-page .client-filter-panel .button,
+  .content .staff-notes-page .client-filter-panel .button,
+  .content .staff-documents-page .documents-filter-panel .button,
+  .content .staff-time-page .time-filter-panel .button,
+  .content .staff-absence-page .client-filter-panel .button,
+  .content .staff-schedule-page .location-actions .button,
+  .content .staff-tour-page .location-actions .button,
+  .content .staff-clients-page .location-actions .button,
+  .content .staff-notes-page .location-actions .button,
+  .content .staff-documents-page .location-actions .button,
+  .content .staff-time-page .location-actions .button,
+  .content .staff-profile-page .location-actions .button,
+  .content .staff-absence-page .location-actions .button {
+    width: 100%;
+  }
+}
+
 .auth-page-shell {
   background: var(--background);
   color: var(--foreground);
