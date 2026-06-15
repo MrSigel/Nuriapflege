@@ -2,6 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import { DashboardOverview } from "@/components/dashboard-overview";
 import { DashboardPage } from "@/components/dashboard-page";
 import { DashboardShell } from "@/components/dashboard-shell";
+import { StaffClientsPage } from "@/components/staff-clients-page";
 import { StaffSchedulePage } from "@/components/staff-schedule-page";
 import { StaffTourPage } from "@/components/staff-tour-page";
 import { getDashboardOverview } from "@/lib/dashboard-overview";
@@ -35,8 +36,9 @@ export default async function StaffDashboardPage({ params }: PageProps) {
     >
       {path === "/mitarbeiter/dienstplan" ? <StaffSchedulePage /> : null}
       {path === "/mitarbeiter/tour" ? <StaffTourPage /> : null}
+      {path === "/mitarbeiter/patienten" ? <StaffClientsPage /> : null}
       {overview ? <DashboardOverview data={overview} role="mitarbeiter" /> : null}
-      {!overview && path !== "/mitarbeiter/dienstplan" && path !== "/mitarbeiter/tour" ? <DashboardPage route={route} context="staff" /> : null}
+      {!overview && path !== "/mitarbeiter/dienstplan" && path !== "/mitarbeiter/tour" && path !== "/mitarbeiter/patienten" ? <DashboardPage route={route} context="staff" /> : null}
     </DashboardShell>
   );
 }
