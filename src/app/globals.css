@@ -1195,12 +1195,12 @@ a {
     radial-gradient(circle at 14% 0%, rgba(15, 118, 110, 0.1), transparent 34%);
   border: 1px solid rgba(15, 118, 110, 0.12);
   border-radius: 8px 8px 0 0;
-  box-shadow: 0 -24px 70px rgba(7, 27, 47, 0.08);
+  box-shadow: 0 -18px 54px rgba(7, 27, 47, 0.07);
   color: #071b2f;
   gap: 0;
   grid-template-columns: 1fr;
-  margin-top: 46px;
-  padding: clamp(24px, 4vw, 40px);
+  margin-top: 34px;
+  padding: clamp(22px, 4vw, 36px);
 }
 
 .public-footer-brand img {
@@ -1211,6 +1211,7 @@ a {
 
 .public-footer p {
   color: #526579;
+  line-height: 1.58;
   max-width: 520px;
 }
 
@@ -1218,9 +1219,9 @@ a {
   align-items: end;
   border-bottom: 1px solid rgba(15, 118, 110, 0.12);
   display: flex;
-  gap: 22px;
+  gap: 20px;
   justify-content: space-between;
-  padding-bottom: 24px;
+  padding-bottom: 20px;
 }
 
 .public-footer-brand > div {
@@ -1230,27 +1231,19 @@ a {
 
 .public-footer-links {
   display: grid;
-  gap: 1px;
+  gap: 12px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  padding-block: 22px;
+  padding-block: 18px;
 }
 
 .public-footer-column {
   align-content: start;
-  background: rgba(255, 255, 255, 0.58);
+  background: rgba(255, 255, 255, 0.42);
   border: 1px solid rgba(15, 118, 110, 0.1);
+  border-radius: 8px;
   display: grid;
-  gap: 10px;
-  min-height: 164px;
-  padding: 18px;
-}
-
-.public-footer-column:first-child {
-  border-radius: 8px 0 0 8px;
-}
-
-.public-footer-column:last-child {
-  border-radius: 0 8px 8px 0;
+  gap: 8px;
+  padding: 16px;
 }
 
 .public-footer-title {
@@ -1258,10 +1251,10 @@ a {
   color: #071b2f;
   display: inline-flex;
   font-size: 13px;
-  font-weight: 520;
+  font-weight: 560;
   gap: 8px;
   letter-spacing: 0;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .public-footer-title svg,
@@ -1273,10 +1266,11 @@ a {
   align-items: center;
   color: #526579;
   display: inline-flex;
-  font-size: 14px;
-  font-weight: 400;
+  font-size: 14.5px;
+  font-weight: 460;
   gap: 8px;
   line-height: 1.45;
+  min-height: 30px;
   text-decoration: none;
   transition:
     color 160ms ease,
@@ -1288,11 +1282,18 @@ a {
   transform: translateX(2px);
 }
 
+.public-footer a svg {
+  color: #0f766e;
+  flex: 0 0 auto;
+  stroke-width: 2;
+}
+
 .public-footer-contact {
   background: #0f766e;
   border: 1px solid rgba(15, 118, 110, 0.2);
   border-radius: 8px;
   color: #ffffff !important;
+  font-weight: 520 !important;
   justify-self: start;
   min-height: 42px;
   padding: 10px 14px;
@@ -1317,7 +1318,7 @@ a {
   gap: 12px;
   grid-column: 1 / -1;
   justify-content: space-between;
-  padding-top: 18px;
+  padding-top: 16px;
 }
 
 @media (max-width: 1100px) {

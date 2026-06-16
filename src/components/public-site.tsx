@@ -3,15 +3,19 @@
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Building2,
+  BadgeEuro,
   CalendarDays,
   CalendarOff,
   CheckCircle2,
   ChevronDown,
   ClipboardList,
   Clock3,
+  Cookie,
   FileText,
   FolderOpen,
+  LayoutGrid,
   LockKeyhole,
+  LogIn,
   Mail,
   MapPin,
   MessageCircle,
@@ -150,6 +154,36 @@ function PublicNav() {
 }
 
 function PublicFooter() {
+  const footerGroups = [
+    {
+      title: "Navigation",
+      icon: LayoutGrid,
+      links: [
+        ["Funktionen", "/funktionen", LayoutGrid],
+        ["Tarifdetails", "/tarifdetails", BadgeEuro],
+        ["Kontakt", "/kontakt", Mail],
+      ],
+    },
+    {
+      title: "Zugang",
+      icon: UserRound,
+      links: [
+        ["Login", "/login", LogIn],
+        ["Registrieren", "/registrieren", UserPlus],
+        ["Cookie-Einstellungen", "/cookie-einstellungen", Cookie],
+      ],
+    },
+    {
+      title: "Rechtliches",
+      icon: Scale,
+      links: [
+        ["Impressum", "/impressum", Scale],
+        ["Datenschutz", "/datenschutz", ShieldCheck],
+        ["AGB", "/agb", FileText],
+      ],
+    },
+  ] as const;
+
   return (
     <motion.footer
       className="public-footer"
@@ -166,34 +200,24 @@ function PublicFooter() {
             transition={{ duration: 0.24 }}
             whileHover={{ scale: 1.03 }}
           />
-          <p>Digitale Pflege Software für ambulante Pflegedienste zur strukturierten Organisation des Pflegealltags.</p>
+          <p>Digitale Pflege-Software für ambulante Pflegedienste zur strukturierten Organisation des Pflegealltags.</p>
         </div>
         <a className="public-footer-contact" href="mailto:kontakt@nuria-pflege.de"><Mail size={15} />kontakt@nuria-pflege.de</a>
       </motion.div>
 
       <motion.div className="public-footer-links" variants={fadeUp}>
-        <div className="public-footer-column">
-          <span className="public-footer-title"><Route size={16} />Navigation</span>
-          <Link href="/funktionen">Funktionen</Link>
-          <Link href="/tarifdetails">Tarifdetails</Link>
-          <Link href="/kontakt">Kontakt</Link>
-        </div>
-        <div className="public-footer-column">
-          <span className="public-footer-title"><UserRound size={16} />Zugang</span>
-          <Link href="/login">Login</Link>
-          <Link href="/registrieren">Registrieren</Link>
-          <Link href="/cookie-einstellungen">Cookie-Einstellungen</Link>
-        </div>
-        <div className="public-footer-column">
-          <span className="public-footer-title"><Scale size={16} />Rechtliches</span>
-          <Link href="/impressum">Impressum</Link>
-          <Link href="/datenschutz">Datenschutz</Link>
-          <Link href="/agb">AGB</Link>
-        </div>
+        {footerGroups.map(({ title, icon: TitleIcon, links }) => (
+          <div className="public-footer-column" key={title}>
+            <span className="public-footer-title"><TitleIcon size={16} />{title}</span>
+            {links.map(([label, href, Icon]) => (
+              <Link href={href} key={href}><Icon size={15} />{label}</Link>
+            ))}
+          </div>
+        ))}
       </motion.div>
 
       <motion.div className="public-footer-bottom" variants={fadeUp}>
-        <span>© Klickhafen.net 2026</span>
+        <span>© 2026 Nuria Pflege. Alle Rechte vorbehalten.</span>
         <span>Software für ambulante Pflegedienste</span>
       </motion.div>
     </motion.footer>
