@@ -12,10 +12,12 @@ import {
   FileText,
   FolderOpen,
   LockKeyhole,
+  Mail,
   MapPin,
   MessageCircle,
   MessagesSquare,
   Route,
+  Scale,
   Settings,
   Shield,
   ShieldCheck,
@@ -114,12 +116,23 @@ const faqs = [
 ] as const;
 
 function PublicNav() {
+  // Logo with hover animation
+  const logoVariants = {
+    hover: { scale: 1.05 },
+    initial: { scale: 1 },
+  };
+
   const [open, setOpen] = useState(false);
 
   return (
     <header className="public-nav">
       <Link className="public-brand" href="/">
-        <img alt="Nuria Pflege" src="/logo_transparent.png" />
+        <motion.img
+          src="/logo_transparent.png"
+          alt="Nuria Pflege"
+          whileHover={{ scale: 1.05 }}
+          transition={{ duration: 0.3 }}
+        />
       </Link>
       <button className="public-menu-button" onClick={() => setOpen((current) => !current)} type="button">
         Menü
@@ -145,25 +158,43 @@ function PublicFooter() {
       viewport={motionViewport}
       whileInView="visible"
     >
-      <motion.div variants={fadeUp}>
-        <strong>Nuria Pflege</strong>
-        <p>Digitale Pflege Software für ambulante Pflegedienste zur strukturierten Organisation des Pflegealltags.</p>
-        <a href="mailto:kontakt@nuria-pflege.de">kontakt@nuria-pflege.de</a>
+      <motion.div className="public-footer-brand" variants={fadeUp}>
+        <div>
+          <motion.img
+            alt="Nuria Pflege"
+            src="/logo_transparent.png"
+            transition={{ duration: 0.24 }}
+            whileHover={{ scale: 1.03 }}
+          />
+          <p>Digitale Pflege Software für ambulante Pflegedienste zur strukturierten Organisation des Pflegealltags.</p>
+        </div>
+        <a className="public-footer-contact" href="mailto:kontakt@nuria-pflege.de"><Mail size={15} />kontakt@nuria-pflege.de</a>
       </motion.div>
-      <motion.div variants={fadeUp}>
-        <Link href="/funktionen">Funktionen</Link>
-        <Link href="/tarifdetails">Tarifdetails</Link>
-        <Link href="/kontakt">Kontakt</Link>
+
+      <motion.div className="public-footer-links" variants={fadeUp}>
+        <div className="public-footer-column">
+          <span className="public-footer-title"><Route size={16} />Navigation</span>
+          <Link href="/funktionen">Funktionen</Link>
+          <Link href="/tarifdetails">Tarifdetails</Link>
+          <Link href="/kontakt">Kontakt</Link>
+        </div>
+        <div className="public-footer-column">
+          <span className="public-footer-title"><UserRound size={16} />Zugang</span>
+          <Link href="/login">Login</Link>
+          <Link href="/registrieren">Registrieren</Link>
+          <Link href="/cookie-einstellungen">Cookie-Einstellungen</Link>
+        </div>
+        <div className="public-footer-column">
+          <span className="public-footer-title"><Scale size={16} />Rechtliches</span>
+          <Link href="/impressum">Impressum</Link>
+          <Link href="/datenschutz">Datenschutz</Link>
+          <Link href="/agb">AGB</Link>
+        </div>
       </motion.div>
-      <motion.div variants={fadeUp}>
-        <Link href="/login">Login</Link>
-        <Link href="/registrieren">Registrieren</Link>
-        <Link href="/cookie-einstellungen">Cookie-Einstellungen</Link>
-      </motion.div>
-      <motion.div variants={fadeUp}>
-        <Link href="/impressum">Impressum</Link>
-        <Link href="/datenschutz">Datenschutz</Link>
-        <Link href="/agb">AGB</Link>
+
+      <motion.div className="public-footer-bottom" variants={fadeUp}>
+        <span>© Klickhafen.net 2026</span>
+        <span>Software für ambulante Pflegedienste</span>
       </motion.div>
     </motion.footer>
   );
@@ -330,7 +361,7 @@ function PricingSection() {
         <p>Nuria Pflege startet mit einem klaren Tarifmodell für ambulante Pflegedienste. Die Details werden transparent im Registrierungsprozess und im Tarifbereich angezeigt.</p>
       </motion.div>
       <motion.div className="public-price-card" variants={fadeUp} whileHover={cardHover}>
-        <strong>Starttarif: 89 € / Monat</strong>
+        <p className="price-title">Starttarif: 89 € / Monat</p>
         <span>3 Monate: 5 % Rabatt</span>
         <span>6 Monate: 10 % Rabatt</span>
         <span>12 Monate: 15 % Rabatt</span>
