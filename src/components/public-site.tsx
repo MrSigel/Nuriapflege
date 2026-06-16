@@ -178,7 +178,7 @@ function Hero() {
           <span />
           <span />
         </motion.div>
-        <motion.h1 variants={fadeUp}>Mehr Übersicht im Pflegealltag</motion.h1>
+        <motion.h1 variants={fadeUp}>Mehr Übersicht im <span>Pflege</span>alltag</motion.h1>
         <motion.p variants={fadeUp}>
           Nuria Pflege ist die digitale Arbeitsfläche für ambulante Pflegedienste: Dienstplanung, Touren,
           Mitarbeiterorganisation, Dokumente, Zeiterfassung und interne Kommunikation an einem Ort.
