@@ -23,7 +23,6 @@ import {
   UserPlus,
   UserRound,
   Users,
-  UploadCloud,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -172,36 +171,29 @@ function PublicFooter() {
 
 function Hero() {
   return (
-    <section className="dynamic-hero">
-      <motion.div animate="visible" className="dynamic-hero-frame" initial="hidden" variants={staggerContainer}>
-        <motion.div className="dynamic-hero-copy" variants={fadeUp}>
-          <h1>Mehr Übersicht im Pflegealltag</h1>
-          <p>Ein klarer digitaler Arbeitsplatz für Dienstplanung, Touren, Dokumente, Zeiterfassung und interne Kommunikation.</p>
-          <div className="dynamic-hero-actions">
-            <Link className="dynamic-hero-button" href="/login">Anmelden</Link>
-            <Link className="dynamic-hero-button secondary" href="/funktionen">Funktionen ansehen</Link>
-          </div>
-        </motion.div>
-        <motion.div className="dynamic-upload-orbit" variants={staggerContainer}>
-          <motion.div className="asset-card asset-card-a" variants={fadeUp} whileHover={{ y: -8, rotate: -2 }} />
-          <motion.div className="asset-card asset-card-b" variants={fadeUp} whileHover={{ y: -8, rotate: 3 }} />
-          <motion.div className="asset-card asset-card-c" variants={fadeUp} whileHover={{ y: -8, rotate: -1 }} />
-          <motion.div className="asset-card asset-card-d" variants={fadeUp} whileHover={{ y: -8, rotate: 2 }} />
-          <motion.div className="asset-card asset-card-e" variants={fadeUp} whileHover={{ y: -8, rotate: -3 }} />
-          <motion.div className="asset-card asset-card-f" variants={fadeUp} whileHover={{ y: -8, rotate: 2 }} />
-          <motion.div className="upload-core" variants={fadeUp} whileHover={{ scale: 1.04 }}>
-            <span>
-              <UploadCloud size={22} />
-            </span>
-            <strong>Upload or drop your assets</strong>
+    <section className="public-hero">
+      <motion.div animate="visible" className="public-hero-copy" initial="hidden" variants={staggerContainer}>
+        <motion.h1 variants={fadeUp}>Mehr Übersicht im Pflegealltag</motion.h1>
+        <motion.p variants={fadeUp}>
+          Nuria Pflege ist die digitale Arbeitsfläche für ambulante Pflegedienste: Dienstplanung, Touren,
+          Mitarbeiterorganisation, Dokumente, Zeiterfassung und interne Kommunikation an einem Ort.
+        </motion.p>
+        <motion.div className="public-actions" variants={fadeUp}>
+          <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+            <Link className="public-button" href="/registrieren">Pflegedienst registrieren</Link>
+          </motion.div>
+          <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+            <Link className="public-button secondary" href="/funktionen">Arbeitsbereiche ansehen</Link>
           </motion.div>
         </motion.div>
-        <div className="dynamic-mobile-chips" aria-hidden="true">
-          <span>Planung</span>
-          <span>Touren</span>
-          <span>Dokumente</span>
-          <span>Kommunikation</span>
-        </div>
+        <motion.div className="public-hero-points" variants={staggerContainer}>
+          {heroPoints.map(([label, Icon]) => (
+            <motion.div className="public-pill" key={label} variants={fadeUp} whileHover={{ scale: 1.02 }}>
+              <Icon size={16} />
+              <span>{label}</span>
+            </motion.div>
+          ))}
+        </motion.div>
       </motion.div>
     </section>
   );
@@ -211,6 +203,15 @@ function HomeSections() {
   return (
     <>
       <Hero />
+      <ExplainSection />
+      <ProblemSection />
+      <FeaturesSection />
+      <RolesSection />
+      <SecuritySection />
+      <PricingSection />
+      <ProcessSection />
+      <FaqSection />
+      <FinalCta />
     </>
   );
 }
@@ -508,7 +509,7 @@ export function PublicSite({ page = "home" }: { page?: PublicPage }) {
         {page === "contact" ? <ContactPage /> : null}
         {page === "imprint" || page === "privacy" || page === "terms" || page === "cookies" ? <LegalPage page={page} /> : null}
       </main>
-      {page === "home" ? null : <PublicFooter />}
+      <PublicFooter />
     </div>
   );
 }
