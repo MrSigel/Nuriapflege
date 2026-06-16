@@ -139,6 +139,7 @@ export async function POST(request: Request) {
       status: "active",
       package_id: plan.packageId,
       billing_interval: interval,
+      onboarding_status: "in_progress",
       payment_status: "pending_payment",
     })
     .select("id")

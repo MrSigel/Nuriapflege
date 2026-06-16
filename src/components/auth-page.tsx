@@ -228,7 +228,7 @@ export function AuthPage({ initialMode = "login" }: AuthPageProps) {
       return;
     }
 
-    window.location.assign("/dashboard/zahlung-tarif");
+    window.location.assign("/dashboard/onboarding");
   }
 
   function toggleSection(section: string) {

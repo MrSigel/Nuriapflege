@@ -23,6 +23,7 @@ create table if not exists public.companies (
   phone text,
   status text not null default 'active',
   package_id text,
+  onboarding_status text not null default 'in_progress',
   payment_status public.nuria_payment_status not null default 'pending_payment',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -1991,7 +1992,9 @@ create policy compliance_evidence_insert_by_company on public.compliance_evidenc
 -- 20260615140000_payment_subscription.sql
 alter table public.companies
   add column if not exists billing_interval text,
+  add column if not exists onboarding_status text not null default 'in_progress',
   add column if not exists payment_marked_at timestamptz,
+  add column if not exists payment_due_until timestamptz,
   add column if not exists payment_due_check_at timestamptz,
   add column if not exists admin_confirmed_at timestamptz,
   add column if not exists locked_at timestamptz,
@@ -2002,6 +2005,10 @@ alter table public.companies
   add column if not exists city text,
   add column if not exists country text,
   add column if not exists billing_email text;
+
+alter table public.companies drop constraint if exists companies_onboarding_status_check;
+alter table public.companies
+  add constraint companies_onboarding_status_check check (onboarding_status in ('in_progress','completed'));
 
 create table if not exists public.company_subscriptions (
   id uuid primary key default gen_random_uuid(),

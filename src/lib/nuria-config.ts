@@ -134,6 +134,15 @@ export const appRoutes: DashboardRoute[] = [
     roles: ["inhaber"],
   },
   {
+    path: "/dashboard/onboarding",
+    title: "Einrichtung",
+    description: "Einrichtungsassistent für Unternehmensdaten, Standort, Tarif und Zahlung.",
+    emptyText: "Einrichtung noch nicht abgeschlossen.",
+    actions: ["Einrichtung fortsetzen"],
+    icon: ClipboardCheck,
+    roles: ["inhaber"],
+  },
+  {
     path: "/dashboard/standorte",
     title: "Standorte",
     description: "Standortstruktur für den eigenen Pflegedienst.",

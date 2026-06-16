@@ -67,6 +67,7 @@ const validRoles: Role[] = ["admin", "inhaber", "pdl", "verwaltung", "mitarbeite
 
 const iconByPath = {
   "/dashboard": LayoutDashboard,
+  "/dashboard/onboarding": ClipboardCheck,
   "/dashboard/zahlung-tarif": CreditCard,
   "/dashboard/standorte": MapPin,
   "/dashboard/mitarbeiter": Users,
@@ -140,7 +141,7 @@ const companyGroups: NavigationGroup[] = [
     title: "Qualität & Sicherheit",
     paths: ["/dashboard/qm-md", "/dashboard/exporte", "/dashboard/aktivitaeten", "/dashboard/compliance"],
   },
-  { title: "Zahlung", paths: ["/dashboard/zahlung-tarif"] },
+  { title: "Zahlung", paths: ["/dashboard/onboarding", "/dashboard/zahlung-tarif"] },
 ];
 
 const adminGroups: NavigationGroup[] = [
