@@ -113,13 +113,6 @@ const faqs = [
   ],
 ] as const;
 
-const previewModules = [
-  ["Dienstplanung", "Strukturierte Einsatzübersicht", CalendarDays],
-  ["Touren", "Geordnete Tagesplanung", Route],
-  ["Dokumente", "Geschützte Ablage", FolderOpen],
-  ["Kommunikation", "Interne Nachrichten", MessagesSquare],
-] as const;
-
 function PublicNav() {
   const [open, setOpen] = useState(false);
 
@@ -198,23 +191,6 @@ function Hero() {
             <motion.div className="public-pill" key={label} variants={fadeUp} whileHover={{ scale: 1.02 }}>
               <Icon size={16} />
               <span>{label}</span>
-            </motion.div>
-          ))}
-        </motion.div>
-      </motion.div>
-      <motion.div
-        animate={{ opacity: 1, x: 0 }}
-        aria-label="Neutrale Software-Vorschau"
-        className="public-dashboard-preview"
-        initial={{ opacity: 0, x: 24 }}
-        transition={{ duration: 0.36, ease: "easeOut" }}
-      >
-        <motion.div className="preview-grid" initial="hidden" variants={staggerContainer} whileInView="visible" viewport={motionViewport}>
-          {previewModules.map(([title, text, Icon]) => (
-            <motion.div className="preview-tile" key={title} variants={fadeUp} whileHover={cardHover}>
-              <Icon size={21} />
-              <strong>{title}</strong>
-              <span>{text}</span>
             </motion.div>
           ))}
         </motion.div>

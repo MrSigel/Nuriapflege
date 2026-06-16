@@ -219,8 +219,8 @@ a {
 .public-hero {
   align-items: start;
   display: grid;
-  gap: 36px;
-  grid-template-columns: minmax(0, 1.02fr) minmax(360px, 0.88fr);
+  gap: 24px;
+  grid-template-columns: 1fr;
   min-height: calc(100vh - 112px);
   padding: 56px 0 34px;
 }
@@ -638,7 +638,7 @@ a {
 
 .public-hero {
   gap: clamp(24px, 4vw, 48px);
-  grid-template-columns: minmax(620px, 1.32fr) minmax(360px, 0.68fr);
+  grid-template-columns: 1fr;
   min-height: min(760px, calc(100vh - 68px));
   padding: clamp(44px, 6.5vw, 76px) 0 40px;
   position: relative;
@@ -716,6 +716,10 @@ a {
   color: #344860;
   font-size: clamp(18px, 1.55vw, 21px);
   max-width: 900px;
+}
+
+.public-hero-copy {
+  max-width: 1040px;
 }
 
 .public-hero .public-button {
