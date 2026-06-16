@@ -174,9 +174,13 @@ function Hero() {
     <section className="public-hero">
       <motion.div animate="visible" className="public-hero-copy" initial="hidden" variants={staggerContainer}>
         <motion.div className="hero-orbit-mark" variants={fadeUp} aria-hidden="true">
-          <span />
-          <span />
-          <span />
+          {[0, 1, 2].map((index) => (
+            <motion.span
+              animate={{ opacity: [0.28, 1, 0.28], scale: [1, 1.12, 1], y: [0, -3, 0] }}
+              key={index}
+              transition={{ delay: index * 0.18, duration: 1.6, ease: "easeInOut", repeat: Infinity }}
+            />
+          ))}
         </motion.div>
         <motion.h1 variants={fadeUp}>Mehr Übersicht im <span>Pflege</span>alltag</motion.h1>
         <motion.p variants={fadeUp}>
