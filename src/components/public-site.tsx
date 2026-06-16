@@ -180,18 +180,17 @@ function Hero() {
   return (
     <section className="public-hero">
       <motion.div animate="visible" className="public-hero-copy" initial="hidden" variants={staggerContainer}>
-        <motion.span className="public-eyebrow" variants={fadeUp}>Software für ambulante Pflegedienste</motion.span>
-        <motion.h1 variants={fadeUp}>Mehr Übersicht im Pflegealltag.</motion.h1>
+        <motion.h1 variants={fadeUp}>Mehr Übersicht im Pflegealltag</motion.h1>
         <motion.p variants={fadeUp}>
-          Nuria Pflege bündelt Dienstplanung, Touren, Mitarbeiterorganisation, Dokumente, Zeiterfassung und interne
-          Kommunikation in einem digitalen System für ambulante Pflegedienste.
+          Nuria Pflege ist die digitale Arbeitsfläche für ambulante Pflegedienste: Dienstplanung, Touren,
+          Mitarbeiterorganisation, Dokumente, Zeiterfassung und interne Kommunikation an einem Ort.
         </motion.p>
         <motion.div className="public-actions" variants={fadeUp}>
           <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
-            <Link className="public-button" href="/registrieren">Jetzt registrieren</Link>
+            <Link className="public-button" href="/registrieren">Pflegedienst registrieren</Link>
           </motion.div>
           <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
-            <Link className="public-button secondary" href="/funktionen">Funktionen ansehen</Link>
+            <Link className="public-button secondary" href="/funktionen">Arbeitsbereiche ansehen</Link>
           </motion.div>
         </motion.div>
         <motion.div className="public-hero-points" variants={staggerContainer}>
@@ -210,12 +209,6 @@ function Hero() {
         initial={{ opacity: 0, x: 24 }}
         transition={{ duration: 0.36, ease: "easeOut" }}
       >
-        <div className="preview-topline">
-          <div>
-            <strong>Nuria Pflege</strong>
-            <span>Organisationsansicht</span>
-          </div>
-        </div>
         <motion.div className="preview-grid" initial="hidden" variants={staggerContainer} whileInView="visible" viewport={motionViewport}>
           {previewModules.map(([title, text, Icon]) => (
             <motion.div className="preview-tile" key={title} variants={fadeUp} whileHover={cardHover}>

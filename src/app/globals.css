@@ -168,10 +168,10 @@ a {
 }
 
 .public-nav-cta {
-  background: #ffffff;
-  border-color: rgba(15, 118, 110, 0.24);
-  box-shadow: 0 8px 18px rgba(11, 53, 81, 0.06);
-  color: #0b3551;
+  background: #0f766e;
+  border-color: #0f766e;
+  box-shadow: 0 10px 22px rgba(15, 118, 110, 0.18);
+  color: #ffffff;
   font-size: 14px;
   font-weight: 500;
   min-height: 36px;
@@ -186,9 +186,9 @@ a {
 }
 
 .public-nav-cta:hover {
-  background: #e8f6f3;
-  border-color: rgba(15, 118, 110, 0.34);
-  color: #0f766e;
+  background: #115e59;
+  border-color: #115e59;
+  color: #ffffff;
 }
 
 .public-button.secondary {
@@ -637,10 +637,10 @@ a {
 }
 
 .public-hero {
-  gap: clamp(30px, 5vw, 70px);
-  grid-template-columns: minmax(0, 1.05fr) minmax(410px, 0.95fr);
-  min-height: min(820px, calc(100vh - 72px));
-  padding: clamp(54px, 8vw, 92px) 0 44px;
+  gap: clamp(24px, 4vw, 48px);
+  grid-template-columns: minmax(620px, 1.32fr) minmax(360px, 0.68fr);
+  min-height: min(760px, calc(100vh - 68px));
+  padding: clamp(44px, 6.5vw, 76px) 0 40px;
   position: relative;
 }
 
@@ -666,8 +666,8 @@ a {
 }
 
 .public-hero-copy {
-  gap: 18px;
-  padding-top: 18px;
+  gap: 22px;
+  padding-top: clamp(22px, 5vw, 58px);
 }
 
 .public-eyebrow {
@@ -687,10 +687,14 @@ a {
 .public-hero h1,
 .public-subhero h1 {
   color: #071b2f;
-  font-size: clamp(46px, 6.7vw, 80px);
-  font-weight: 760;
+  font-size: clamp(52px, 6vw, 82px);
+  font-weight: 720;
   letter-spacing: 0;
   line-height: 0.98;
+}
+
+.public-hero h1 {
+  white-space: nowrap;
 }
 
 .public-hero p,
@@ -710,12 +714,16 @@ a {
 
 .public-hero-copy > p {
   color: #344860;
-  font-size: clamp(16px, 1.45vw, 18px);
-  max-width: 700px;
+  font-size: clamp(18px, 1.55vw, 21px);
+  max-width: 900px;
 }
 
 .public-hero .public-button {
-  font-weight: 560;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 680;
+  min-height: 52px;
+  padding-inline: 22px;
 }
 
 .public-hero-points {
@@ -762,7 +770,7 @@ a {
     0 34px 90px rgba(11, 31, 51, 0.16),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
   gap: 16px;
-  margin-top: clamp(58px, 8vw, 96px);
+  margin-top: clamp(72px, 10vw, 122px);
   padding: 20px;
 }
 
@@ -802,6 +810,7 @@ a {
 
 .preview-grid {
   gap: 14px;
+  grid-template-columns: 1fr;
 }
 
 .preview-tile,
@@ -1115,6 +1124,10 @@ a {
 
   .public-hero {
     grid-template-columns: 1fr;
+  }
+
+  .public-hero h1 {
+    white-space: normal;
   }
 
   .public-dashboard-preview {
