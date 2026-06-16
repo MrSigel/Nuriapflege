@@ -927,14 +927,20 @@ a {
 }
 
 .public-section {
-  gap: 24px;
-  padding: clamp(56px, 8vw, 88px) 0;
+  align-items: center;
+  gap: clamp(24px, 4vw, 34px);
+  justify-items: center;
+  padding: clamp(58px, 8vw, 92px) 0;
+  text-align: center;
 }
 
 .public-section-heading {
   display: grid;
-  gap: 12px;
+  gap: 14px;
+  justify-items: center;
+  margin-inline: auto;
   max-width: 780px;
+  text-align: center;
 }
 
 .public-section-heading.center {
@@ -957,6 +963,7 @@ a {
   display: grid;
   gap: 16px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
 }
 
 .public-mini-card,
@@ -977,16 +984,19 @@ a {
 .public-problem-card,
 .public-card,
 .public-role-card {
-  align-content: start;
+  align-content: center;
   display: grid;
   gap: 11px;
+  justify-items: center;
   min-height: 190px;
   padding: 20px;
+  text-align: center;
 }
 
 .public-card-grid {
   gap: 16px;
   grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: 100%;
 }
 
 .public-icon-badge {
@@ -1013,6 +1023,7 @@ a {
 
 .public-role-grid {
   gap: 16px;
+  width: 100%;
 }
 
 .public-role-card {
@@ -1031,6 +1042,7 @@ a {
 }
 
 .public-security {
+  justify-items: center;
   background:
     radial-gradient(circle at 82% 0%, rgba(45, 212, 191, 0.17), transparent 34%),
     #0b1f33;
@@ -1055,6 +1067,7 @@ a {
   display: grid;
   gap: 14px;
   grid-template-columns: repeat(5, minmax(0, 1fr));
+  width: 100%;
 }
 
 .public-security-card {
@@ -1063,8 +1076,10 @@ a {
   border-radius: 8px;
   display: grid;
   gap: 12px;
+  justify-items: center;
   min-height: 132px;
   padding: 16px;
+  text-align: center;
 }
 
 .public-security-card span {
@@ -1074,15 +1089,21 @@ a {
 }
 
 .public-pricing {
+  align-items: center;
   background: rgba(255, 255, 255, 0.56);
   border: 1px solid rgba(15, 118, 110, 0.12);
   border-radius: 8px;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 440px);
+  justify-items: center;
   padding-inline: clamp(18px, 4vw, 34px);
 }
 
 .public-price-card {
   gap: 13px;
+  justify-items: center;
   padding: 24px;
+  text-align: center;
+  width: 100%;
 }
 
 .public-price-card strong {
@@ -1094,14 +1115,17 @@ a {
 .public-step-grid {
   gap: 16px;
   grid-template-columns: repeat(5, minmax(0, 1fr));
+  width: 100%;
 }
 
 .public-step {
-  align-content: start;
+  align-content: center;
   display: grid;
   gap: 12px;
+  justify-items: center;
   min-height: 156px;
   padding: 18px;
+  text-align: center;
 }
 
 .public-step span {
@@ -1152,14 +1176,17 @@ a {
     radial-gradient(circle at 90% 0%, rgba(45, 212, 191, 0.2), transparent 34%),
     linear-gradient(135deg, #071b2f, #0b2f3f);
   box-shadow: 0 28px 70px rgba(11, 31, 51, 0.2);
+  justify-items: center;
   margin-top: 18px;
   padding: clamp(30px, 6vw, 58px);
+  text-align: center;
 }
 
 .public-cta h2,
 .public-cta p {
   color: #fff;
   max-width: 850px;
+  text-align: center;
 }
 
 .public-footer {

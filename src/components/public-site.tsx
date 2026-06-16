@@ -229,7 +229,6 @@ function ExplainSection() {
   return (
     <motion.section className="public-section public-explain" initial="hidden" variants={staggerContainer} viewport={motionViewport} whileInView="visible">
       <motion.div className="public-section-heading center" variants={fadeUp}>
-        <span className="public-eyebrow">Kurz erklärt</span>
         <h2>Eine Plattform für den Pflegealltag.</h2>
         <p>Nuria Pflege unterstützt Pflegedienste dabei, interne Abläufe digital zu bündeln – von der Planung bis zur täglichen Mitarbeiteransicht.</p>
       </motion.div>
@@ -250,7 +249,6 @@ function ProblemSection() {
   return (
     <motion.section className="public-section" initial="hidden" variants={staggerContainer} viewport={motionViewport} whileInView="visible">
       <motion.div className="public-section-heading" variants={fadeUp}>
-        <span className="public-eyebrow">Alltag strukturieren</span>
         <h2>Typische Aufgaben im Alltag.</h2>
       </motion.div>
       <div className="public-problem-grid">
@@ -270,7 +268,6 @@ function FeaturesSection() {
   return (
     <motion.section className="public-section" initial="hidden" variants={staggerContainer} viewport={motionViewport} whileInView="visible">
       <motion.div className="public-section-heading" variants={fadeUp}>
-        <span className="public-eyebrow">Funktionen</span>
         <h2>Wichtige Bereiche an einem Ort.</h2>
       </motion.div>
       <div className="public-card-grid">
@@ -290,7 +287,6 @@ function RolesSection() {
   return (
     <motion.section className="public-section" initial="hidden" variants={staggerContainer} viewport={motionViewport} whileInView="visible">
       <motion.div className="public-section-heading" variants={fadeUp}>
-        <span className="public-eyebrow">Rollen</span>
         <h2>Für verschiedene Rollen im Pflegedienst.</h2>
       </motion.div>
       <div className="public-role-grid">
@@ -311,7 +307,6 @@ function SecuritySection() {
   return (
     <motion.section className="public-section public-security" initial="hidden" variants={staggerContainer} viewport={motionViewport} whileInView="visible">
       <motion.div className="public-section-heading" variants={fadeUp}>
-        <span className="public-eyebrow">Sicherheit & Zugriff</span>
         <h2>Zugriffe klar geregelt.</h2>
         <p>Interne Bereiche sind auf Rollen, Pflegedienste und zugewiesene Inhalte ausgerichtet.</p>
       </motion.div>
@@ -331,7 +326,6 @@ function PricingSection() {
   return (
     <motion.section className="public-section public-pricing" initial="hidden" variants={staggerContainer} viewport={motionViewport} whileInView="visible">
       <motion.div className="public-section-heading" variants={fadeUp}>
-        <span className="public-eyebrow">Tarifdetails</span>
         <h2>Tarifdetails</h2>
         <p>Nuria Pflege startet mit einem klaren Tarifmodell für ambulante Pflegedienste. Die Details werden transparent im Registrierungsprozess und im Tarifbereich angezeigt.</p>
       </motion.div>
@@ -358,7 +352,6 @@ function ProcessSection() {
   return (
     <motion.section className="public-section" initial="hidden" variants={staggerContainer} viewport={motionViewport} whileInView="visible">
       <motion.div className="public-section-heading" variants={fadeUp}>
-        <span className="public-eyebrow">Ablauf</span>
         <h2>So starten Pflegedienste mit Nuria Pflege.</h2>
       </motion.div>
       <div className="public-step-grid">
@@ -380,7 +373,6 @@ function FaqSection() {
   return (
     <motion.section className="public-section public-faq" initial="hidden" variants={staggerContainer} viewport={motionViewport} whileInView="visible">
       <motion.div className="public-section-heading center" variants={fadeUp}>
-        <span className="public-eyebrow">FAQ</span>
         <h2>Häufige Fragen</h2>
       </motion.div>
       <motion.div className="public-faq-list" variants={staggerContainer}>
