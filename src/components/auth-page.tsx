@@ -211,19 +211,16 @@ export function AuthPage({ initialMode = "login" }: AuthPageProps) {
             <ChevronDown size={16} />
           </motion.span>
         </button>
-        <AnimatePresence initial={false}>
-          {open ? (
-            <motion.div
-              className="auth-section-content"
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.18 }}
-            >
-              <div>{children}</div>
-            </motion.div>
-          ) : null}
-        </AnimatePresence>
+        <motion.div
+          aria-hidden={!open}
+          className="auth-section-content"
+          initial={false}
+          animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }}
+          transition={{ duration: 0.18 }}
+          style={{ overflow: "hidden", pointerEvents: open ? "auto" : "none" }}
+        >
+          <div>{children}</div>
+        </motion.div>
       </div>
     );
   }
