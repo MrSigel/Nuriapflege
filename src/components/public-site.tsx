@@ -173,6 +173,11 @@ function Hero() {
   return (
     <section className="public-hero">
       <motion.div animate="visible" className="public-hero-copy" initial="hidden" variants={staggerContainer}>
+        <motion.div className="hero-orbit-mark" variants={fadeUp} aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </motion.div>
         <motion.h1 variants={fadeUp}>Mehr Übersicht im Pflegealltag</motion.h1>
         <motion.p variants={fadeUp}>
           Nuria Pflege ist die digitale Arbeitsfläche für ambulante Pflegedienste: Dienstplanung, Touren,
@@ -193,6 +198,24 @@ function Hero() {
               <span>{label}</span>
             </motion.div>
           ))}
+        </motion.div>
+      </motion.div>
+      <motion.div animate="visible" className="hero-structure-board" initial="hidden" variants={staggerContainer}>
+        <motion.div className="hero-board-column primary" variants={fadeUp}>
+          <span>Dienstplanung</span>
+          <strong>Planen</strong>
+        </motion.div>
+        <motion.div className="hero-board-column" variants={fadeUp}>
+          <span>Touren</span>
+          <strong>Koordinieren</strong>
+        </motion.div>
+        <motion.div className="hero-board-column" variants={fadeUp}>
+          <span>Zeiten</span>
+          <strong>Erfassen</strong>
+        </motion.div>
+        <motion.div className="hero-board-column" variants={fadeUp}>
+          <span>Dokumente</span>
+          <strong>Ablegen</strong>
         </motion.div>
       </motion.div>
     </section>
