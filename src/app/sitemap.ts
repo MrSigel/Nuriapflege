@@ -11,6 +11,10 @@ const publicRoutes = [
   "/datenschutz",
   "/agb",
   "/cookie-einstellungen",
+  "/widerruf",
+  "/av-vertrag",
+  "/tom",
+  "/rechtliches",
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

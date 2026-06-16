@@ -99,7 +99,7 @@ export async function getOnboardingData(): Promise<OnboardingData> {
 
   if (!supabase || !cid) return empty;
 
-  const [{ data: company }, { data: owner }, { data: primaryLocation }, { data: paymentLog }] = await Promise.all([
+  const [{ data: company }, { data: owner }, { data: primaryLocation }, paymentLogResult] = await Promise.all([
     supabase
       .from("companies")
       .select("id,name,legal_name,email,phone,street,house_number,postal_code,city,country,ik_number,onboarding_status,payment_status,package_id,billing_interval,payment_marked_at,payment_due_until,payment_due_check_at,admin_confirmed_at")
@@ -116,14 +116,43 @@ export async function getOnboardingData(): Promise<OnboardingData> {
       .maybeSingle(),
     supabase
       .from("company_payment_logs")
-      .select("id,amount,status,marked_at")
+      .select("id,amount,status,marked_at,billing_interval")
       .eq("company_id", cid)
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle(),
   ]);
 
-  const purpose = paymentLog?.id ? `NURIA-${cid}-${paymentLog.id}` : `NURIA-${cid}-OFFEN`;
+  let paymentLog = paymentLogResult.data;
+  if (company && !paymentLog?.id) {
+    const interval = company.billing_interval && company.billing_interval in plans ? company.billing_interval as BillingInterval : "monthly";
+    const plan = calculatePlan(interval);
+    const { data: subscription } = await supabase
+      .from("company_subscriptions")
+      .select("id")
+      .eq("company_id", cid)
+      .neq("status", "cancelled")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const { data: createdLog } = await supabase
+      .from("company_payment_logs")
+      .insert({
+        company_id: cid,
+        subscription_id: subscription?.id ?? null,
+        amount: plan.total,
+        currency: "EUR",
+        billing_interval: interval,
+        payment_method: "bank_transfer",
+        status: "pending",
+        notes: "Payment-Datensatz für Onboarding-Zahlungsübersicht erstellt.",
+      })
+      .select("id,amount,status,marked_at,billing_interval")
+      .single();
+    paymentLog = createdLog ?? null;
+  }
+
+  const purpose = paymentLog?.id ? `NURIA-${cid}-${paymentLog.id}` : `NURIA-${cid}`;
 
   return {
     company: company as OnboardingData["company"],

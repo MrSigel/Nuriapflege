@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { CalendarDays, CheckCircle2, Clock3, Download, Eye, FilterX, PauseCircle, Search, UserRound, Users, XCircle } from "lucide-react";
 import { useMemo, useState } from "react";
+import { ConfirmActionDialog } from "@/components/action-dialogs";
 import { ShiftModal } from "@/components/shift-modal";
 import type { ShiftsData, ShiftStatus, ShiftType } from "@/lib/shifts";
 
@@ -134,7 +135,7 @@ export function ShiftsPage({ data, actions }: ShiftsPageProps) {
                 <div className="location-actions">
                   <details><summary><Eye size={15} />Ansehen</summary><div className="location-detail-panel"><p>Titel: {shift.title}</p><p>Datum: {new Intl.DateTimeFormat("de-DE").format(new Date(shift.date))}</p><p>Zeiten: {value(shift.suggested_start_time)} - {value(shift.suggested_end_time)}</p><p>Status: {statusLabels[shift.status]}</p><p>Diensttyp: {typeLabels[shift.shift_type]}</p><p>Mitarbeiter: {value(shift.employee_name)}</p><p>Klient: {value(shift.client_name)}</p><p>Standort: {value(shift.location_name)}</p><p>Notizen: {value(shift.notes)}</p><p>Erstellt von: {value(shift.created_by_name)}</p><p>Zuletzt aktualisiert: {new Intl.DateTimeFormat("de-DE").format(new Date(shift.updated_at))}</p></div></details>
                   <ShiftModal action={actions.updateShift} buttonLabel="Bearbeiten" submitLabel="Änderungen speichern" data={data} shift={shift} />
-                  {(["planned", "in_progress", "completed", "cancelled"] as ShiftStatus[]).filter((next) => next !== shift.status).map((next) => <form action={actions.changeShiftStatus} key={next}><input name="id" type="hidden" value={shift.id} /><input name="status" type="hidden" value={next} /><button className="button secondary" type="submit">{statusLabels[next]} setzen</button></form>)}
+                  {(["planned", "in_progress", "completed", "cancelled"] as ShiftStatus[]).filter((next) => next !== shift.status).map((next) => <ConfirmActionDialog action={actions.changeShiftStatus} buttonLabel={`${statusLabels[next]} setzen`} description="Bitte bestätigen Sie die Statusänderung für diesen Dienst." hiddenFields={[{ name: "id", value: shift.id }, { name: "status", value: next }]} key={next} title="Status ändern" />)}
                 </div>
               </motion.article>
             ))}

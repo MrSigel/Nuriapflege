@@ -1,4 +1,5 @@
 import { Building2, Download, Eye, MapPin, Pencil, Users, UserRound } from "lucide-react";
+import { ActionDialog, ConfirmActionDialog } from "@/components/action-dialogs";
 import { LocationCreateModal } from "@/components/location-create-modal";
 import {
   createLocation,
@@ -27,19 +28,11 @@ const statusLabels: Record<LocationStatus, string> = {
   inactive: "Inaktiv",
 };
 
-function LocationForm({
-  action,
-  location,
-  submitLabel,
-}: {
-  action: (formData: FormData) => void;
-  location?: CompanyLocation;
-  submitLabel: string;
-}) {
+function LocationFields({ location }: { location?: CompanyLocation }) {
   const isPrimary = Boolean(location?.is_primary);
 
   return (
-    <form action={action} className="location-form">
+    <>
       {location ? (
         <>
           <input name="id" type="hidden" value={location.id} />
@@ -105,10 +98,7 @@ function LocationForm({
         Notizen
         <textarea name="notes" defaultValue={location?.notes ?? ""} rows={3} />
       </label>
-      <button className="button location-form-submit" type="submit">
-        {submitLabel}
-      </button>
-    </form>
+    </>
   );
 }
 
@@ -168,22 +158,35 @@ function LocationCard({ location }: { location: CompanyLocation }) {
           </div>
         </details>
 
-        <details>
-          <summary>
-            <Pencil size={15} />
-            Bearbeiten
-          </summary>
-          <LocationForm action={updateLocation} location={location} submitLabel="Änderungen speichern" />
-        </details>
+        <ActionDialog
+          action={updateLocation}
+          buttonIcon={<Pencil size={15} />}
+          buttonLabel="Bearbeiten"
+          buttonVariant="secondary"
+          formClassName="location-form"
+          submitLabel="Änderungen speichern"
+          title="Standort bearbeiten"
+        >
+          <LocationFields location={location} />
+        </ActionDialog>
 
-        <form action={toggleLocationStatus}>
-          <input name="id" type="hidden" value={location.id} />
-          <input name="status" type="hidden" value={location.status} />
-          <input name="is_primary" type="hidden" value={String(location.is_primary)} />
-          <button className="button secondary" disabled={location.is_primary} type="submit">
-            {location.status === "active" ? "Inaktiv setzen" : "Aktiv setzen"}
+        {!location.is_primary ? (
+          <ConfirmActionDialog
+            action={toggleLocationStatus}
+            buttonLabel={location.status === "active" ? "Inaktiv setzen" : "Aktiv setzen"}
+            description="Bitte bestätigen Sie die Statusänderung für diesen Standort."
+            hiddenFields={[
+              { name: "id", value: location.id },
+              { name: "status", value: location.status },
+              { name: "is_primary", value: location.is_primary },
+            ]}
+            title="Status ändern"
+          />
+        ) : (
+          <button className="button secondary" disabled type="button">
+            Inaktiv setzen
           </button>
-        </form>
+        )}
       </div>
     </article>
   );

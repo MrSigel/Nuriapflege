@@ -89,7 +89,7 @@ export default async function CompanyDashboardPage({ params }: PageProps) {
   const access = await getCompanyAccessState();
   const writeBlocked = !access.canWrite;
 
-  if (path === "/dashboard/onboarding" && access.canWrite) {
+  if (path === "/dashboard/onboarding" && access.company?.onboarding_status === "completed") {
     redirect("/dashboard");
   }
 
@@ -124,7 +124,7 @@ export default async function CompanyDashboardPage({ params }: PageProps) {
       {writeBlocked && path !== "/dashboard/onboarding" ? (
         <div className={`dashboard-access-banner ${access.isOverdue ? "overdue" : ""}`}>
           <div>
-            <strong>{access.isOverdue ? "Zahlung offen" : "Ihr Zugang ist vorbereitet."}</strong>
+            <strong>{access.isOverdue ? "Zahlung offen" : "Einrichtung noch nicht abgeschlossen"}</strong>
             <p>
               {access.isOverdue
                 ? "Für Ihr Nutzerkonto liegt noch kein bestätigter Zahlungseingang vor. Bitte prüfen Sie die Überweisung oder kontaktieren Sie den Support."

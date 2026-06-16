@@ -4,7 +4,7 @@ import { PublicSite } from "@/components/public-site";
 export const metadata: Metadata = {
   title: "Nuria Pflege | Pflege Software für ambulante Pflegedienste",
   description:
-    "Nuria Pflege unterstützt ambulante Pflegedienste bei Dienstplanung, Tourenplanung Pflege, Zeiterfassung Pflege und digitaler Organisation.",
+    "Digitale Organisation für ambulante Pflegedienste mit Dienstplanung, Touren, Dokumenten, Zeiterfassung und Kommunikation.",
   alternates: { canonical: "/" },
   openGraph: {
     title: "Nuria Pflege | Pflege Software für ambulante Pflegedienste",

@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Download, Eye, FilterX, MapPin, PauseCircle, Search, Stethoscope, UserRound, Users } from "lucide-react";
 import { useMemo, useState } from "react";
+import { ConfirmActionDialog } from "@/components/action-dialogs";
 import { ClientModal } from "@/components/client-modal";
 import type { CareLevel, ClientsData, ClientStatus } from "@/lib/clients";
 
@@ -135,11 +136,14 @@ export function ClientsPage({ data, actions }: ClientsPageProps) {
                   </details>
                   <ClientModal action={actions.updateClient} buttonLabel="Bearbeiten" submitLabel="Änderungen speichern" locations={data.locations} client={client} />
                   {(["active", "paused", "inactive"] as ClientStatus[]).filter((next) => next !== client.status).map((next) => (
-                    <form action={actions.changeClientStatus} key={next}>
-                      <input name="id" type="hidden" value={client.id} />
-                      <input name="status" type="hidden" value={next} />
-                      <button className="button secondary" type="submit">{statusLabels[next]} setzen</button>
-                    </form>
+                    <ConfirmActionDialog
+                      action={actions.changeClientStatus}
+                      buttonLabel={`${statusLabels[next]} setzen`}
+                      description="Bitte bestätigen Sie die Statusänderung für diesen Klienten."
+                      hiddenFields={[{ name: "id", value: client.id }, { name: "status", value: next }]}
+                      key={next}
+                      title="Status ändern"
+                    />
                   ))}
                 </div>
               </motion.article>

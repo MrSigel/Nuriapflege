@@ -11,9 +11,11 @@ import {
   Search,
   Send,
   UserPlus,
+  X,
   Users,
 } from "lucide-react";
 import { Fragment, useMemo, useState } from "react";
+import { ActionDialog, ConfirmActionDialog } from "@/components/action-dialogs";
 import type { CommunicationData, Conversation, ConversationType } from "@/lib/communication";
 
 type Props = {
@@ -72,16 +74,86 @@ function ActionMenu({
   children: React.ReactNode;
   variant?: "primary" | "secondary";
 }) {
+  const [open, setOpen] = useState(false);
+  const [dirty, setDirty] = useState(false);
+  const [confirmClose, setConfirmClose] = useState(false);
+
+  function requestClose() {
+    if (dirty) {
+      setConfirmClose(true);
+      return;
+    }
+    setOpen(false);
+  }
+
   return (
-    <details className="communication-action-menu">
-      <summary className={`button ${variant === "secondary" ? "secondary" : ""}`}>
+    <>
+      <motion.button
+        className={`button ${variant === "secondary" ? "secondary" : ""}`}
+        type="button"
+        onClick={() => setOpen(true)}
+        whileHover={{ y: -1 }}
+        whileTap={{ scale: 0.98 }}
+      >
         {icon}
         {summary}
-      </summary>
-      <motion.div className="communication-action-popover" initial={{ opacity: 0, y: 10, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }}>
-        {children}
-      </motion.div>
-    </details>
+      </motion.button>
+      <AnimatePresence>
+        {open ? (
+          <motion.div className="modal-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <motion.div
+              className="modal-panel action-dialog-panel"
+              initial={{ opacity: 0, y: 12, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.98 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+            >
+              <div className="modal-header">
+                <div>
+                  <h2>{summary}</h2>
+                </div>
+                <button className="modal-close" type="button" onClick={requestClose} aria-label="Fenster schließen">
+                  <X size={18} />
+                </button>
+              </div>
+              <div
+                onChangeCapture={() => setDirty(true)}
+                onSubmitCapture={() => {
+                  setDirty(false);
+                  setOpen(false);
+                }}
+              >
+                {children}
+              </div>
+            </motion.div>
+            <AnimatePresence>
+              {confirmClose ? (
+                <motion.div className="confirm-dialog" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}>
+                  <h3>Änderungen verwerfen?</h3>
+                  <p>Nicht gespeicherte Änderungen gehen verloren.</p>
+                  <div>
+                    <button className="button secondary" type="button" onClick={() => setConfirmClose(false)}>
+                      Abbrechen
+                    </button>
+                    <button
+                      className="button"
+                      type="button"
+                      onClick={() => {
+                        setConfirmClose(false);
+                        setDirty(false);
+                        setOpen(false);
+                      }}
+                    >
+                      Verwerfen
+                    </button>
+                  </div>
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+    </>
   );
 }
 
@@ -343,13 +415,14 @@ export function CommunicationPage({ data, actions }: Props) {
                         {active.participants.length} Teilnehmer · {active.status === "archived" ? "Archiviert" : "Aktiv"}
                       </p>
                     </div>
-                    <form action={actions.archiveConversation}>
-                      <input name="conversation_id" type="hidden" value={active.id} />
-                      <button className="button secondary archive-button" type="submit">
-                        <Archive size={16} />
-                        Archivieren
-                      </button>
-                    </form>
+                    <ConfirmActionDialog
+                      action={actions.archiveConversation}
+                      buttonIcon={<Archive size={16} />}
+                      buttonLabel="Archivieren"
+                      description="Bitte bestätigen Sie, dass diese Konversation archiviert werden soll."
+                      hiddenFields={[{ name: "conversation_id", value: active.id }]}
+                      title="Konversation archivieren"
+                    />
                   </header>
 
                   <div className="message-list">
@@ -399,18 +472,29 @@ export function CommunicationPage({ data, actions }: Props) {
                               {p.name} · {p.role}
                               {p.staff_code ? ` · ${p.staff_code}` : ""}
                             </span>
-                            <form action={actions.removeParticipant}>
-                              <input name="conversation_id" type="hidden" value={active.id} />
-                              <input name="user_id" type="hidden" value={p.id} />
-                              <button className="button secondary" type="submit">
-                                Entfernen
-                              </button>
-                            </form>
+                            <ConfirmActionDialog
+                              action={actions.removeParticipant}
+                              buttonLabel="Entfernen"
+                              description="Bitte bestätigen Sie, dass dieser Teilnehmer entfernt werden soll."
+                              hiddenFields={[
+                                { name: "conversation_id", value: active.id },
+                                { name: "user_id", value: p.id },
+                              ]}
+                              title="Teilnehmer entfernen"
+                            />
                           </div>
                         ))}
                       </div>
-                      <form action={actions.addParticipant} className="participant-add">
-                        <input name="conversation_id" type="hidden" value={active.id} />
+                      <ActionDialog
+                        action={actions.addParticipant}
+                        buttonIcon={<UserPlus size={16} />}
+                        buttonLabel="Hinzufügen"
+                        buttonVariant="secondary"
+                        formClassName="participant-add"
+                        hiddenFields={[{ name: "conversation_id", value: active.id }]}
+                        submitLabel="Hinzufügen"
+                        title="Teilnehmer hinzufügen"
+                      >
                         <select name="user_id" required>
                           <option value="">Teilnehmer wahlen</option>
                           {data.users
@@ -421,11 +505,7 @@ export function CommunicationPage({ data, actions }: Props) {
                               </option>
                             ))}
                         </select>
-                        <button className="button secondary" type="submit">
-                          <UserPlus size={16} />
-                          Hinzufugen
-                        </button>
-                      </form>
+                      </ActionDialog>
                     </div>
                   ) : null}
                 </motion.section>
