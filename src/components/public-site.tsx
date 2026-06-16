@@ -200,24 +200,6 @@ function Hero() {
           ))}
         </motion.div>
       </motion.div>
-      <motion.div animate="visible" className="hero-structure-board" initial="hidden" variants={staggerContainer}>
-        <motion.div className="hero-board-column primary" variants={fadeUp}>
-          <span>Dienstplanung</span>
-          <strong>Planen</strong>
-        </motion.div>
-        <motion.div className="hero-board-column" variants={fadeUp}>
-          <span>Touren</span>
-          <strong>Koordinieren</strong>
-        </motion.div>
-        <motion.div className="hero-board-column" variants={fadeUp}>
-          <span>Zeiten</span>
-          <strong>Erfassen</strong>
-        </motion.div>
-        <motion.div className="hero-board-column" variants={fadeUp}>
-          <span>Dokumente</span>
-          <strong>Ablegen</strong>
-        </motion.div>
-      </motion.div>
     </section>
   );
 }
