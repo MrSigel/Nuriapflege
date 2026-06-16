@@ -78,6 +78,41 @@ function dashboardForRole(role?: string | null) {
   return "/dashboard";
 }
 
+function Section({
+  id,
+  title,
+  open,
+  onToggle,
+  children,
+}: {
+  id: string;
+  title: string;
+  open: boolean;
+  onToggle: (section: string) => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="auth-accordion-section">
+      <button className="auth-section-trigger" onClick={() => onToggle(id)} type="button">
+        <span>{title}</span>
+        <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.16 }}>
+          <ChevronDown size={16} />
+        </motion.span>
+      </button>
+      <motion.div
+        aria-hidden={!open}
+        className="auth-section-content"
+        initial={false}
+        animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }}
+        transition={{ duration: 0.18 }}
+        style={{ overflow: "hidden", pointerEvents: open ? "auto" : "none" }}
+      >
+        <div>{children}</div>
+      </motion.div>
+    </div>
+  );
+}
+
 export function AuthPage({ initialMode = "login" }: AuthPageProps) {
   const [mode, setMode] = useState<AuthMode>(initialMode);
   const [showPassword, setShowPassword] = useState(false);
@@ -200,31 +235,6 @@ export function AuthPage({ initialMode = "login" }: AuthPageProps) {
     setOpenSections((current) => (current.includes(section) ? current.filter((item) => item !== section) : [...current, section]));
   }
 
-  function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
-    const open = openSections.includes(id);
-
-    return (
-      <div className="auth-accordion-section">
-        <button className="auth-section-trigger" onClick={() => toggleSection(id)} type="button">
-          <span>{title}</span>
-          <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.16 }}>
-            <ChevronDown size={16} />
-          </motion.span>
-        </button>
-        <motion.div
-          aria-hidden={!open}
-          className="auth-section-content"
-          initial={false}
-          animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }}
-          transition={{ duration: 0.18 }}
-          style={{ overflow: "hidden", pointerEvents: open ? "auto" : "none" }}
-        >
-          <div>{children}</div>
-        </motion.div>
-      </div>
-    );
-  }
-
   return (
     <main className="auth-page-shell">
       <motion.section className="auth-panel" initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.24 }}>
@@ -284,7 +294,7 @@ export function AuthPage({ initialMode = "login" }: AuthPageProps) {
                   </form>
                 ) : (
                   <form className="auth-form" onSubmit={handleRegister}>
-                    <Section id="personal" title="Persönliche Daten">
+                    <Section id="personal" title="Persönliche Daten" open={openSections.includes("personal")} onToggle={toggleSection}>
                       <div className="auth-grid">
                         <label>Vorname<input name="firstName" required /></label>
                         <label>Nachname<input name="lastName" required /></label>
@@ -296,7 +306,7 @@ export function AuthPage({ initialMode = "login" }: AuthPageProps) {
                       </div>
                     </Section>
 
-                    <Section id="company" title="Pflegedienst">
+                    <Section id="company" title="Pflegedienst" open={openSections.includes("company")} onToggle={toggleSection}>
                       <label>Pflegedienstname<input name="companyName" required /></label>
                       <div className="auth-grid">
                         <label>Rechtsform optional<input name="legalForm" /></label>
@@ -305,7 +315,7 @@ export function AuthPage({ initialMode = "login" }: AuthPageProps) {
                       <label>IK-Nummer optional<input name="ikNumber" /></label>
                     </Section>
 
-                    <Section id="address" title="Adresse">
+                    <Section id="address" title="Adresse" open={openSections.includes("address")} onToggle={toggleSection}>
                       <div className="auth-grid">
                         <label>Straße<input name="street" required /></label>
                         <label>Hausnummer<input name="houseNumber" required /></label>
@@ -320,7 +330,7 @@ export function AuthPage({ initialMode = "login" }: AuthPageProps) {
                       </div>
                     </Section>
 
-                    <Section id="tariff" title="Tarif">
+                    <Section id="tariff" title="Tarif" open={openSections.includes("tariff")} onToggle={toggleSection}>
                       <div className="billing-choice-grid">
                         {pricePreview.map((item) => (
                           <label className="billing-choice" key={item.key}>
