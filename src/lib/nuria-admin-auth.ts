@@ -6,21 +6,42 @@ import { cookies } from "next/headers";
 const cookieName = "nuria_admin_session";
 const maxAge = 60 * 60 * 8;
 
+function normalizeEnvValue(value: string | undefined) {
+  const normalized = value?.trim() ?? "";
+
+  if (
+    (normalized.startsWith("\"") && normalized.endsWith("\"")) ||
+    (normalized.startsWith("'") && normalized.endsWith("'"))
+  ) {
+    return normalized.slice(1, -1);
+  }
+
+  return normalized;
+}
+
+function adminEmail() {
+  return normalizeEnvValue(process.env.NURIA_ADMIN_EMAIL);
+}
+
+function adminPassword() {
+  return normalizeEnvValue(process.env.NURIA_ADMIN_PASSWORD);
+}
+
 function base64Url(value: string) {
   return Buffer.from(value).toString("base64url");
 }
 
 function sign(payload: string) {
-  const secret = `${process.env.NURIA_ADMIN_EMAIL ?? ""}:${process.env.NURIA_ADMIN_PASSWORD ?? ""}`;
+  const secret = `${adminEmail()}:${adminPassword()}`;
   return createHmac("sha256", secret).update(payload).digest("base64url");
 }
 
 function hasAdminEnv() {
-  return Boolean(process.env.NURIA_ADMIN_EMAIL && process.env.NURIA_ADMIN_PASSWORD);
+  return Boolean(adminEmail() && adminPassword());
 }
 
 export function verifyNuriaAdminCredentials(email: string, password: string) {
-  return hasAdminEnv() && email === process.env.NURIA_ADMIN_EMAIL && password === process.env.NURIA_ADMIN_PASSWORD;
+  return hasAdminEnv() && email.trim() === adminEmail() && password === adminPassword();
 }
 
 export async function createNuriaAdminSession() {
