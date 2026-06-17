@@ -420,7 +420,9 @@ export function DashboardShell({ role, routes, children }: DashboardShellProps) 
           <button className="drawer-close" onClick={() => setOpen(false)} aria-label="Navigation schließen">
             <X size={17} />
           </button>
-          <div className="brand">Nuria Pflege</div>
+          <div className="brand">
+            <img src="/logo_transparent.png" alt="Nuria Pflege" />
+          </div>
         </div>
 
         <nav className="nav-scroll">

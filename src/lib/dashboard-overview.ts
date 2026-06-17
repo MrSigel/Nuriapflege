@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { companyId as getRequestCompanyId, userId as getRequestUserId } from "@/lib/onboarding";
 import { getSupabaseServerClient } from "@/lib/supabase-server";
 import type { Role } from "@/lib/nuria-config";
 
@@ -60,7 +61,7 @@ type QueryContext = {
 type SupabaseQuery = any;
 
 const openStatuses = ["open", "pending", "planned", "missing"];
-const employeeRoles = ["inhaber", "pdl", "verwaltung", "mitarbeiter", "pflegefachkraft"];
+const employeeRoles = ["pdl", "verwaltung", "mitarbeiter", "pflegefachkraft"];
 
 function todayIsoDate() {
   return new Date().toISOString().slice(0, 10);
@@ -264,10 +265,11 @@ async function getNews(supabase: SupabaseClient, context: QueryContext): Promise
 }
 
 export async function getDashboardOverview(role: Role): Promise<DashboardOverviewData> {
+  const [companyId, userId] = await Promise.all([getRequestCompanyId(), getRequestUserId()]);
   const context: QueryContext = {
     role,
-    companyId: process.env.NURIA_DEV_COMPANY_ID ?? null,
-    userId: process.env.NURIA_DEV_USER_ID ?? null,
+    companyId,
+    userId,
     today: todayIsoDate(),
   };
   const supabase = getSupabaseServerClient();

@@ -51,10 +51,7 @@ export type DashboardRoute = {
 
 export const developmentAccounts: AuthAccount[] = [
   { email: "admin@test.de", role: "admin", password: "Test123456!", tenantId: null },
-  { email: "inhaber@test.de", role: "inhaber", password: "Test123456!", tenantId: "tenant_dev_inhaber" },
-  { email: "pdl@test.de", role: "pdl", password: "Test123456!", tenantId: "tenant_dev_inhaber" },
   { email: "verwaltung@test.de", role: "verwaltung", password: "Test123456!", tenantId: "tenant_dev_inhaber" },
-  { email: "ma@test.de", role: "mitarbeiter", password: "Test123456!", tenantId: "tenant_dev_inhaber" },
 ];
 
 export const tenantAccessModel = {
