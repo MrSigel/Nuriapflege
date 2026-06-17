@@ -1010,18 +1010,18 @@ function LegalPage({ page }: { page: LegalPageKey }) {
   if (page === "legal") {
     return (
       <PublicSubPage intro="Zentrale Übersicht rechtlicher Informationen und vertrauensbildender Grundlagen." title="Rechtliches & Vertrauen">
-        <motion.section className="public-section public-legal-page" initial="hidden" variants={staggerContainer} viewport={motionViewport} whileInView="visible">
+        <section className="public-section public-legal-page">
           <div className="public-legal-card-grid">
             {legalOverviewCards.map(([title, href, Icon, text]) => (
-              <motion.article className="public-detail-card public-legal-card" key={href} variants={fadeUp} whileHover={cardHover}>
+              <article className="public-detail-card public-legal-card" key={href}>
                 <span className="public-icon-badge"><Icon size={20} /></span>
                 <h3>{title}</h3>
                 <p>{text}</p>
                 <Link href={href}>Seite öffnen</Link>
-              </motion.article>
+              </article>
             ))}
           </div>
-          <motion.article className="public-note-card public-trust-card" variants={fadeUp}>
+          <article className="public-note-card public-trust-card">
             <ShieldCheck size={22} />
             <div>
               <h2>Vertrauensgrundlagen</h2>
@@ -1033,8 +1033,8 @@ function LegalPage({ page }: { page: LegalPageKey }) {
                 <li>AV-Vertrag und TOM vorbereitet</li>
               </ul>
             </div>
-          </motion.article>
-        </motion.section>
+          </article>
+        </section>
       </PublicSubPage>
     );
   }
@@ -1043,17 +1043,17 @@ function LegalPage({ page }: { page: LegalPageKey }) {
 
   return (
     <PublicSubPage intro={content.intro} title={content.title}>
-      <motion.section className="public-section public-legal-page" initial="hidden" variants={staggerContainer} viewport={motionViewport} whileInView="visible">
+      <section className="public-section public-legal-page">
         {content.sections.length > 3 ? (
-          <motion.nav className="public-legal-toc" variants={fadeUp} aria-label="Abschnittsnavigation">
+          <nav className="public-legal-toc" aria-label="Abschnittsnavigation">
             {content.sections.map((section) => (
               <a href={`#${section.id}`} key={section.id}>{section.title}</a>
             ))}
-          </motion.nav>
+          </nav>
         ) : null}
         <div className="public-legal-content">
           {content.sections.map((section) => (
-            <motion.article className="public-info-card public-legal-section" id={section.id} key={section.id} variants={fadeUp}>
+            <article className="public-info-card public-legal-section" id={section.id} key={section.id}>
               <h2>{section.title}</h2>
               {section.body?.map((paragraph) => (
                 <p key={paragraph}>{paragraph}</p>
@@ -1066,10 +1066,10 @@ function LegalPage({ page }: { page: LegalPageKey }) {
                 </ul>
               ) : null}
               {section.link ? <a className="public-button legal-link-button" href={section.link.href}>{section.link.label}</a> : null}
-            </motion.article>
+            </article>
           ))}
         </div>
-      </motion.section>
+      </section>
     </PublicSubPage>
   );
 }
