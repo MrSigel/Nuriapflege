@@ -78,6 +78,13 @@ function dashboardForRole(role?: string | null) {
   return "/dashboard";
 }
 
+function setAuthContextCookies(userId: string, companyId: string) {
+  const secure = window.location.protocol === "https:" ? "; Secure" : "";
+  const options = `; Path=/; Max-Age=${60 * 60 * 24 * 30}; SameSite=Lax${secure}`;
+  document.cookie = `nuria_user_id=${encodeURIComponent(userId)}${options}`;
+  document.cookie = `nuria_company_id=${encodeURIComponent(companyId)}${options}`;
+}
+
 function Section({
   id,
   title,
@@ -160,7 +167,10 @@ export function AuthPage({ initialMode = "login" }: AuthPageProps) {
       return;
     }
 
-    const { data: profile } = await supabase.from("profiles").select("role").eq("id", data.user.id).maybeSingle();
+    const { data: profile } = await supabase.from("profiles").select("role, company_id").eq("id", data.user.id).maybeSingle();
+    if (profile?.company_id) {
+      setAuthContextCookies(data.user.id, profile.company_id);
+    }
     window.location.assign(dashboardForRole(profile?.role));
   }
 
@@ -220,12 +230,17 @@ export function AuthPage({ initialMode = "login" }: AuthPageProps) {
       return;
     }
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error || !data.user) {
       setRegisterLoading(false);
       setMode("login");
       setMessage({ type: "success", text: "Registrierung erfolgreich. Bitte loggen Sie sich ein." });
       return;
+    }
+
+    const { data: profile } = await supabase.from("profiles").select("company_id").eq("id", data.user.id).maybeSingle();
+    if (profile?.company_id) {
+      setAuthContextCookies(data.user.id, profile.company_id);
     }
 
     window.location.assign("/dashboard/onboarding");

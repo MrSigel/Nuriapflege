@@ -34,7 +34,7 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type PublicPage = "home" | "features" | "pricing" | "contact" | "imprint" | "privacy" | "terms" | "cookies" | "withdrawal" | "dpa" | "tom" | "legal";
 
@@ -175,7 +175,6 @@ const pricingFaqs = [
 ] as const;
 
 const contactCards = [
-  ["E-Mail", "kontakt@nuria-pflege.de", "mailto:kontakt@nuria-pflege.de", Mail],
   ["Betreiber", "Enrico Gross", "", UserRound],
   ["Standort", "Castrop-Rauxel, Deutschland", "", MapPin],
   ["Website", "www.nuria-pflege.de", "http://www.nuria-pflege.de", Globe],
@@ -292,6 +291,55 @@ function PublicFooter() {
         <span>© 2026 Nuria Pflege. Alle Rechte vorbehalten.</span>
       </motion.div>
     </motion.footer>
+  );
+}
+
+const cookieConsentName = "nuria_cookie_consent";
+const cookieMaxAge = 60 * 60 * 24 * 180;
+
+function CookieConsentBanner() {
+  const [visible, setVisible] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
+  useEffect(() => {
+    setVisible(!document.cookie.split("; ").some((cookie) => cookie.startsWith(`${cookieConsentName}=`)));
+  }, []);
+
+  function saveConsent(value: "accepted" | "rejected" | "necessary") {
+    document.cookie = `${cookieConsentName}=${value}; Max-Age=${cookieMaxAge}; Path=/; SameSite=Lax`;
+    setSettingsOpen(false);
+    setVisible(false);
+  }
+
+  if (!visible) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div className="cookie-consent" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 24 }} transition={{ duration: 0.22 }}>
+        <div className="cookie-consent-copy">
+          <span>Cookie-Einstellungen</span>
+          <p>Nuria Pflege verwendet aktuell nur technisch notwendige Cookies und Speichermechanismen für Betrieb, Sicherheit, Anmeldung und die Speicherung dieser Auswahl.</p>
+          {settingsOpen ? (
+            <div className="cookie-consent-settings">
+              <label>
+                <input checked disabled type="checkbox" />
+                Technisch notwendige Cookies
+              </label>
+              <small>Erforderlich für Website-Betrieb, Anmeldung, Session-Verwaltung und Cookie-Auswahl.</small>
+            </div>
+          ) : null}
+        </div>
+        <div className="cookie-consent-actions">
+          <button type="button" onClick={() => saveConsent("accepted")}>Akzeptieren</button>
+          <button type="button" onClick={() => saveConsent("rejected")}>Ablehnen</button>
+          {settingsOpen ? (
+            <button type="button" onClick={() => saveConsent("necessary")}>Auswahl speichern</button>
+          ) : (
+            <button type="button" onClick={() => setSettingsOpen(true)}>Einstellen</button>
+          )}
+        </div>
+      </motion.div>
+    </AnimatePresence>
   );
 }
 
@@ -722,15 +770,16 @@ function ContactPageContent() {
   return (
     <>
       <PublicSubPage
-        actions={[
-          ["E-Mail schreiben", "mailto:kontakt@nuria-pflege.de", "primary"],
-          ["Jetzt registrieren", "/registrieren", "secondary"],
-        ]}
         badge="Kontakt"
         intro="Haben Sie Fragen zur Nutzung, Registrierung oder Einrichtung? Kontaktieren Sie uns gerne direkt."
         title="Kontakt zu Nuria Pflege."
         visual={<SubHeroVisual items={[["E-Mail", Mail], ["Betreiber", UserRound], ["Standort", MapPin], ["Website", Globe]]} />}
       />
+      <motion.section className="public-section public-contact-cta" initial="hidden" variants={staggerContainer} viewport={motionViewport} whileInView="visible">
+        <motion.a className="public-button" href="mailto:kontakt@nuria-pflege.de" variants={fadeUp} whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+          E-Mail schreiben
+        </motion.a>
+      </motion.section>
       <motion.section className="public-section public-contact-section" initial="hidden" variants={staggerContainer} viewport={motionViewport} whileInView="visible">
         <div className="public-contact-grid">
           {contactCards.map(([title, value, href, Icon]) => (
@@ -843,73 +892,78 @@ const operatorLines = ["Nuria Pflege", "Enrico Gross", "Einzelunternehmen", "Ger
 const legalPages: Record<Exclude<LegalPageKey, "legal">, { title: string; intro: string; sections: LegalSection[] }> = {
   imprint: {
     title: "Impressum",
-    intro: "Angaben zum Betreiber von Nuria Pflege.",
+    intro: "Anbieterkennzeichnung für Nuria Pflege nach aktueller deutscher Rechtslage.",
     sections: [
-      { id: "anbieter", title: "Angaben gemäß § 5 TMG / DDG", list: operatorLines },
+      { id: "anbieter", title: "Angaben nach § 5 DDG", list: operatorLines },
       { id: "kontakt", title: "Kontakt", body: ["E-Mail: kontakt@nuria-pflege.de"], link: { href: "mailto:kontakt@nuria-pflege.de", label: "kontakt@nuria-pflege.de" } },
-      { id: "mstv", title: "Verantwortlich nach § 18 Abs. 2 MStV", list: ["Enrico Gross", "Gerther Straße 76", "44577 Castrop-Rauxel", "Deutschland"] },
-      { id: "streitschlichtung", title: "EU-Streitschlichtung und Verbraucherstreitbeilegung", body: ["Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung bereit. Diese ist unter https://ec.europa.eu/consumers/odr/ erreichbar.", "Nuria Pflege ist nicht verpflichtet und nicht bereit, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen."] },
+      { id: "ustid", title: "Umsatzsteuer-ID", body: ["Umsatzsteuer-Identifikationsnummer gemäß § 27a Umsatzsteuergesetz: DE278597389."] },
+      { id: "mstv", title: "Verantwortlich nach § 18 Abs. 2 MStV", body: ["Verantwortlich für journalistisch-redaktionelle Inhalte, soweit solche Inhalte angeboten werden: Enrico Gross, Gerther Straße 76, 44577 Castrop-Rauxel, Deutschland."] },
+      { id: "streitschlichtung", title: "Streitbeilegung", body: ["Nuria Pflege ist nicht verpflichtet und nicht bereit, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen."] },
     ],
   },
   privacy: {
     title: "Datenschutzerklärung",
-    intro: "Informationen zur Verarbeitung personenbezogener Daten bei Nuria Pflege.",
+    intro: "Informationen zur Verarbeitung personenbezogener Daten bei Nuria Pflege nach DSGVO und deutschem Datenschutzrecht.",
     sections: [
       { id: "verantwortlicher", title: "1. Verantwortlicher", body: ["Verantwortlich für diese Website und die Bereitstellung von Nuria Pflege ist Enrico Gross, Nuria Pflege, Gerther Straße 76, 44577 Castrop-Rauxel, Deutschland. Kontakt: kontakt@nuria-pflege.de."] },
-      { id: "hinweise", title: "2. Allgemeine Hinweise", body: ["Personenbezogene Daten werden verarbeitet, soweit dies zur Bereitstellung der Website, zur Registrierung, zur Nutzung geschützter Softwarebereiche, zur Bearbeitung von Anfragen oder zur Erfüllung organisatorischer und vertraglicher Zwecke erforderlich ist."] },
-      { id: "hosting", title: "3. Hosting und technische Infrastruktur", body: ["Nuria Pflege wird technisch über Vercel und Supabase bereitgestellt. Dabei können technische Server- und Logdaten verarbeitet werden, um Website und Anwendung auszuliefern, Sicherheit zu gewährleisten, Fehler zu analysieren und den Betrieb zu ermöglichen."] },
-      { id: "supabase", title: "4. Supabase", body: ["Supabase wird für Authentifizierung, Datenbankfunktionen und die Speicherung anwendungsbezogener Daten eingesetzt. Dazu können Benutzerkonten, Unternehmensdaten, Rollen, Klientendaten, Mitarbeiterdaten, Dokumente, interne Kommunikation, Zeiterfassung, Abwesenheiten und technische Verarbeitungsdaten gehören."] },
-      { id: "konto", title: "5. Registrierung und Benutzerkonto", body: ["Bei der Registrierung eines Pflegedienstes werden Unternehmensdaten, Inhaber-Konto, Login-Daten sowie rollen- und rechtebezogene Informationen verarbeitet. Mitarbeiterkonten können durch berechtigte Nutzer angelegt oder eingeladen werden."] },
-      { id: "mandanten", title: "6. Pflegeunternehmen und Mandantentrennung", body: ["Daten werden mandantenbezogen verarbeitet. Jeder Pflegedienst arbeitet in einem eigenen Organisationsbereich. Zugriffe richten sich nach Rollen, Berechtigungen und Zuweisungen; Mitarbeiter sehen nur eigene oder zugewiesene Inhalte."] },
-      { id: "klienten", title: "7. Klienten- und Patientendaten", body: ["Pflegedienste können Klientendaten im System verarbeiten, um interne Organisation, Dienstplanung, Touren, Dokumentation und Kommunikation zu unterstützen. Diese Daten werden nicht öffentlich dargestellt und sind aufgrund ihrer Sensibilität besonders sorgfältig zu behandeln."] },
-      { id: "dokumente", title: "8. Dokumente und Uploads", body: ["Dokumente können in geschützten internen Bereichen hochgeladen und Klienten, Einsätzen, Touren oder weiteren organisatorischen Vorgängen zugeordnet werden. Der Zugriff erfolgt rollen- und berechtigungsbezogen."] },
-      { id: "kommunikation", title: "9. Interne Kommunikation", body: ["Nuria Pflege kann Nachrichten, Konversationen, Teilnehmerinformationen und Nachrichteninhalte zwischen berechtigten Benutzern speichern und verarbeiten."] },
-      { id: "planung", title: "10. Zeiterfassung, Dienstplanung und Tourenplanung", body: ["Zur Organisation des Pflegealltags können Dienst- und Einsatzdaten, Touren, Arbeitszeiten, Statusinformationen und Notizen verarbeitet werden."] },
-      { id: "kontakt", title: "11. Kontaktaufnahme", body: ["Bei Kontaktaufnahme können Name, E-Mail-Adresse, Unternehmen und Nachricht verarbeitet werden, um die Anfrage zu bearbeiten und zu beantworten."] },
-      { id: "cookies", title: "12. Cookies", body: ["Aktuell verwendet Nuria Pflege nur technisch notwendige Cookies, die für Betrieb, Sicherheit und Anmeldung erforderlich sind. Werden später Tracking- oder Marketingtools eingebunden, ist hierfür eine gesonderte Einwilligungslösung erforderlich."] },
-      { id: "google", title: "13. Google Search Console und Google Business", body: ["Google Search Console dient der technischen Auswertung der Website-Auffindbarkeit und setzt keinen Cookie-Banner für Besucher voraus. Google Business wird nur relevant, soweit externe Google-Angebote tatsächlich verlinkt oder eingebunden werden."] },
-      { id: "empfaenger", title: "14. Empfänger und Auftragsverarbeiter", body: ["Als technische Dienstleister werden Vercel und Supabase eingesetzt. Weitere Dienstleister werden nur berücksichtigt, soweit sie tatsächlich genutzt werden."] },
-      { id: "dauer", title: "15. Speicherdauer", body: ["Daten werden gespeichert, solange dies für die jeweiligen Zwecke erforderlich ist, ein Nutzungs- oder Vertragsverhältnis besteht, gesetzliche Aufbewahrungsfristen gelten oder berechtigte Interessen bestehen. Löschanfragen können an kontakt@nuria-pflege.de gerichtet werden."] },
-      { id: "rechte", title: "16. Rechte betroffener Personen", list: ["Auskunft", "Berichtigung", "Löschung", "Einschränkung der Verarbeitung", "Datenübertragbarkeit", "Widerspruch", "Beschwerde bei einer zuständigen Aufsichtsbehörde"] },
-      { id: "sicherheit", title: "17. Sicherheit", body: ["Nuria Pflege nutzt rollenbasierte Zugriffe, Mandantentrennung, Zugriffsbeschränkungen und technische sowie organisatorische Maßnahmen, um Daten im Rahmen der Anwendung geschützt zu verarbeiten."] },
+      { id: "datenschutzbeauftragter", title: "2. Datenschutzbeauftragter", body: ["Datenschutzbeauftragter und Ansprechpartner für Datenschutzanfragen: Enrico Gross, Nuria Pflege, Gerther Straße 76, 44577 Castrop-Rauxel, Deutschland. Kontakt: kontakt@nuria-pflege.de."] },
+      { id: "grundlagen", title: "3. Zwecke und Rechtsgrundlagen", body: ["Personenbezogene Daten werden verarbeitet, soweit dies zur Bereitstellung der Website, zur Registrierung, zur Nutzung geschützter Softwarebereiche, zur Bearbeitung von Anfragen, zur Vertragsanbahnung, zur Vertragserfüllung, zur Erfüllung rechtlicher Pflichten oder zur Wahrung berechtigter Interessen erforderlich ist. Als Rechtsgrundlagen kommen insbesondere Art. 6 Abs. 1 lit. b DSGVO, Art. 6 Abs. 1 lit. c DSGVO, Art. 6 Abs. 1 lit. f DSGVO und, sofern eine Einwilligung eingeholt wird, Art. 6 Abs. 1 lit. a DSGVO in Betracht."] },
+      { id: "hosting", title: "4. Hosting und technische Infrastruktur", body: ["Nuria Pflege wird technisch über Vercel und Supabase bereitgestellt. Dabei können technische Server- und Logdaten verarbeitet werden, etwa IP-Adresse, Zeitpunkt des Zugriffs, angeforderte Ressourcen, Browser- und Geräteinformationen sowie technische Fehlerdaten, um Website und Anwendung auszuliefern, Sicherheit zu unterstützen, Störungen zu analysieren und den Betrieb zu ermöglichen.", "Vercel veröffentlicht Informationen zu Datenschutz, Sicherheit und internationalen Datentransfers. Diese Informationen werden bei der datenschutzrechtlichen Einordnung berücksichtigt."] },
+      { id: "supabase", title: "5. Supabase", body: ["Supabase wird für Authentifizierung, Datenbankfunktionen und anwendungsbezogene Speicherung eingesetzt. Die Supabase-Projektregion ist die EU-Region. Dazu können Benutzerkonten, Unternehmensdaten, Rollen, Rechte, Klientendaten, Mitarbeiterdaten, Dokumente, interne Kommunikation, Zeiterfassung, Abwesenheiten, Standorte, Notizen, Übergaben und technische Verarbeitungsdaten gehören.", "Supabase veröffentlicht Informationen zu Datenschutz, Sicherheit und Transfermechanismen. Diese Informationen werden bei der datenschutzrechtlichen Einordnung berücksichtigt."] },
+      { id: "konto", title: "6. Registrierung und Benutzerkonto", body: ["Bei der Registrierung eines Pflegedienstes werden Unternehmensdaten, Inhaber-Konto, Login-Daten, Tarif- und Zahlungsstatus sowie rollen- und rechtebezogene Informationen verarbeitet. Mitarbeiterkonten können durch berechtigte Nutzer angelegt oder eingeladen werden."] },
+      { id: "mandanten", title: "7. Pflegeunternehmen und Mandantentrennung", body: ["Daten werden organisations- und mandantenbezogen verarbeitet. Jeder Pflegedienst arbeitet in einem eigenen Organisationsbereich. Zugriffe richten sich nach Rollen, Berechtigungen und Zuweisungen; Mitarbeiter sehen nur eigene oder zugewiesene Inhalte."] },
+      { id: "klienten", title: "8. Klienten- und Patientendaten", body: ["Pflegedienste können Klienten- und Patientendaten im System verarbeiten, um interne Organisation, Dienstplanung, Touren, Dokumentenablage, Notizen, Übergaben und Kommunikation zu unterstützen. Diese Daten werden nicht öffentlich dargestellt und können je nach Eingabe besondere Kategorien personenbezogener Daten im Sinne von Art. 9 DSGVO betreffen. Für die rechtmäßige Eingabe und Nutzung solcher Daten bleibt der jeweilige Pflegedienst verantwortlich."] },
+      { id: "dokumente", title: "9. Dokumente und Uploads", body: ["Dokumente können in geschützten internen Bereichen hochgeladen und Klienten, Einsätzen, Touren oder weiteren organisatorischen Vorgängen zugeordnet werden. Der Zugriff erfolgt rollen- und berechtigungsbezogen."] },
+      { id: "kommunikation", title: "10. Interne Kommunikation", body: ["Nuria Pflege kann Nachrichten, Konversationen, Teilnehmerinformationen, Ankündigungen und Nachrichteninhalte zwischen berechtigten Benutzern speichern und verarbeiten."] },
+      { id: "planung", title: "11. Zeiterfassung, Dienstplanung und Tourenplanung", body: ["Zur Organisation des Pflegealltags können Dienst- und Einsatzdaten, Touren, Arbeitszeiten, Statusinformationen, Abwesenheiten, Urlaube und organisatorische Notizen verarbeitet werden."] },
+      { id: "kontakt", title: "12. Kontaktaufnahme", body: ["Bei Kontaktaufnahme können Name, E-Mail-Adresse, Unternehmen, Telefonnummer und Nachricht verarbeitet werden, um die Anfrage zu bearbeiten und zu beantworten."] },
+      { id: "cookies", title: "13. Cookies und lokale Speicherung", body: ["Aktuell verwendet Nuria Pflege nur technisch notwendige Cookies und vergleichbare Speichermechanismen, die für Betrieb, Sicherheit, Anmeldung, Session-Verwaltung und die Speicherung der Cookie-Auswahl erforderlich sind. Grundlage für den Zugriff auf Endeinrichtungen ist bei technisch notwendigen Vorgängen § 25 Abs. 2 TDDDG. Werden später Tracking- oder Marketingtools eingebunden, ist hierfür eine gesonderte Einwilligungslösung erforderlich."], list: ["nuria_cookie_consent: speichert die Cookie-Auswahl, Speicherdauer bis zu 6 Monate.", "sb-<project-ref>-auth-token: Supabase-Authentifizierungsspeicher für angemeldete Benutzer, Speicherdauer abhängig von Sitzung, Token-Laufzeit oder Logout.", "technische Server- und Sicherheitslogs bei Vercel/Supabase: dienen Betrieb, Sicherheit und Fehleranalyse."] },
+      { id: "google", title: "14. Google Search Console und Google Business", body: ["Google Search Console kann zur technischen Auswertung der Auffindbarkeit der Website genutzt werden und setzt hierfür keinen Cookie-Banner für Website-Besucher voraus. Google Business ist nur relevant, soweit externe Google-Angebote tatsächlich verlinkt oder eingebunden werden."] },
+      { id: "empfaenger", title: "15. Empfänger und Auftragsverarbeiter", body: ["Als technische Dienstleister werden Vercel Inc. für Hosting, Auslieferung und technische Plattformdienste sowie Supabase Inc. für Datenbank, Authentifizierung, Storage und technische Backend-Dienste eingesetzt. Weitere Empfänger oder Auftragsverarbeiter werden nur berücksichtigt, soweit sie tatsächlich genutzt werden."] },
+      { id: "drittland", title: "16. Drittlandbezug", body: ["Die Supabase-Projektregion ist die EU-Region. Je nach eingesetzter technischer Infrastruktur, Support-, Sicherheits- oder Betriebsprozessen kann eine Verarbeitung außerhalb der Europäischen Union oder des Europäischen Wirtschaftsraums dennoch nicht vollständig ausgeschlossen werden. In solchen Fällen sind geeignete Garantien nach DSGVO zu berücksichtigen."] },
+      { id: "dauer", title: "17. Speicherdauer", body: ["Daten werden gespeichert, solange dies für die jeweiligen Zwecke erforderlich ist, ein Nutzungs- oder Vertragsverhältnis besteht, gesetzliche Aufbewahrungsfristen gelten oder berechtigte Interessen bestehen. Löschanfragen können an kontakt@nuria-pflege.de gerichtet werden."] },
+      { id: "rechte", title: "18. Rechte betroffener Personen", list: ["Auskunft nach Art. 15 DSGVO", "Berichtigung nach Art. 16 DSGVO", "Löschung nach Art. 17 DSGVO", "Einschränkung der Verarbeitung nach Art. 18 DSGVO", "Datenübertragbarkeit nach Art. 20 DSGVO", "Widerspruch nach Art. 21 DSGVO", "Widerruf erteilter Einwilligungen mit Wirkung für die Zukunft", "Beschwerde bei einer zuständigen Datenschutzaufsichtsbehörde"] },
+      { id: "sicherheit", title: "19. Sicherheit", body: ["Nuria Pflege nutzt rollenbasierte Zugriffe, Mandantentrennung, Zugriffsbeschränkungen und technische sowie organisatorische Maßnahmen, um Daten im Rahmen der Anwendung geschützt zu verarbeiten. Eine absolute Sicherheit kann bei internetbasierten Diensten nicht zugesichert werden."] },
     ],
   },
   terms: {
     title: "Allgemeine Geschäftsbedingungen",
-    intro: "Vorbereitete Nutzungsbedingungen für die SaaS-Plattform Nuria Pflege.",
+    intro: "Nutzungsbedingungen für Nuria Pflege als Software-as-a-Service-Angebot für ambulante Pflegedienste.",
     sections: [
-      { id: "geltung", title: "1. Geltungsbereich", body: ["Diese Bedingungen gelten für die Nutzung von Nuria Pflege durch Pflegedienste und Unternehmen."] },
-      { id: "gegenstand", title: "2. Vertragsgegenstand", body: ["Nuria Pflege ist eine digitale Softwareplattform zur internen Organisation ambulanter Pflegedienste, insbesondere für Dienstplanung, Tourenplanung, Mitarbeiterorganisation, Klientenverwaltung, Dokumentenablage, Zeiterfassung und interne Kommunikation."] },
-      { id: "registrierung", title: "3. Registrierung und Nutzerkonto", body: ["Die Registrierung erfolgt durch einen berechtigten Inhaber oder eine entsprechend verantwortliche Person. Unternehmensdaten, Benutzerkonten, Rollen und Berechtigungen sind richtig und aktuell zu halten."] },
-      { id: "nutzung", title: "4. Nutzung der Software", body: ["Die Nutzung erfolgt nach Rolle und Berechtigung. Nuria Pflege ersetzt keine medizinische Beratung, keine rechtliche Beratung und garantiert keine bestimmten medizinischen, organisatorischen oder rechtlichen Ergebnisse. Eine missbräuchliche Nutzung ist untersagt."] },
+      { id: "geltung", title: "1. Geltungsbereich", body: ["Diese Bedingungen gelten für die Nutzung von Nuria Pflege durch Pflegedienste, Unternehmen und sonstige Unternehmer im Sinne von § 14 BGB. Das Angebot richtet sich nicht an Verbraucher im Sinne von § 13 BGB."] },
+      { id: "gegenstand", title: "2. Vertragsgegenstand", body: ["Nuria Pflege ist eine digitale Softwareplattform zur internen Organisation ambulanter Pflegedienste, insbesondere für Dienstplanung, Tourenplanung, Mitarbeiterorganisation, Klientenverwaltung, Dokumentenablage, Zeiterfassung, interne Kommunikation, Notizen, Übergaben, Abwesenheiten, Rollen, Rechte und Standorte."] },
+      { id: "registrierung", title: "3. Registrierung und Nutzerkonto", body: ["Die Registrierung erfolgt durch einen berechtigten Inhaber oder eine entsprechend verantwortliche Person. Unternehmensdaten, Benutzerkonten, Rollen, Berechtigungen und Tarifinformationen sind richtig und aktuell zu halten."] },
+      { id: "nutzung", title: "4. Nutzung der Software", body: ["Die Nutzung erfolgt nach Rolle und Berechtigung. Nuria Pflege ersetzt keine medizinische Beratung und keine rechtliche Beratung und garantiert keine bestimmten medizinischen, organisatorischen oder rechtlichen Ergebnisse. Eine missbräuchliche oder rechtswidrige Nutzung ist untersagt."] },
       { id: "tarife", title: "5. Tarife und Zahlung", body: ["Der Starttarif beträgt 89 € monatlich. Laufzeitoptionen können mit 5 % Rabatt für 3 Monate, 10 % Rabatt für 6 Monate oder 15 % Rabatt für 12 Monate gewählt werden. Zahlungen erfolgen per Banküberweisung über den internen Tarif- und Zahlungsbereich."] },
-      { id: "aktivierung", title: "6. Aktivierung und Zahlungsbestätigung", body: ["Der Kunde kann bestätigen, dass eine Zahlung vorgenommen wurde. Der Zugang kann daraufhin vorläufig freigeschaltet werden. Der Zahlungseingang wird geprüft und innerhalb von 5 Tagen erwartet. Bei ausbleibender Zahlung kann der Zugang eingeschränkt oder gesperrt werden."] },
-      { id: "pflichten", title: "7. Pflichten des Kunden", list: ["rechtmäßige Nutzung der Software", "eigene Verantwortung für eingegebene Daten", "Schutz von Zugangsdaten", "korrekte Verwaltung von Mitarbeiterzugängen", "Einladung nur berechtigter Personen"] },
-      { id: "datenschutz", title: "8. Datenschutz und Auftragsverarbeitung", body: ["Die Nutzung kann die Verarbeitung personenbezogener Daten beinhalten. Ein AV-Vertrag nach Art. 28 DSGVO wird bereitgestellt. Der Kunde bleibt für die rechtmäßige Eingabe und Nutzung der Daten verantwortlich."] },
-      { id: "verfuegbarkeit", title: "9. Verfügbarkeit", body: ["Nuria Pflege wird als Software bereitgestellt. Wartungen, technische Einschränkungen oder Störungen können auftreten und werden möglichst zeitnah bearbeitet. Eine ununterbrochene Verfügbarkeit wird nicht zugesichert."] },
-      { id: "haftung", title: "10. Haftung", body: ["Die Haftung richtet sich nach den gesetzlichen Bestimmungen. Für vom Kunden eingegebene Inhalte, deren Richtigkeit und rechtmäßige Nutzung ist der Kunde verantwortlich."] },
-      { id: "laufzeit", title: "11. Laufzeit und Kündigung", body: ["Die Laufzeit richtet sich nach der gewählten Tarif- oder Laufzeitoption. Eine Kündigung erfolgt zum Ende der jeweiligen Laufzeit nach den im Tarif- und Zahlungsbereich angegebenen Bedingungen."] },
-      { id: "leistungen", title: "12. Änderungen der Leistungen", body: ["Nuria Pflege kann funktional weiterentwickelt werden. Wesentliche Änderungen werden angemessen kommuniziert."] },
-      { id: "schluss", title: "13. Schlussbestimmungen", body: ["Es gilt deutsches Recht, soweit rechtlich zulässig. Gerichtsstandvereinbarungen gelten nur, soweit gesetzlich zulässig. Sollte eine Regelung unwirksam sein, bleiben die übrigen Regelungen unberührt."] },
+      { id: "aktivierung", title: "6. Aktivierung und Zahlungsbestätigung", body: ["Der Kunde kann bestätigen, dass eine Zahlung vorgenommen wurde. Der Zugang kann daraufhin vorläufig freigeschaltet werden. Der Zahlungseingang wird geprüft und innerhalb von 5 Kalendertagen erwartet. Bei ausbleibender Zahlung kann der Zugang eingeschränkt oder gesperrt werden."] },
+      { id: "pflichten", title: "7. Pflichten des Kunden", list: ["rechtmäßige Nutzung der Software", "eigene Verantwortung für eingegebene Daten", "Schutz von Zugangsdaten", "korrekte Verwaltung von Mitarbeiterzugängen", "Einladung nur berechtigter Personen", "Beachtung datenschutzrechtlicher Pflichten bei Klienten-, Patienten- und Mitarbeiterdaten"] },
+      { id: "datenschutz", title: "8. Datenschutz und Auftragsverarbeitung", body: ["Die Nutzung kann die Verarbeitung personenbezogener Daten beinhalten. Soweit Nuria Pflege Daten im Auftrag des Kunden verarbeitet, wird ein AV-Vertrag nach Art. 28 DSGVO bereitgestellt. Der Kunde bleibt für die rechtmäßige Eingabe, Pflege und Nutzung der Daten verantwortlich."] },
+      { id: "verfuegbarkeit", title: "9. Verfügbarkeit", body: ["Nuria Pflege wird als internetbasierte Software bereitgestellt. Wartungen, technische Einschränkungen oder Störungen können auftreten und werden möglichst zeitnah bearbeitet. Eine ununterbrochene Verfügbarkeit wird nicht zugesichert."] },
+      { id: "haftung", title: "10. Haftung", body: ["Die Haftung richtet sich nach den gesetzlichen Bestimmungen. Für vom Kunden eingegebene Inhalte, deren Richtigkeit, deren rechtmäßige Nutzung und die fachliche Bewertung im Pflegebetrieb ist der Kunde verantwortlich."] },
+      { id: "laufzeit", title: "11. Laufzeit und Kündigung", body: ["Die Laufzeit richtet sich nach der gewählten Tarif- oder Laufzeitoption. Monatliche Laufzeiten können zum Ende des laufenden Abrechnungsmonats gekündigt werden. Laufzeiten über 3, 6 oder 12 Monate können zum Ende der gebuchten Laufzeit gekündigt werden. Die Kündigung kann in Textform per E-Mail an kontakt@nuria-pflege.de erfolgen."] },
+      { id: "verlaengerung", title: "12. Verlängerung", body: ["Sofern keine Kündigung zum Ende der laufenden Laufzeit erfolgt, kann der Zugang für die gleiche oder eine im Tarifbereich gewählte neue Laufzeit fortgeführt werden. Eine automatische Abbuchung findet nicht statt, solange Zahlung per Banküberweisung vorgesehen ist."] },
+      { id: "leistungen", title: "13. Änderungen der Leistungen", body: ["Nuria Pflege kann funktional weiterentwickelt werden. Wesentliche Änderungen, die die Nutzung erheblich betreffen, werden angemessen kommuniziert."] },
+      { id: "schluss", title: "14. Schlussbestimmungen", body: ["Es gilt deutsches Recht, soweit rechtlich zulässig. Gerichtsstandvereinbarungen gelten nur, soweit gesetzlich zulässig. Sollte eine Regelung unwirksam sein, bleiben die übrigen Regelungen unberührt."] },
     ],
   },
   cookies: {
     title: "Cookie-Einstellungen",
     intro: "Informationen zu technisch notwendigen Cookies bei Nuria Pflege.",
     sections: [
-      { id: "stand", title: "Aktueller Stand", body: ["Aktuell verwendet Nuria Pflege nur technisch notwendige Cookies, die für Betrieb, Sicherheit und Anmeldung erforderlich sind."] },
-      { id: "notwendig", title: "Technisch notwendige Cookies", body: ["Diese Cookies und vergleichbaren Speichermechanismen dienen der sicheren Bereitstellung der Website, der Anmeldung, der Session-Verwaltung und dem Schutz interner Bereiche."] },
+      { id: "stand", title: "Aktueller Stand", body: ["Aktuell verwendet Nuria Pflege nur technisch notwendige Cookies und vergleichbare Speichermechanismen, die für Betrieb, Sicherheit, Anmeldung und Cookie-Auswahl erforderlich sind."] },
+      { id: "notwendig", title: "Technisch notwendige Cookies", body: ["Diese Cookies und vergleichbaren Speichermechanismen dienen der sicheren Bereitstellung der Website, der Anmeldung, der Session-Verwaltung, der Speicherung der Cookie-Auswahl und dem Schutz interner Bereiche. Technisch notwendige Speicherungen können nach § 25 Abs. 2 TDDDG ohne gesonderte Einwilligung zulässig sein, wenn sie für den ausdrücklich gewünschten digitalen Dienst erforderlich sind."], list: ["nuria_cookie_consent: speichert die Auswahl im Cookie-Banner, Speicherdauer bis zu 6 Monate.", "sb-<project-ref>-auth-token: Supabase-Authentifizierungsspeicher für angemeldete Benutzer, Speicherdauer abhängig von Sitzung, Token-Laufzeit oder Logout.", "technische Server- und Sicherheitslogs bei Vercel/Supabase: Betrieb, Sicherheit und Fehleranalyse."] },
       { id: "keine-werbung", title: "Keine Werbe- oder Tracking-Cookies", body: ["Es werden keine Google-Analytics-, Meta-Pixel-, TikTok-Pixel- oder vergleichbaren Marketing-Cookies gesetzt, solange solche Dienste nicht aktiv eingebunden sind."] },
-      { id: "dauer", title: "Speicherdauer", body: ["Die Speicherdauer richtet sich nach dem jeweiligen technischen Zweck, insbesondere nach der Dauer einer Sitzung oder nach sicherheitsbezogenen Anforderungen."] },
+      { id: "dauer", title: "Speicherdauer", body: ["Die Speicherdauer richtet sich nach dem jeweiligen technischen Zweck, insbesondere nach der Dauer einer Sitzung, nach sicherheitsbezogenen Anforderungen oder nach technisch notwendigen Anmeldefunktionen."] },
+      { id: "aenderungen", title: "Änderungen", body: ["Wenn später Analyse-, Marketing- oder externe Trackingdienste eingebunden werden, muss diese Seite angepasst und eine passende Einwilligungslösung umgesetzt werden."] },
     ],
   },
   withdrawal: {
     title: "Widerruf",
     intro: "Hinweise zum Widerruf bei einer B2B-Softwareleistung.",
     sections: [
-      { id: "ausrichtung", title: "Angebot für Unternehmen", body: ["Nuria Pflege richtet sich an Pflegedienste und Unternehmen und damit grundsätzlich an Unternehmer im Sinne des B2B-Bereichs."] },
-      { id: "verbraucher", title: "Verbraucherwiderrufsrecht", body: ["Ein gesetzliches Verbraucherwiderrufsrecht gilt grundsätzlich für Verbraucher. Bei Verträgen zwischen Unternehmen besteht ein solches gesetzliches Verbraucherwiderrufsrecht in der Regel nicht."] },
-      { id: "regelungen", title: "Individuelle Regelungen", body: ["Abweichende oder ergänzende vertragliche Regelungen können im Einzelfall vereinbart werden."] },
+      { id: "ausrichtung", title: "Angebot für Unternehmen", body: ["Nuria Pflege richtet sich an Pflegedienste, Unternehmen und sonstige Unternehmer im Sinne von § 14 BGB. Das Angebot ist nicht auf den Abschluss von Verbraucherverträgen mit Verbrauchern im Sinne von § 13 BGB ausgerichtet."] },
+      { id: "verbraucher", title: "Verbraucherwiderrufsrecht", body: ["Das gesetzliche Widerrufsrecht nach §§ 312g, 355 BGB betrifft grundsätzlich Verbraucher bei außerhalb von Geschäftsräumen geschlossenen Verträgen und Fernabsatzverträgen. Bei Verträgen zwischen Unternehmern besteht ein solches gesetzliches Verbraucherwiderrufsrecht in der Regel nicht."] },
+      { id: "regelungen", title: "Individuelle Regelungen", body: ["Abweichende oder ergänzende vertragliche Regelungen können im Einzelfall vereinbart werden. Gesetzliche Rechte, die unabhängig von einem Verbraucherwiderrufsrecht bestehen, bleiben unberührt."] },
     ],
   },
   dpa: {
@@ -917,9 +971,11 @@ const legalPages: Record<Exclude<LegalPageKey, "legal">, { title: string; intro:
     intro: "Informationen zur Auftragsverarbeitung nach Art. 28 DSGVO.",
     sections: [
       { id: "einordnung", title: "Auftragsverarbeitung", body: ["Nuria Pflege kann personenbezogene Daten im Auftrag des jeweiligen Pflegedienstes verarbeiten, soweit der Pflegedienst Daten in der Software erfasst und verwaltet."] },
-      { id: "av", title: "AV-Vertrag", body: ["Für diese Verarbeitung wird ein AV-Vertrag nach Art. 28 DSGVO bereitgestellt. Der AV-Vertrag kann vor Nutzung oder auf Anfrage bereitgestellt werden."], link: { href: "mailto:kontakt@nuria-pflege.de?subject=AV-Vertrag%20Nuria%20Pflege", label: "AV-Vertrag anfragen" } },
-      { id: "unterauftrag", title: "Unterauftragsverarbeiter", list: ["Vercel", "Supabase"] },
-      { id: "verantwortung", title: "Verantwortlichkeiten", body: ["Der Pflegedienst bleibt für die rechtmäßige Eingabe und Nutzung personenbezogener Daten verantwortlich. Nuria Pflege unterstützt die technische Verarbeitung im Rahmen der bereitgestellten Anwendung."] },
+      { id: "av", title: "AV-Vertrag", body: ["Für diese Verarbeitung wird ein AV-Vertrag nach Art. 28 DSGVO bereitgestellt. Der AV-Vertrag regelt insbesondere Gegenstand und Dauer der Verarbeitung, Art und Zweck der Verarbeitung, Arten personenbezogener Daten, Kategorien betroffener Personen, Weisungen, Vertraulichkeit, technische und organisatorische Maßnahmen, Unterauftragsverarbeiter, Unterstützungspflichten sowie Rückgabe oder Löschung von Daten."], link: { href: "mailto:kontakt@nuria-pflege.de?subject=AV-Vertrag%20Nuria%20Pflege", label: "AV-Vertrag anfragen" } },
+      { id: "unterauftrag", title: "Unterauftragsverarbeiter", list: ["Vercel Inc.: Hosting, Auslieferung, Plattformbetrieb, technische Logs und Sicherheitsfunktionen.", "Supabase Inc.: Datenbank, Authentifizierung, Storage und technische Backend-Dienste."] },
+      { id: "transfer", title: "Internationale Übermittlungen", body: ["Die Supabase-Projektregion ist die EU-Region. Je nach technischer Infrastruktur, Support-, Sicherheits- oder Betriebsprozessen können internationale Übermittlungen dennoch nicht vollständig ausgeschlossen werden. In solchen Fällen sind geeignete Garantien nach DSGVO zu berücksichtigen."] },
+      { id: "verantwortung", title: "Verantwortlichkeiten", body: ["Der Pflegedienst bleibt Verantwortlicher für die rechtmäßige Eingabe, Pflege und Nutzung personenbezogener Daten in seinem Organisationsbereich. Nuria Pflege unterstützt die technische Verarbeitung im Rahmen der bereitgestellten Anwendung und verarbeitet Daten nach Maßgabe des AV-Vertrags."] },
+      { id: "besondere-daten", title: "Besondere Kategorien personenbezogener Daten", body: ["Soweit Pflegedienste Gesundheitsdaten oder vergleichbar sensible Daten in Nuria Pflege eintragen, betrifft dies besondere Kategorien personenbezogener Daten. Die Zulässigkeit der Verarbeitung und die hierfür erforderlichen Rechtsgrundlagen sind vom jeweiligen Pflegedienst zu prüfen und sicherzustellen."] },
     ],
   },
   tom: {
@@ -930,8 +986,10 @@ const legalPages: Record<Exclude<LegalPageKey, "legal">, { title: string; intro:
       { id: "rollen", title: "Benutzerrollen und Datenzugriff", body: ["Inhaber, PDL, Verwaltung und Mitarbeiter erhalten unterschiedliche Ansichten und Berechtigungen. Mitarbeiter sehen nur eigene oder zugewiesene Inhalte."] },
       { id: "mandanten", title: "Mandantentrennung", body: ["Pflegedienste arbeiten in getrennten Organisationsbereichen. Daten werden mandantenbezogen strukturiert."] },
       { id: "dokumente", title: "Dokumentenzugriff", body: ["Dokumente und Uploads werden internen Bereichen zugeordnet und rollenbezogen zugänglich gemacht."] },
-      { id: "hosting", title: "Hosting und Infrastruktur", body: ["Die technische Bereitstellung erfolgt über Vercel und Supabase."] },
-      { id: "protokolle", title: "Protokollierung, Sicherung und Verfügbarkeit", body: ["Soweit vorhanden, können Aktivitätsprotokolle, Exportmöglichkeiten und organisatorische Löschprozesse zur Nachvollziehbarkeit und Verwaltung eingesetzt werden."] },
+      { id: "hosting", title: "Hosting und Infrastruktur", body: ["Die technische Bereitstellung erfolgt über Vercel und Supabase. Die Supabase-Projektregion ist die EU-Region. Diese Dienste stellen Infrastruktur für Auslieferung, Datenbank, Authentifizierung, Storage, technische Speicherung, Sicherheitsfunktionen und Fehleranalyse bereit."] },
+      { id: "protokolle", title: "Protokollierung und Nachvollziehbarkeit", body: ["Soweit im System vorhanden, können Aktivitätsprotokolle und technische Protokolldaten zur Nachvollziehbarkeit, Fehleranalyse, Sicherheit und Verwaltung eingesetzt werden."] },
+      { id: "verfuegbarkeit", title: "Sicherung und Verfügbarkeit", body: ["Sicherungs-, Wiederherstellungs- und Verfügbarkeitsmaßnahmen richten sich nach der eingesetzten technischen Infrastruktur und den dort verfügbaren Funktionen. Eine absolute Verfügbarkeit wird nicht zugesichert."] },
+      { id: "loeschung", title: "Löschung und Export", body: ["Soweit Funktionen vorhanden sind, können Daten exportiert oder gelöscht werden. Organisatorische Löschprozesse sind vom jeweiligen Pflegedienst im Rahmen seiner Verantwortlichkeit festzulegen."] },
       { id: "dokumentation", title: "Dokumentation", body: ["Die technischen und organisatorischen Maßnahmen werden dokumentiert und im Rahmen der rechtlichen Vorbereitung geprüft."] },
     ],
   },
@@ -1072,6 +1130,7 @@ export function PublicSite({ page = "home" }: { page?: PublicPage }) {
         {page === "imprint" || page === "privacy" || page === "terms" || page === "cookies" || page === "withdrawal" || page === "dpa" || page === "tom" || page === "legal" ? <LegalPage page={page} /> : null}
       </main>
       <PublicFooter />
+      <CookieConsentBanner />
     </div>
   );
 }

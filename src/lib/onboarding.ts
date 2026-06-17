@@ -1,5 +1,6 @@
 import { calculatePlan, plans, type BillingInterval } from "@/lib/payment";
 import { getSupabaseServerClient } from "@/lib/supabase-server";
+import { cookies } from "next/headers";
 
 export type OnboardingStatus = "in_progress" | "completed";
 
@@ -48,12 +49,14 @@ export type OnboardingData = {
   isOverdue: boolean;
 };
 
-export function companyId() {
-  return process.env.NURIA_DEV_COMPANY_ID ?? null;
+export async function companyId() {
+  const cookieStore = await cookies();
+  return cookieStore.get("nuria_company_id")?.value ?? process.env.NURIA_DEV_COMPANY_ID ?? null;
 }
 
-export function userId() {
-  return process.env.NURIA_DEV_USER_ID ?? null;
+export async function userId() {
+  const cookieStore = await cookies();
+  return cookieStore.get("nuria_user_id")?.value ?? process.env.NURIA_DEV_USER_ID ?? null;
 }
 
 export function canCompanyWrite(company: { onboarding_status?: string | null; payment_status?: string | null; admin_confirmed_at?: string | null; payment_due_until?: string | null; payment_due_check_at?: string | null } | null) {
@@ -71,7 +74,7 @@ export function isCompanyPaymentOverdue(company: { payment_status?: string | nul
 
 export async function getCompanyAccessState() {
   const supabase = getSupabaseServerClient();
-  const cid = companyId();
+  const cid = await companyId();
   if (!supabase || !cid) return { canWrite: false, isOverdue: false, company: null };
   const { data: company } = await supabase
     .from("companies")
@@ -83,8 +86,8 @@ export async function getCompanyAccessState() {
 
 export async function getOnboardingData(): Promise<OnboardingData> {
   const supabase = getSupabaseServerClient();
-  const cid = companyId();
-  const uid = userId();
+  const cid = await companyId();
+  const uid = await userId();
   const planList = (Object.keys(plans) as BillingInterval[]).map(calculatePlan);
   const empty = {
     company: null,

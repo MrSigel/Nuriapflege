@@ -38,8 +38,8 @@ function normalizeInterval(raw: string | null): BillingInterval | null {
 
 export async function saveOnboardingCompany(formData: FormData): Promise<ActionResult> {
   const supabase = getSupabaseServerClient();
-  const cid = companyId();
-  const uid = userId();
+  const cid = await companyId();
+  const uid = await userId();
   if (!supabase || !cid) return fail("Onboarding ist aktuell nicht verfügbar.");
 
   let email: string;
@@ -87,7 +87,7 @@ export async function saveOnboardingCompany(formData: FormData): Promise<ActionR
 
 export async function saveOnboardingLocation(formData: FormData): Promise<ActionResult> {
   const supabase = getSupabaseServerClient();
-  const cid = companyId();
+  const cid = await companyId();
   if (!supabase || !cid) return fail("Onboarding ist aktuell nicht verfügbar.");
 
   let payload;
@@ -129,7 +129,7 @@ export async function saveOnboardingLocation(formData: FormData): Promise<Action
 
 export async function selectOnboardingPlan(formData: FormData): Promise<ActionResult> {
   const supabase = getSupabaseServerClient();
-  const cid = companyId();
+  const cid = await companyId();
   if (!supabase || !cid) return fail("Onboarding ist aktuell nicht verfügbar.");
 
   const interval = normalizeInterval(value(formData, "billing_interval"));
@@ -203,8 +203,8 @@ export async function confirmOnboardingPayment(formData: FormData): Promise<Acti
   if (formData.get("payment_confirmed") !== "on") return fail("Bitte bestätigen Sie die Zahlung.");
 
   const supabase = getSupabaseServerClient();
-  const cid = companyId();
-  const uid = userId();
+  const cid = await companyId();
+  const uid = await userId();
   if (!supabase || !cid) return fail("Onboarding ist aktuell nicht verfügbar.");
 
   const interval = normalizeInterval(value(formData, "billing_interval")) ?? "monthly";

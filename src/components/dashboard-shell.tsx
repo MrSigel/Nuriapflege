@@ -65,6 +65,20 @@ const roleLabels: Record<Role, string> = {
 
 const validRoles: Role[] = ["admin", "inhaber", "pdl", "verwaltung", "mitarbeiter", "pflegefachkraft"];
 
+function setDashboardContextCookies(userId: string, companyId: string) {
+  const secure = window.location.protocol === "https:" ? "; Secure" : "";
+  const options = `; Path=/; Max-Age=${60 * 60 * 24 * 30}; SameSite=Lax${secure}`;
+  document.cookie = `nuria_user_id=${encodeURIComponent(userId)}${options}`;
+  document.cookie = `nuria_company_id=${encodeURIComponent(companyId)}${options}`;
+}
+
+function clearDashboardContextCookies() {
+  const secure = window.location.protocol === "https:" ? "; Secure" : "";
+  const options = `; Path=/; Max-Age=0; SameSite=Lax${secure}`;
+  document.cookie = `nuria_user_id=${options}`;
+  document.cookie = `nuria_company_id=${options}`;
+}
+
 const iconByPath = {
   "/dashboard": LayoutDashboard,
   "/dashboard/onboarding": ClipboardCheck,
@@ -298,6 +312,7 @@ export function DashboardShell({ role, routes, children }: DashboardShellProps) 
         return;
       }
 
+      setDashboardContextCookies(user.id, profile.company_id);
       setProfileRole(loadedRole as Role);
       setProfileLoading(false);
     }
@@ -378,6 +393,7 @@ export function DashboardShell({ role, routes, children }: DashboardShellProps) 
       await supabase.auth.signOut();
     }
 
+    clearDashboardContextCookies();
     window.location.assign("/login");
   }
 
