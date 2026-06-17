@@ -1,17 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { requireCompanyRole } from "@/lib/current-user";
 import type { EmployeeRole } from "@/lib/employees";
 import { getSupabaseServerClient } from "@/lib/supabase-server";
 import { managedRoles, permissions } from "@/lib/permissions-config";
 
-function getCompanyId() {
-  return process.env.NURIA_DEV_COMPANY_ID ?? null;
-}
-
 export async function saveRolePermissions(formData: FormData) {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
+  const { companyId } = await requireCompanyRole(["inhaber", "pdl"]);
   if (!supabase || !companyId) return;
 
   const editableRoles = managedRoles.map((role) => role.key).filter((role) => role !== "inhaber");

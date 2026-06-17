@@ -36,6 +36,42 @@ function normalizeInterval(raw: string | null): BillingInterval | null {
   return raw && raw in plans ? raw as BillingInterval : null;
 }
 
+async function upsertPrimaryLocation(cid: string, uid: string | null) {
+  const supabase = getSupabaseServerClient();
+  if (!supabase) return false;
+
+  const { data: company } = await supabase
+    .from("companies")
+    .select("id,name,email,billing_email,phone,street,house_number,postal_code,city,state,country")
+    .eq("id", cid)
+    .maybeSingle();
+
+  if (!company?.name || !company.postal_code || !company.city) return false;
+
+  const payload = {
+    company_id: cid,
+    name: company.name,
+    street: company.street,
+    house_number: company.house_number,
+    postal_code: company.postal_code,
+    city: company.city,
+    state: company.state,
+    email: company.billing_email ?? company.email,
+    phone: company.phone,
+    location_type: "hauptstandort",
+    is_primary: true,
+    status: "active",
+    updated_by: uid,
+  };
+
+  const { data: existing } = await supabase.from("company_locations").select("id").eq("company_id", cid).eq("is_primary", true).maybeSingle();
+  const result = existing?.id
+    ? await supabase.from("company_locations").update(payload).eq("id", existing.id).eq("company_id", cid)
+    : await supabase.from("company_locations").insert({ ...payload, created_by: uid });
+
+  return !result.error;
+}
+
 export async function saveOnboardingCompany(formData: FormData): Promise<ActionResult> {
   const supabase = getSupabaseServerClient();
   const cid = await companyId();
@@ -77,6 +113,8 @@ export async function saveOnboardingCompany(formData: FormData): Promise<ActionR
         .eq("company_id", cid);
       if (profileError) return fail("Inhaber-Daten konnten nicht gespeichert werden.");
     }
+
+    await upsertPrimaryLocation(cid, uid);
   } catch {
     return fail("Bitte füllen Sie alle Pflichtfelder aus.");
   }
@@ -298,6 +336,8 @@ export async function confirmOnboardingPayment(formData: FormData): Promise<Acti
     .eq("id", paymentLogId)
     .eq("company_id", cid);
   if (logError) return fail("Zahlung konnte nicht bestätigt werden. Bitte versuchen Sie es erneut.");
+
+  if (!(await upsertPrimaryLocation(cid, uid))) return fail("Hauptstandort konnte nicht gespeichert werden.");
 
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/onboarding");

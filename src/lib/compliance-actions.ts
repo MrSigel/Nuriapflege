@@ -1,11 +1,139 @@
 "use server";
-import { revalidatePath } from "next/cache";import { getSupabaseServerClient } from "@/lib/supabase-server";import { writeActivityLog } from "@/lib/activity-log-actions";
-const cats=["datenschutz","zugriffskontrolle","rollen_rechte","exporte","loeschungen","dokumentation","aufbewahrung","technische_massnahmen","organisatorische_massnahmen","mitarbeiterzugriff","pruefprotokolle","sonstiges"] as const;const statuses=["open","in_progress","waiting","completed","overdue","archived"] as const;const priorities=["low","normal","high","urgent"] as const;const evTypes=["document","note","check","export_log","access_log","deletion_log","other"] as const;
-function cid(){return process.env.NURIA_DEV_COMPANY_ID??null}function uid(){return process.env.NURIA_DEV_USER_ID??null}function t(v:FormDataEntryValue|null){const s=typeof v==="string"?v.trim():"";return s||null}function req(fd:FormData,k:string){const v=t(fd.get(k));if(!v)throw new Error("Pflichtfeld fehlt.");return v}function one<T extends readonly string[]>(v:string|null,a:T,l:string){if(!v||!a.includes(v))throw new Error(`${l} ist ungültig.`);return v as T[number]}function d(v:string|null){if(!v)return null;const x=new Date(v);if(Number.isNaN(x.getTime()))throw new Error("Datum ist ungültig.");return v}
-async function ref(table:"company_locations"|"profiles"|"documents"|"compliance_items",id:string|null,c:string){if(!id)return null;const s=getSupabaseServerClient();if(!s)return null;const{data}=await s.from(table).select("id").eq("company_id",c).eq("id",id).maybeSingle();if(!data)throw new Error("Auswahl ist ungültig.");return id}
-async function itemPayload(fd:FormData,c:string){const status=one(t(fd.get("status")),statuses,"Status");return{title:req(fd,"title"),description:t(fd.get("description")),category:one(t(fd.get("category")),cats,"Kategorie"),status,priority:one(t(fd.get("priority")),priorities,"Priorität"),location_id:await ref("company_locations",t(fd.get("location_id")),c),responsible_user_id:await ref("profiles",t(fd.get("responsible_user_id")),c),due_date:d(t(fd.get("due_date"))),last_checked_at:d(t(fd.get("last_checked_at"))),notes:t(fd.get("notes")),completed_at:status==="completed"?new Date().toISOString():null,archived_at:status==="archived"?new Date().toISOString():null}}
-export async function createComplianceItem(fd:FormData){const s=getSupabaseServerClient(),c=cid();if(!s||!c)return;const p=await itemPayload(fd,c);const{data}=await s.from("compliance_items").insert({...p,company_id:c,created_by:uid(),updated_by:uid()}).select("id,title").single();if(data)await writeActivityLog({companyId:c,userId:uid(),action:"created",entityType:"system",entityId:data.id,entityLabel:data.title,message:"Compliance-Prüfpunkt wurde erstellt."});revalidatePath("/dashboard/compliance")}
-export async function updateComplianceItem(fd:FormData){const s=getSupabaseServerClient(),c=cid(),id=req(fd,"id");if(!s||!c)return;const p=await itemPayload(fd,c);await s.from("compliance_items").update({...p,updated_by:uid()}).eq("id",id).eq("company_id",c);await writeActivityLog({companyId:c,userId:uid(),action:"updated",entityType:"system",entityId:id,entityLabel:p.title,message:"Compliance-Prüfpunkt wurde geändert."});revalidatePath("/dashboard/compliance")}
-export async function changeComplianceItemStatus(fd:FormData){const s=getSupabaseServerClient(),c=cid(),id=req(fd,"id"),status=one(t(fd.get("status")),statuses,"Status");if(!s||!c)return;await s.from("compliance_items").update({status,completed_at:status==="completed"?new Date().toISOString():null,archived_at:status==="archived"?new Date().toISOString():null,updated_by:uid()}).eq("id",id).eq("company_id",c);await writeActivityLog({companyId:c,userId:uid(),action:status==="archived"?"archived":"status_changed",entityType:"system",entityId:id,message:"Compliance-Status wurde geändert."});revalidatePath("/dashboard/compliance")}
-export async function changeComplianceItemPriority(fd:FormData){const s=getSupabaseServerClient(),c=cid(),id=req(fd,"id"),priority=one(t(fd.get("priority")),priorities,"Priorität");if(!s||!c)return;await s.from("compliance_items").update({priority,updated_by:uid()}).eq("id",id).eq("company_id",c);await writeActivityLog({companyId:c,userId:uid(),action:"updated",entityType:"system",entityId:id,message:"Compliance-Priorität wurde geändert."});revalidatePath("/dashboard/compliance")}
-export async function createComplianceEvidence(fd:FormData){const s=getSupabaseServerClient(),c=cid();if(!s||!c)return;const p={compliance_item_id:await ref("compliance_items",req(fd,"compliance_item_id"),c),document_id:await ref("documents",t(fd.get("document_id")),c),title:req(fd,"title"),description:t(fd.get("description")),evidence_type:one(t(fd.get("evidence_type")),evTypes,"Nachweistyp")};const{data}=await s.from("compliance_evidence").insert({...p,company_id:c,created_by:uid()}).select("id,title").single();if(data)await writeActivityLog({companyId:c,userId:uid(),action:"created",entityType:"system",entityId:data.id,entityLabel:data.title,message:"Compliance-Nachweis wurde hinzugefügt."});revalidatePath("/dashboard/compliance")}
+
+import { revalidatePath } from "next/cache";
+import { requireCompanyRole } from "@/lib/current-user";
+import { writeActivityLog } from "@/lib/activity-log-actions";
+import { getSupabaseServerClient } from "@/lib/supabase-server";
+
+const categories = ["datenschutz", "zugriffskontrolle", "rollen_rechte", "exporte", "loeschungen", "dokumentation", "aufbewahrung", "technische_massnahmen", "organisatorische_massnahmen", "mitarbeiterzugriff", "pruefprotokolle", "sonstiges"] as const;
+const statuses = ["open", "in_progress", "waiting", "completed", "overdue", "archived"] as const;
+const priorities = ["low", "normal", "high", "urgent"] as const;
+const evidenceTypes = ["document", "note", "check", "export_log", "access_log", "deletion_log", "other"] as const;
+
+function text(value: FormDataEntryValue | null) {
+  const normalized = typeof value === "string" ? value.trim() : "";
+  return normalized || null;
+}
+
+function required(formData: FormData, key: string) {
+  const value = text(formData.get(key));
+  if (!value) throw new Error("Pflichtfeld fehlt.");
+  return value;
+}
+
+function one<T extends readonly string[]>(value: string | null, allowed: T, label: string) {
+  if (!value || !allowed.includes(value)) throw new Error(`${label} ist ungueltig.`);
+  return value as T[number];
+}
+
+function date(value: string | null) {
+  if (!value) return null;
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) throw new Error("Datum ist ungueltig.");
+  return value;
+}
+
+async function ref(table: "company_locations" | "profiles" | "documents" | "compliance_items", id: string | null, companyId: string) {
+  if (!id) return null;
+  const supabase = getSupabaseServerClient();
+  if (!supabase) return null;
+
+  const { data } = await supabase.from(table).select("id").eq("company_id", companyId).eq("id", id).maybeSingle();
+  if (!data) throw new Error("Auswahl ist ungueltig.");
+  return id;
+}
+
+async function itemPayload(formData: FormData, companyId: string) {
+  const status = one(text(formData.get("status")), statuses, "Status");
+  return {
+    title: required(formData, "title"),
+    description: text(formData.get("description")),
+    category: one(text(formData.get("category")), categories, "Kategorie"),
+    status,
+    priority: one(text(formData.get("priority")), priorities, "Prioritaet"),
+    location_id: await ref("company_locations", text(formData.get("location_id")), companyId),
+    responsible_user_id: await ref("profiles", text(formData.get("responsible_user_id")), companyId),
+    due_date: date(text(formData.get("due_date"))),
+    last_checked_at: date(text(formData.get("last_checked_at"))),
+    notes: text(formData.get("notes")),
+    completed_at: status === "completed" ? new Date().toISOString() : null,
+    archived_at: status === "archived" ? new Date().toISOString() : null,
+  };
+}
+
+async function context() {
+  return requireCompanyRole(["inhaber", "pdl"]);
+}
+
+export async function createComplianceItem(formData: FormData) {
+  const supabase = getSupabaseServerClient();
+  const { companyId, userId } = await context();
+  if (!supabase || !companyId) return;
+
+  const payload = await itemPayload(formData, companyId);
+  const { data } = await supabase
+    .from("compliance_items")
+    .insert({ ...payload, company_id: companyId, created_by: userId, updated_by: userId })
+    .select("id,title")
+    .single();
+
+  if (data) await writeActivityLog({ companyId, userId, action: "created", entityType: "system", entityId: data.id, entityLabel: data.title, message: "Compliance-Pruefpunkt wurde erstellt." });
+  revalidatePath("/dashboard/compliance");
+}
+
+export async function updateComplianceItem(formData: FormData) {
+  const supabase = getSupabaseServerClient();
+  const { companyId, userId } = await context();
+  const id = required(formData, "id");
+  if (!supabase || !companyId) return;
+
+  const payload = await itemPayload(formData, companyId);
+  await supabase.from("compliance_items").update({ ...payload, updated_by: userId }).eq("id", id).eq("company_id", companyId);
+  await writeActivityLog({ companyId, userId, action: "updated", entityType: "system", entityId: id, entityLabel: payload.title, message: "Compliance-Pruefpunkt wurde geaendert." });
+  revalidatePath("/dashboard/compliance");
+}
+
+export async function changeComplianceItemStatus(formData: FormData) {
+  const supabase = getSupabaseServerClient();
+  const { companyId, userId } = await context();
+  const id = required(formData, "id");
+  const status = one(text(formData.get("status")), statuses, "Status");
+  if (!supabase || !companyId) return;
+
+  await supabase
+    .from("compliance_items")
+    .update({ status, completed_at: status === "completed" ? new Date().toISOString() : null, archived_at: status === "archived" ? new Date().toISOString() : null, updated_by: userId })
+    .eq("id", id)
+    .eq("company_id", companyId);
+  await writeActivityLog({ companyId, userId, action: status === "archived" ? "archived" : "status_changed", entityType: "system", entityId: id, message: "Compliance-Status wurde geaendert." });
+  revalidatePath("/dashboard/compliance");
+}
+
+export async function changeComplianceItemPriority(formData: FormData) {
+  const supabase = getSupabaseServerClient();
+  const { companyId, userId } = await context();
+  const id = required(formData, "id");
+  const priority = one(text(formData.get("priority")), priorities, "Prioritaet");
+  if (!supabase || !companyId) return;
+
+  await supabase.from("compliance_items").update({ priority, updated_by: userId }).eq("id", id).eq("company_id", companyId);
+  await writeActivityLog({ companyId, userId, action: "updated", entityType: "system", entityId: id, message: "Compliance-Prioritaet wurde geaendert." });
+  revalidatePath("/dashboard/compliance");
+}
+
+export async function createComplianceEvidence(formData: FormData) {
+  const supabase = getSupabaseServerClient();
+  const { companyId, userId } = await context();
+  if (!supabase || !companyId) return;
+
+  const payload = {
+    compliance_item_id: await ref("compliance_items", required(formData, "compliance_item_id"), companyId),
+    document_id: await ref("documents", text(formData.get("document_id")), companyId),
+    title: required(formData, "title"),
+    description: text(formData.get("description")),
+    evidence_type: one(text(formData.get("evidence_type")), evidenceTypes, "Nachweistyp"),
+  };
+  const { data } = await supabase.from("compliance_evidence").insert({ ...payload, company_id: companyId, created_by: userId }).select("id,title").single();
+  if (data) await writeActivityLog({ companyId, userId, action: "created", entityType: "system", entityId: data.id, entityLabel: data.title, message: "Compliance-Nachweis wurde hinzugefuegt." });
+  revalidatePath("/dashboard/compliance");
+}

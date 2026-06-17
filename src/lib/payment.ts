@@ -1,5 +1,3 @@
-import { getSupabaseServerClient } from "@/lib/supabase-server";
-
 export type BillingInterval = "monthly" | "quarterly" | "half_yearly" | "yearly";
 export type PaymentStatus = "pending_payment" | "payment_marked_as_sent" | "active" | "payment_overdue" | "locked";
 export type SubscriptionStatus = "pending" | "payment_marked_as_sent" | "active" | "overdue" | "locked" | "cancelled";
@@ -9,16 +7,92 @@ export const plans: Record<BillingInterval, { label: string; packageId: string; 
   monthly: { label: "Monatlich", packageId: "NP-START-89-MONTHLY", months: 1, discount: 0 },
   quarterly: { label: "3 Monate", packageId: "NP-START-89-QUARTERLY", months: 3, discount: 5 },
   half_yearly: { label: "6 Monate", packageId: "NP-START-89-HALFYEAR", months: 6, discount: 10 },
-  yearly: { label: "Jährlich", packageId: "NP-START-89-YEARLY", months: 12, discount: 15 },
+  yearly: { label: "Jaehrlich", packageId: "NP-START-89-YEARLY", months: 12, discount: 15 },
 };
 export const monthlyPrice = 89;
 
-export type PaymentCompany = { id:string; name:string|null; legal_name:string|null; email:string|null; billing_email:string|null; street:string|null; house_number:string|null; postal_code:string|null; city:string|null; country:string|null; payment_status:PaymentStatus|null; package_id:string|null; billing_interval:BillingInterval|null; payment_marked_at:string|null; payment_due_until:string|null; payment_due_check_at:string|null; admin_confirmed_at:string|null; locked_at:string|null; created_at:string; updated_at:string };
-export type Subscription = { id:string; company_id:string; package_id:string; package_name:string; monthly_price:number; billing_interval:BillingInterval; discount_percent:number; subtotal_amount:number; total_amount:number; currency:string; status:SubscriptionStatus; started_at:string; current_period_start:string|null; current_period_end:string|null; is_legacy_plan:boolean; plan_version:string; created_at:string; updated_at:string };
-export type PaymentLog = { id:string; company_id:string; subscription_id:string|null; amount:number; currency:string; billing_interval:BillingInterval; payment_method:string; status:PaymentLogStatus; marked_by:string|null; marked_at:string|null; confirmed_by:string|null; confirmed_at:string|null; notes:string|null; created_at:string; updated_at:string; marked_by_name:string|null };
-export type PaymentData = { company: PaymentCompany | null; subscription: Subscription | null; logs: PaymentLog[]; bank: { recipient:string; iban:string; bic:string; bank:string; purpose:string }; stats:{ status:string; packageId:string; interval:string; nextCheck:string; amount:number; lastMarked:string }; };
+export type PaymentCompany = {
+  id: string;
+  name: string | null;
+  legal_name: string | null;
+  email: string | null;
+  billing_email: string | null;
+  street: string | null;
+  house_number: string | null;
+  postal_code: string | null;
+  city: string | null;
+  country: string | null;
+  payment_status: PaymentStatus | null;
+  package_id: string | null;
+  billing_interval: BillingInterval | null;
+  payment_marked_at: string | null;
+  payment_due_until: string | null;
+  payment_due_check_at: string | null;
+  admin_confirmed_at: string | null;
+  locked_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
 
-function companyId(){return process.env.NURIA_DEV_COMPANY_ID??null} function userName(r:{first_name?:string|null;last_name?:string|null;email?:string|null}){return [r.first_name,r.last_name].filter(Boolean).join(" ")||r.email||"Nicht hinterlegt"}
-export function calculatePlan(interval: BillingInterval){const p=plans[interval];const subtotal=monthlyPrice*p.months;const total=Number((subtotal*(1-p.discount/100)).toFixed(2));return{...p,billing_interval:interval,monthlyPrice,subtotal,total,currency:"EUR"}}
-function intervalFromPackage(packageId?:string|null,billing?:string|null):BillingInterval{if(billing&&billing in plans)return billing as BillingInterval;if(packageId?.includes("QUARTERLY"))return"quarterly";if(packageId?.includes("HALFYEAR"))return"half_yearly";if(packageId?.includes("YEARLY"))return"yearly";return"monthly"}
-export async function getPaymentData():Promise<PaymentData>{const s=getSupabaseServerClient();const c=companyId();const empty={company:null,subscription:null,logs:[],bank:{recipient:"Enrico Gross",iban:"DE17100101788022253533",bic:"REVODEB2",bank:"Revolut",purpose:""},stats:{status:"Nicht hinterlegt",packageId:"Nicht hinterlegt",interval:"Nicht hinterlegt",nextCheck:"Nicht hinterlegt",amount:0,lastMarked:"Nicht hinterlegt"}};if(!s||!c)return empty;const {data:company}=await s.from("companies").select("id,name,legal_name,email,billing_email,street,house_number,postal_code,city,country,payment_status,package_id,billing_interval,payment_marked_at,payment_due_until,payment_due_check_at,admin_confirmed_at,locked_at,created_at,updated_at").eq("id",c).maybeSingle();if(!company)return empty;const interval=intervalFromPackage(company.package_id,company.billing_interval);const plan=calculatePlan(interval);let {data:subscription}=await s.from("company_subscriptions").select("*").eq("company_id",c).neq("status","cancelled").order("created_at",{ascending:false}).limit(1).maybeSingle();if(!subscription){const start=new Date();const end=new Date(start);end.setMonth(end.getMonth()+plan.months);const inserted=await s.from("company_subscriptions").insert({company_id:c,package_id:company.package_id??plan.packageId,package_name:"Nuria Pflege Start",monthly_price:monthlyPrice,billing_interval:interval,discount_percent:plan.discount,subtotal_amount:plan.subtotal,total_amount:plan.total,currency:"EUR",status:company.payment_status==="active"?"active":company.payment_status==="payment_marked_as_sent"?"payment_marked_as_sent":"pending",current_period_start:start.toISOString().slice(0,10),current_period_end:end.toISOString().slice(0,10)}).select("*").single();subscription=inserted.data}const {data:logs}=await s.from("company_payment_logs").select("*, profiles(first_name,last_name,email)").eq("company_id",c).order("created_at",{ascending:false});const normalizedLogs=((logs??[]) as any[]).map(l=>({...l,marked_by_name:Array.isArray(l.profiles)?userName(l.profiles[0]??{}):userName(l.profiles??{})})) as PaymentLog[];const paymentId=normalizedLogs[0]?.id??subscription?.id??"OFFEN";const purpose=`NURIA-${company.id}-${paymentId}`;return{company:company as PaymentCompany,subscription:subscription as Subscription|null,logs:normalizedLogs,bank:{recipient:"Enrico Gross",iban:"DE17100101788022253533",bic:"REVODEB2",bank:"Revolut",purpose},stats:{status:company.payment_status??"pending_payment",packageId:subscription?.package_id??company.package_id??plan.packageId,interval:plans[(subscription?.billing_interval??interval) as BillingInterval].label,nextCheck:company.payment_due_until??company.payment_due_check_at??"Nicht hinterlegt",amount:Number(subscription?.total_amount??plan.total),lastMarked:company.payment_marked_at??"Nicht hinterlegt"}}}
+export type Subscription = {
+  id: string;
+  company_id: string;
+  package_id: string;
+  package_name: string;
+  monthly_price: number;
+  billing_interval: BillingInterval;
+  discount_percent: number;
+  subtotal_amount: number;
+  total_amount: number;
+  currency: string;
+  status: SubscriptionStatus;
+  started_at: string;
+  current_period_start: string | null;
+  current_period_end: string | null;
+  is_legacy_plan: boolean;
+  plan_version: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type PaymentLog = {
+  id: string;
+  company_id: string;
+  subscription_id: string | null;
+  amount: number;
+  currency: string;
+  billing_interval: BillingInterval;
+  payment_method: string;
+  status: PaymentLogStatus;
+  marked_by: string | null;
+  marked_at: string | null;
+  confirmed_by: string | null;
+  confirmed_at: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+  marked_by_name: string | null;
+};
+
+export type PaymentData = {
+  company: PaymentCompany | null;
+  subscription: Subscription | null;
+  logs: PaymentLog[];
+  bank: { recipient: string; iban: string; bic: string; bank: string; purpose: string };
+  stats: { status: string; packageId: string; interval: string; nextCheck: string; amount: number; lastMarked: string };
+};
+
+export function calculatePlan(interval: BillingInterval) {
+  const plan = plans[interval];
+  const subtotal = monthlyPrice * plan.months;
+  const total = Number((subtotal * (1 - plan.discount / 100)).toFixed(2));
+  return { ...plan, billing_interval: interval, monthlyPrice, subtotal, total, currency: "EUR" };
+}
+
+export function intervalFromPackage(packageId?: string | null, billing?: string | null): BillingInterval {
+  if (billing && billing in plans) return billing as BillingInterval;
+  if (packageId?.includes("QUARTERLY")) return "quarterly";
+  if (packageId?.includes("HALFYEAR")) return "half_yearly";
+  if (packageId?.includes("YEARLY")) return "yearly";
+  return "monthly";
+}

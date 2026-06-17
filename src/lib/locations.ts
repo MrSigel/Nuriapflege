@@ -1,5 +1,7 @@
 import { revalidatePath } from "next/cache";
+import { requireCompanyManager } from "@/lib/current-user";
 import { getSupabaseServerClient } from "@/lib/supabase-server";
+import { companyId as currentCompanyId } from "@/lib/onboarding";
 
 export type LocationType = "hauptstandort" | "nebenstandort" | "verwaltungsstandort" | "aussenstelle" | "einsatzgebiet";
 export type LocationStatus = "active" | "inactive";
@@ -41,9 +43,7 @@ export type LocationsData = {
 const locationTypes = ["hauptstandort", "nebenstandort", "verwaltungsstandort", "aussenstelle", "einsatzgebiet"] as const;
 const locationStatuses = ["active", "inactive"] as const;
 
-function getCompanyId() {
-  return process.env.NURIA_DEV_COMPANY_ID ?? null;
-}
+type ActionResult = { ok: boolean; message?: string };
 
 function sanitize(value: FormDataEntryValue | null) {
   const text = typeof value === "string" ? value.trim() : "";
@@ -130,7 +130,7 @@ async function countRows(table: string, companyId: string, locationId: string) {
 
 export async function getLocationsData(): Promise<LocationsData> {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
+  const companyId = await currentCompanyId();
 
   if (!supabase || !companyId) {
     return {
@@ -185,70 +185,90 @@ export async function getLocationsData(): Promise<LocationsData> {
   };
 }
 
-export async function createLocation(formData: FormData) {
+export async function createLocation(formData: FormData): Promise<ActionResult> {
   "use server";
 
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
+  const context = await requireCompanyManager().catch((error: Error) => ({ error }));
 
-  if (!supabase || !companyId) {
-    return;
+  if (!supabase || "error" in context) {
+    return { ok: false, message: "Standort konnte nicht gespeichert werden." };
   }
 
-  const payload = parseLocationPayload(formData, true);
-
-  await supabase.from("company_locations").insert({
-    ...payload,
-    company_id: companyId,
-    is_primary: false,
-  });
+  try {
+    const payload = parseLocationPayload(formData, true);
+    const { error } = await supabase.from("company_locations").insert({
+      ...payload,
+      company_id: context.companyId,
+      is_primary: false,
+      created_by: context.userId,
+      updated_by: context.userId,
+    });
+    if (error) return { ok: false, message: "Standort konnte nicht gespeichert werden." };
+  } catch (error) {
+    return { ok: false, message: error instanceof Error ? error.message : "Standort konnte nicht gespeichert werden." };
+  }
 
   revalidatePath("/dashboard/standorte");
+  return { ok: true, message: "Standort wurde gespeichert." };
 }
 
-export async function updateLocation(formData: FormData) {
+export async function updateLocation(formData: FormData): Promise<ActionResult> {
   "use server";
 
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
-  const id = requireText(formData, "id");
-  const isPrimary = formData.get("is_primary") === "true";
+  const context = await requireCompanyManager().catch((error: Error) => ({ error }));
 
-  if (!supabase || !companyId) {
-    return;
+  if (!supabase || "error" in context) {
+    return { ok: false, message: "Standort konnte nicht gespeichert werden." };
   }
 
-  const payload = parseLocationPayload(formData, false);
+  try {
+    const id = requireText(formData, "id");
+    const isPrimary = formData.get("is_primary") === "true";
+    const payload = parseLocationPayload(formData, false);
 
-  if (isPrimary) {
-    payload.location_type = "hauptstandort";
-    payload.status = "active";
+    if (isPrimary) {
+      payload.location_type = "hauptstandort";
+      payload.status = "active";
+    }
+
+    const { error } = await supabase.from("company_locations").update({ ...payload, updated_by: context.userId }).eq("id", id).eq("company_id", context.companyId);
+    if (error) return { ok: false, message: "Standort konnte nicht gespeichert werden." };
+  } catch (error) {
+    return { ok: false, message: error instanceof Error ? error.message : "Standort konnte nicht gespeichert werden." };
   }
-
-  await supabase.from("company_locations").update(payload).eq("id", id).eq("company_id", companyId);
 
   revalidatePath("/dashboard/standorte");
+  return { ok: true, message: "Standort wurde gespeichert." };
 }
 
-export async function toggleLocationStatus(formData: FormData) {
+export async function toggleLocationStatus(formData: FormData): Promise<ActionResult> {
   "use server";
 
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
-  const id = requireText(formData, "id");
-  const currentStatus = validateStatus(sanitize(formData.get("status")));
-  const isPrimary = formData.get("is_primary") === "true";
+  const context = await requireCompanyManager().catch((error: Error) => ({ error }));
 
-  if (!supabase || !companyId || isPrimary) {
-    return;
+  if (!supabase || "error" in context) {
+    return { ok: false, message: "Status konnte nicht geändert werden." };
   }
 
-  await supabase
-    .from("company_locations")
-    .update({ status: currentStatus === "active" ? "inactive" : "active" })
-    .eq("id", id)
-    .eq("company_id", companyId)
-    .eq("is_primary", false);
+  try {
+    const id = requireText(formData, "id");
+    const currentStatus = validateStatus(sanitize(formData.get("status")));
+    const isPrimary = formData.get("is_primary") === "true";
+    if (isPrimary) return { ok: false, message: "Der Hauptstandort kann nicht deaktiviert werden." };
+    const { error } = await supabase
+      .from("company_locations")
+      .update({ status: currentStatus === "active" ? "inactive" : "active", updated_by: context.userId })
+      .eq("id", id)
+      .eq("company_id", context.companyId)
+      .eq("is_primary", false);
+    if (error) return { ok: false, message: "Status konnte nicht geändert werden." };
+  } catch {
+    return { ok: false, message: "Status konnte nicht geändert werden." };
+  }
 
   revalidatePath("/dashboard/standorte");
+  return { ok: true, message: "Status wurde geändert." };
 }

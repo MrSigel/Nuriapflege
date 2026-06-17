@@ -1,4 +1,5 @@
 import { getSupabaseServerClient } from "@/lib/supabase-server";
+import { getCurrentUserContext } from "@/lib/current-user";
 
 export type TimeEntryStatus = "draft" | "submitted" | "approved" | "rejected" | "corrected";
 export type TimeEntryType = "work_time" | "client_visit" | "tour_time" | "break" | "admin_time" | "other";
@@ -26,12 +27,11 @@ export type TimeTrackingData = {
   proofRows: Array<{ employeeId: string; employeeName: string; total: number; work: number; visits: number; breaks: number; admin: number; open: number; approved: number }>;
 };
 
-function companyId() { return process.env.NURIA_DEV_COMPANY_ID ?? null; }
 function dkey(d: Date) { return d.toISOString().slice(0, 10); }
 function week(d: Date) { const day = d.getDay() || 7; const s = new Date(d); s.setDate(d.getDate() - day + 1); const e = new Date(s); e.setDate(s.getDate() + 6); return { s: dkey(s), e: dkey(e) }; }
 
 export async function getTimeTrackingData(): Promise<TimeTrackingData> {
-  const supabase = getSupabaseServerClient(); const cid = companyId(); const now = new Date(); const today = dkey(now); const w = week(now); const mStart = dkey(new Date(now.getFullYear(), now.getMonth(), 1)); const mEnd = dkey(new Date(now.getFullYear(), now.getMonth() + 1, 0));
+  const supabase = getSupabaseServerClient(); const context = await getCurrentUserContext(); const cid = context?.companyId ?? null; const now = new Date(); const today = dkey(now); const w = week(now); const mStart = dkey(new Date(now.getFullYear(), now.getMonth(), 1)); const mEnd = dkey(new Date(now.getFullYear(), now.getMonth() + 1, 0));
   const empty = { todayMinutes: 0, weekMinutes: 0, monthMinutes: 0, open: 0, approved: 0, rejected: 0, corrected: 0, withoutEmployee: 0 };
   if (!supabase || !cid) return { entries: [], employees: [], locations: [], clients: [], tours: [], tourStops: [], shifts: [], today, stats: empty, proofRows: [] };
   const [{ data: entries }, { data: employees }, { data: locations }, { data: clients }, { data: tours }, { data: stops }, { data: shifts }] = await Promise.all([

@@ -1,4 +1,5 @@
 import { getSupabaseServerClient } from "@/lib/supabase-server";
+import { getCurrentUserContext } from "@/lib/current-user";
 
 export type TourStatus = "planned" | "in_progress" | "completed" | "cancelled";
 export type TourStopStatus = "planned" | "in_progress" | "completed" | "skipped" | "cancelled";
@@ -57,10 +58,6 @@ export type ToursData = {
   };
 };
 
-function getCompanyId() {
-  return process.env.NURIA_DEV_COMPANY_ID ?? null;
-}
-
 function key(date: Date) {
   return date.toISOString().slice(0, 10);
 }
@@ -76,7 +73,8 @@ function weekRange(today: Date) {
 
 export async function getToursData(): Promise<ToursData> {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
+  const context = await getCurrentUserContext();
+  const companyId = context?.companyId ?? null;
   const now = new Date();
   const today = key(now);
   const week = weekRange(now);

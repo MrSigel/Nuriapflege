@@ -2996,3 +2996,14 @@ for select using (public.is_admin());
 drop policy if exists admin_logs_admin_insert on public.admin_logs;
 create policy admin_logs_admin_insert on public.admin_logs
 for insert with check (public.is_admin());
+
+-- 20260617130000_employee_invitation_tokens.sql
+alter table public.profiles
+  add column if not exists invited_by uuid references public.profiles(id) on delete set null,
+  add column if not exists invitation_token_hash text,
+  add column if not exists invitation_expires_at timestamptz,
+  add column if not exists invitation_sent_at timestamptz;
+
+create index if not exists profiles_invitation_token_hash_idx
+  on public.profiles(invitation_token_hash)
+  where invitation_token_hash is not null;

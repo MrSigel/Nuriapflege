@@ -2361,6 +2361,88 @@ button {
   padding: 10px 14px;
 }
 
+.form-status {
+  border-radius: 8px;
+  font-size: 14px;
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 10px 12px;
+}
+
+.form-status.success {
+  background: #eef6f5;
+  border: 1px solid rgba(15, 118, 110, 0.18);
+  color: #0f766e;
+}
+
+.form-status.error {
+  background: #fff1f2;
+  border: 1px solid rgba(190, 18, 60, 0.16);
+  color: #be123c;
+}
+
+.invite-page {
+  align-items: center;
+  background: #f5f8fb;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 22px;
+}
+
+.invite-card {
+  background: #ffffff;
+  border: 1px solid rgba(11, 31, 51, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 24px 70px rgba(11, 31, 51, 0.09);
+  display: grid;
+  gap: 16px;
+  max-width: 430px;
+  padding: 28px;
+  width: 100%;
+}
+
+.invite-card span {
+  color: #64748b;
+  display: block;
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+
+.invite-card h1 {
+  font-size: 30px;
+  margin: 0;
+}
+
+.invite-card p {
+  color: #64748b;
+  margin: 6px 0 0;
+}
+
+.invite-card label {
+  display: grid;
+  gap: 7px;
+}
+
+.invite-card input {
+  border: 1px solid rgba(11, 31, 51, 0.14);
+  border-radius: 8px;
+  font: inherit;
+  min-height: 42px;
+  padding: 10px 12px;
+}
+
+.invite-card button {
+  background: #0f766e;
+  border: 0;
+  border-radius: 8px;
+  color: #ffffff;
+  cursor: pointer;
+  font: inherit;
+  min-height: 44px;
+  padding: 10px 14px;
+}
+
 .nuria-admin-main {
   display: grid;
   gap: 22px;

@@ -1,7 +1,4 @@
-import { notFound } from "next/navigation";
-import { DashboardPage } from "@/components/dashboard-page";
-import { DashboardShell } from "@/components/dashboard-shell";
-import { adminRoutes, routeByPath } from "@/lib/nuria-config";
+import { redirect } from "next/navigation";
 
 type PageProps = {
   params: Promise<{ slug?: string[] }>;
@@ -9,20 +6,5 @@ type PageProps = {
 
 export default async function AdminDashboardPage({ params }: PageProps) {
   const { slug = [] } = await params;
-  const path = `/admin${slug.length ? `/${slug.join("/")}` : ""}`;
-  const route = routeByPath(path);
-
-  if (!route || !path.startsWith("/admin")) {
-    notFound();
-  }
-
-  return (
-    <DashboardShell
-      role="admin"
-      title={route.title}
-      routes={adminRoutes.map(({ path, title }) => ({ path, title }))}
-    >
-      <DashboardPage route={route} context="admin" />
-    </DashboardShell>
-  );
+  redirect(`/nuria-admin${slug.length ? `/${slug.join("/")}` : ""}`);
 }

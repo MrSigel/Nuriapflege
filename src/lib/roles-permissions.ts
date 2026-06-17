@@ -1,4 +1,5 @@
 import type { Employee, EmployeeRole } from "@/lib/employees";
+import { getCurrentUserContext } from "@/lib/current-user";
 import { getSupabaseServerClient } from "@/lib/supabase-server";
 import { managedRoles, permissions } from "@/lib/permissions-config";
 
@@ -16,13 +17,10 @@ export type RolePermissionData = {
   };
 };
 
-function getCompanyId() {
-  return process.env.NURIA_DEV_COMPANY_ID ?? null;
-}
-
 export async function getRolePermissionData(): Promise<RolePermissionData> {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
+  const context = await getCurrentUserContext();
+  const companyId = context?.companyId ?? null;
   const roleKeys = managedRoles.map((role) => role.key);
   const enabled = Object.fromEntries(
     roleKeys.map((role) => [

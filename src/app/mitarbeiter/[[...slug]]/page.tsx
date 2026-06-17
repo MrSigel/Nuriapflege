@@ -13,6 +13,7 @@ import { StaffTimePage } from "@/components/staff-time-page";
 import { StaffTourPage } from "@/components/staff-tour-page";
 import { getDashboardOverview } from "@/lib/dashboard-overview";
 import { routeByPath, staffRoutes } from "@/lib/nuria-config";
+import { getCurrentUserContext } from "@/lib/current-user";
 
 type PageProps = {
   params: Promise<{ slug?: string[] }>;
@@ -32,13 +33,26 @@ export default async function StaffDashboardPage({ params }: PageProps) {
     notFound();
   }
 
-  const overview = path === "/mitarbeiter/dashboard" ? await getDashboardOverview("mitarbeiter") : null;
+  const userContext = await getCurrentUserContext();
+  if (!userContext) {
+    redirect("/login");
+  }
+
+  if (userContext.role !== "mitarbeiter" && userContext.role !== "pflegefachkraft") {
+    redirect("/dashboard");
+  }
+
+  if (!route.roles.includes(userContext.role)) {
+    redirect("/mitarbeiter/dashboard");
+  }
+
+  const overview = path === "/mitarbeiter/dashboard" ? await getDashboardOverview(userContext.role) : null;
 
   return (
     <DashboardShell
-      role="mitarbeiter"
+      role={userContext.role}
       title={route.title}
-      routes={staffRoutes.map(({ path, title }) => ({ path, title }))}
+      routes={staffRoutes.filter((route) => route.roles.includes(userContext.role)).map(({ path, title }) => ({ path, title }))}
     >
       {path === "/mitarbeiter/dienstplan" ? <StaffSchedulePage /> : null}
       {path === "/mitarbeiter/tour" ? <StaffTourPage /> : null}

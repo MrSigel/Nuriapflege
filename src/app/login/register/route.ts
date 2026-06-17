@@ -166,6 +166,36 @@ export async function POST(request: Request) {
     return error("Inhaber-Profil konnte nicht erstellt werden.");
   }
 
+  const primaryLocation = {
+    company_id: company.id,
+    name: values.companyName,
+    street: values.street,
+    house_number: values.houseNumber,
+    postal_code: values.postalCode,
+    city: values.city,
+    state: state || null,
+    email: values.email,
+    phone: values.phone,
+    location_type: "hauptstandort",
+    is_primary: true,
+    status: "active",
+    updated_by: userId,
+  };
+  const { data: existingPrimaryLocation } = await supabase
+    .from("company_locations")
+    .select("id")
+    .eq("company_id", company.id)
+    .eq("is_primary", true)
+    .maybeSingle();
+  const primaryLocationResult = existingPrimaryLocation?.id
+    ? await supabase.from("company_locations").update(primaryLocation).eq("id", existingPrimaryLocation.id).eq("company_id", company.id)
+    : await supabase.from("company_locations").insert({ ...primaryLocation, created_by: userId });
+  if (primaryLocationResult.error) {
+    await supabase.auth.admin.deleteUser(userId);
+    await supabase.from("companies").delete().eq("id", company.id);
+    return error("Hauptstandort konnte nicht erstellt werden.");
+  }
+
   const { data: subscription, error: subscriptionError } = await supabase
     .from("company_subscriptions")
     .insert({

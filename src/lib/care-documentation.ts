@@ -1,4 +1,5 @@
 import { getSupabaseServerClient } from "@/lib/supabase-server";
+import { getCurrentUserContext } from "@/lib/current-user";
 
 export type CareCategory = "pflegebericht" | "uebergabe" | "beobachtung" | "massnahme" | "vitalwerte" | "wunde" | "medikation" | "ereignis" | "sonstiges";
 export type CareStatus = "draft" | "submitted" | "reviewed" | "archived";
@@ -6,11 +7,10 @@ export type CareVisibility = "internal" | "care_team" | "management";
 export type CareOption = { id: string; name: string };
 export type CareDoc = { id:string; company_id:string; client_id:string; employee_id:string|null; shift_id:string|null; tour_id:string|null; tour_stop_id:string|null; documentation_date:string; documentation_time:string|null; category:CareCategory; title:string; content:string; status:CareStatus; visibility:CareVisibility; created_by:string|null; updated_by:string|null; reviewed_by:string|null; reviewed_at:string|null; updated_at:string; client_name:string|null; employee_name:string|null; shift_name:string|null; tour_name:string|null; tour_stop_name:string|null; created_by_name:string|null; reviewed_by_name:string|null };
 export type CareData = { docs: CareDoc[]; clients: CareOption[]; employees: CareOption[]; shifts: CareOption[]; tours: CareOption[]; tourStops: CareOption[]; today:string; stats:{ today:number; week:number; drafts:number; submitted:number; reviewed:number; archived:number; handovers:number; withoutClient:number } };
-function cid(){return process.env.NURIA_DEV_COMPANY_ID ?? null}
 function key(d:Date){return d.toISOString().slice(0,10)}
 function week(d:Date){const day=d.getDay()||7; const s=new Date(d); s.setDate(d.getDate()-day+1); const e=new Date(s); e.setDate(s.getDate()+6); return {s:key(s),e:key(e)}}
 export async function getCareDocumentationData(): Promise<CareData> {
-  const supabase=getSupabaseServerClient(); const companyId=cid(); const now=new Date(); const today=key(now); const w=week(now); const empty={today:0,week:0,drafts:0,submitted:0,reviewed:0,archived:0,handovers:0,withoutClient:0};
+  const supabase=getSupabaseServerClient(); const context=await getCurrentUserContext(); const companyId=context?.companyId??null; const now=new Date(); const today=key(now); const w=week(now); const empty={today:0,week:0,drafts:0,submitted:0,reviewed:0,archived:0,handovers:0,withoutClient:0};
   if(!supabase||!companyId) return {docs:[],clients:[],employees:[],shifts:[],tours:[],tourStops:[],today,stats:empty};
   const [{data:docs},{data:clients},{data:employees},{data:shifts},{data:tours},{data:stops}]=await Promise.all([
     supabase.from("care_documentation").select("*").eq("company_id",companyId).order("documentation_date",{ascending:false}).order("documentation_time",{ascending:false}),

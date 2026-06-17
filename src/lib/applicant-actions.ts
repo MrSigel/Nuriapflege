@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { requireCompanyRole } from "@/lib/current-user";
 import { getSupabaseServerClient } from "@/lib/supabase-server";
 import type { ApplicantPosition, ApplicantRating, ApplicantSource, ApplicantStatus } from "@/lib/applicants";
 
@@ -8,14 +9,6 @@ const statuses = ["new", "contacted", "interview_planned", "interview_done", "of
 const ratings = ["none", "interesting", "strong", "not_suitable"] as const;
 const sources = ["manual", "website", "facebook", "instagram", "recommendation", "job_portal", "phone", "email", "other"] as const;
 const positions = ["pflegefachkraft", "pflegehelfer", "hauswirtschaft", "betreuungskraft", "verwaltung", "pdl", "azubi", "quereinsteiger", "sonstiges"] as const;
-
-function getCompanyId() {
-  return process.env.NURIA_DEV_COMPANY_ID ?? null;
-}
-
-function getUserId() {
-  return process.env.NURIA_DEV_USER_ID ?? null;
-}
 
 function sanitize(value: FormDataEntryValue | null) {
   const text = typeof value === "string" ? value.trim() : "";
@@ -95,8 +88,7 @@ async function parseApplicantPayload(formData: FormData, companyId: string) {
 
 export async function createApplicant(formData: FormData) {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
-  const userId = getUserId();
+  const { companyId, userId } = await requireCompanyRole(["inhaber", "pdl", "verwaltung"]);
   if (!supabase || !companyId) return;
 
   const payload = await parseApplicantPayload(formData, companyId);
@@ -106,8 +98,7 @@ export async function createApplicant(formData: FormData) {
 
 export async function updateApplicant(formData: FormData) {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
-  const userId = getUserId();
+  const { companyId, userId } = await requireCompanyRole(["inhaber", "pdl", "verwaltung"]);
   const id = requireText(formData, "id");
   if (!supabase || !companyId) return;
 
@@ -118,8 +109,7 @@ export async function updateApplicant(formData: FormData) {
 
 export async function changeApplicantStatus(formData: FormData) {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
-  const userId = getUserId();
+  const { companyId, userId } = await requireCompanyRole(["inhaber", "pdl", "verwaltung"]);
   const id = requireText(formData, "id");
   const status = validateStatus(sanitize(formData.get("status")));
   if (!supabase || !companyId) return;
@@ -134,8 +124,7 @@ export async function changeApplicantStatus(formData: FormData) {
 
 export async function changeApplicantRating(formData: FormData) {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
-  const userId = getUserId();
+  const { companyId, userId } = await requireCompanyRole(["inhaber", "pdl", "verwaltung"]);
   const id = requireText(formData, "id");
   const rating = validateRating(sanitize(formData.get("rating")));
   if (!supabase || !companyId) return;
@@ -146,8 +135,7 @@ export async function changeApplicantRating(formData: FormData) {
 
 export async function setApplicantFollowUp(formData: FormData) {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
-  const userId = getUserId();
+  const { companyId, userId } = await requireCompanyRole(["inhaber", "pdl", "verwaltung"]);
   const id = requireText(formData, "id");
   const next_follow_up_at = validateDateTime(sanitize(formData.get("next_follow_up_at")));
   if (!supabase || !companyId) return;

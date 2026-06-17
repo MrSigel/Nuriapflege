@@ -2,14 +2,15 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useActionState, useEffect, useState, type ReactNode } from "react";
 
 type HiddenInput = {
   name: string;
   value: string | number | boolean;
 };
 
-type DialogAction = (formData: FormData) => void | Promise<void>;
+type ActionResult = { ok: boolean; message?: string };
+type DialogAction = (formData: FormData) => void | Promise<void> | Promise<ActionResult>;
 
 function HiddenFields({ fields = [] }: { fields?: HiddenInput[] }) {
   return (
@@ -47,6 +48,17 @@ export function ActionDialog({
   const [open, setOpen] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [confirmClose, setConfirmClose] = useState(false);
+  const [state, formAction, pending] = useActionState(async (_: ActionResult, formData: FormData) => {
+    const result = await action(formData);
+    return result && typeof result === "object" && "ok" in result ? result : { ok: true };
+  }, { ok: false });
+
+  useEffect(() => {
+    if (state.ok) {
+      setDirty(false);
+      setOpen(false);
+    }
+  }, [state.ok]);
 
   function requestClose() {
     if (dirty) {
@@ -95,22 +107,19 @@ export function ActionDialog({
                 </button>
               </div>
               <form
-                action={action}
+                action={formAction}
                 className={formClassName}
                 onChangeCapture={() => setDirty(true)}
-                onSubmit={() => {
-                  setDirty(false);
-                  setOpen(false);
-                }}
               >
                 <HiddenFields fields={hiddenFields} />
                 {children}
+                {state.message ? <p className={`form-status ${state.ok ? "success" : "error"}`}>{state.message}</p> : null}
                 <div className="action-dialog-footer">
                   <button className="button secondary" type="button" onClick={requestClose}>
                     Abbrechen
                   </button>
-                  <button className="button" type="submit">
-                    {submitLabel}
+                  <button className="button" disabled={pending} type="submit">
+                    {pending ? "Speichern..." : submitLabel}
                   </button>
                 </div>
               </form>
@@ -158,6 +167,14 @@ export function ConfirmActionDialog({
   title: string;
 }) {
   const [open, setOpen] = useState(false);
+  const [state, formAction, pending] = useActionState(async (_: ActionResult, formData: FormData) => {
+    const result = await action(formData);
+    return result && typeof result === "object" && "ok" in result ? result : { ok: true };
+  }, { ok: false });
+
+  useEffect(() => {
+    if (state.ok) setOpen(false);
+  }, [state.ok]);
 
   return (
     <>
@@ -190,14 +207,15 @@ export function ConfirmActionDialog({
                   <X size={18} />
                 </button>
               </div>
-              <form action={action} onSubmit={() => setOpen(false)}>
+              <form action={formAction}>
                 <HiddenFields fields={hiddenFields} />
+                {state.message ? <p className={`form-status ${state.ok ? "success" : "error"}`}>{state.message}</p> : null}
                 <div className="action-dialog-footer">
                   <button className="button secondary" type="button" onClick={() => setOpen(false)}>
                     Abbrechen
                   </button>
-                  <button className="button" type="submit">
-                    {confirmLabel}
+                  <button className="button" disabled={pending} type="submit">
+                    {pending ? "Speichern..." : confirmLabel}
                   </button>
                 </div>
               </form>

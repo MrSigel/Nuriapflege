@@ -51,12 +51,12 @@ export type OnboardingData = {
 
 export async function companyId() {
   const cookieStore = await cookies();
-  return cookieStore.get("nuria_company_id")?.value ?? process.env.NURIA_DEV_COMPANY_ID ?? null;
+  return cookieStore.get("nuria_company_id")?.value ?? null;
 }
 
 export async function userId() {
   const cookieStore = await cookies();
-  return cookieStore.get("nuria_user_id")?.value ?? process.env.NURIA_DEV_USER_ID ?? null;
+  return cookieStore.get("nuria_user_id")?.value ?? null;
 }
 
 export function canCompanyWrite(company: { onboarding_status?: string | null; payment_status?: string | null; admin_confirmed_at?: string | null; payment_due_until?: string | null; payment_due_check_at?: string | null } | null) {

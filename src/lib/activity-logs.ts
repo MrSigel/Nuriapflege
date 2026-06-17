@@ -1,4 +1,5 @@
 import { getSupabaseServerClient } from "@/lib/supabase-server";
+import { getCurrentUserContext } from "@/lib/current-user";
 
 export type ActivityLog = {
   id: string;
@@ -28,12 +29,12 @@ export type ActivityLogsData = {
   exportPrepared: boolean;
 };
 
-function companyId() { return process.env.NURIA_DEV_COMPANY_ID ?? null; }
 function name(row: { first_name?: string | null; last_name?: string | null; email?: string | null }) { return [row.first_name, row.last_name].filter(Boolean).join(" ") || row.email || "Nicht hinterlegt"; }
 
 export async function getActivityLogsData(): Promise<ActivityLogsData> {
   const supabase = getSupabaseServerClient();
-  const cid = companyId();
+  const context = await getCurrentUserContext();
+  const cid = context?.companyId ?? null;
   const empty = { logs: [], users: [], stats: { total: 0, today: 0, changes: 0, files: 0, exports: 0, warnings: 0, errors: 0, security: 0 }, exportPrepared: true };
   if (!supabase || !cid) return empty;
 

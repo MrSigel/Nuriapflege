@@ -1,4 +1,5 @@
 import { getSupabaseServerClient } from "@/lib/supabase-server";
+import { companyId as currentCompanyId } from "@/lib/onboarding";
 
 export type ClientStatus = "active" | "inactive" | "paused";
 export type CareLevel = "none" | "1" | "2" | "3" | "4" | "5" | "applied" | "unknown";
@@ -50,13 +51,9 @@ export type ClientsData = {
   exportPrepared: boolean;
 };
 
-function getCompanyId() {
-  return process.env.NURIA_DEV_COMPANY_ID ?? null;
-}
-
 export async function getClientsData(): Promise<ClientsData> {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
+  const companyId = await currentCompanyId();
 
   if (!supabase || !companyId) {
     return {

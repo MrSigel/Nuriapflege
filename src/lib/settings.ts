@@ -1,4 +1,5 @@
 import { getSupabaseServerClient } from "@/lib/supabase-server";
+import { getCurrentUserContext } from "@/lib/current-user";
 import { pricingModel } from "@/lib/nuria-config";
 
 export type CompanySettingsData = {
@@ -76,18 +77,11 @@ export const defaultUserSettings = {
   new_application_notifications: true,
 };
 
-function getCompanyId() {
-  return process.env.NURIA_DEV_COMPANY_ID ?? null;
-}
-
-function getUserId() {
-  return process.env.NURIA_DEV_USER_ID ?? null;
-}
-
 export async function getSettingsData(): Promise<CompanySettingsData> {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
-  const userId = getUserId();
+  const context = await getCurrentUserContext();
+  const companyId = context?.companyId ?? null;
+  const userId = context?.userId ?? null;
 
   if (!supabase || !companyId) {
     return {

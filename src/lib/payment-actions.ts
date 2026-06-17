@@ -1,17 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { requireCompanyRole } from "@/lib/current-user";
 import { calculatePlan, plans, type BillingInterval } from "@/lib/payment";
-import { getSupabaseServerClient } from "@/lib/supabase-server";
 import { writeActivityLog } from "@/lib/activity-log-actions";
-
-function companyId() {
-  return process.env.NURIA_DEV_COMPANY_ID ?? null;
-}
-
-function userId() {
-  return process.env.NURIA_DEV_USER_ID ?? null;
-}
+import { getSupabaseServerClient } from "@/lib/supabase-server";
 
 function text(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -20,23 +13,26 @@ function text(formData: FormData, key: string) {
 
 function email(value: string | null) {
   if (!value) return null;
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) throw new Error("E-Mail ist ungültig.");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) throw new Error("E-Mail ist ungueltig.");
   return value;
+}
+
+async function context() {
+  return requireCompanyRole(["inhaber"]);
 }
 
 export async function markPaymentSent() {
   const supabase = getSupabaseServerClient();
-  const cid = companyId();
-  const uid = userId();
-  if (!supabase || !cid) return;
+  const { companyId, userId } = await context();
+  if (!supabase || !companyId) return;
 
-  const { data: company } = await supabase.from("companies").select("payment_status,billing_interval,package_id").eq("id", cid).maybeSingle();
+  const { data: company } = await supabase.from("companies").select("payment_status,billing_interval,package_id").eq("id", companyId).maybeSingle();
   if (!company || company.payment_status === "payment_marked_as_sent" || company.payment_status === "active") return;
 
   const { data: subscription } = await supabase
     .from("company_subscriptions")
     .select("*")
-    .eq("company_id", cid)
+    .eq("company_id", companyId)
     .neq("status", "cancelled")
     .order("created_at", { ascending: false })
     .limit(1)
@@ -58,32 +54,32 @@ export async function markPaymentSent() {
       package_id: subscription?.package_id ?? company.package_id ?? plan.packageId,
       billing_interval: interval,
     })
-    .eq("id", cid);
+    .eq("id", companyId);
 
   if (subscription?.id) {
-    await supabase.from("company_subscriptions").update({ status: "payment_marked_as_sent" }).eq("id", subscription.id).eq("company_id", cid);
+    await supabase.from("company_subscriptions").update({ status: "payment_marked_as_sent" }).eq("id", subscription.id).eq("company_id", companyId);
   }
 
   await supabase.from("company_payment_logs").insert({
-    company_id: cid,
+    company_id: companyId,
     subscription_id: subscription?.id ?? null,
     amount: Number(subscription?.total_amount ?? plan.total),
     currency: "EUR",
     billing_interval: interval,
     payment_method: "bank_transfer",
     status: "marked_as_sent",
-    marked_by: uid,
+    marked_by: userId,
     marked_at: now,
-    notes: "Überweisung als ausgeführt markiert. Die Zahlung wird intern geprüft.",
+    notes: "Ueberweisung als ausgefuehrt markiert. Die Zahlung wird intern geprueft.",
   });
 
   await writeActivityLog({
-    companyId: cid,
-    userId: uid,
+    companyId,
+    userId,
     action: "updated",
     entityType: "company_settings",
     entityLabel: "Zahlung & Tarif",
-    message: "Überweisung wurde als ausgeführt markiert.",
+    message: "Ueberweisung wurde als ausgefuehrt markiert.",
   });
 
   revalidatePath("/dashboard/zahlung-tarif");
@@ -92,8 +88,8 @@ export async function markPaymentSent() {
 
 export async function saveBillingData(formData: FormData) {
   const supabase = getSupabaseServerClient();
-  const cid = companyId();
-  if (!supabase || !cid) return;
+  const { companyId, userId } = await context();
+  if (!supabase || !companyId) return;
 
   await supabase
     .from("companies")
@@ -107,15 +103,15 @@ export async function saveBillingData(formData: FormData) {
       city: text(formData, "city"),
       country: text(formData, "country"),
     })
-    .eq("id", cid);
+    .eq("id", companyId);
 
   await writeActivityLog({
-    companyId: cid,
-    userId: userId(),
+    companyId,
+    userId,
     action: "updated",
     entityType: "company_settings",
     entityLabel: "Rechnungsdaten",
-    message: "Rechnungsdaten wurden geändert.",
+    message: "Rechnungsdaten wurden geaendert.",
   });
 
   revalidatePath("/dashboard/zahlung-tarif");

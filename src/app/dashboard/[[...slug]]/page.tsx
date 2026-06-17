@@ -58,10 +58,11 @@ import { getExportsData } from "@/lib/exports";
 import { getActivityLogsData } from "@/lib/activity-logs";
 import { getComplianceData } from "@/lib/compliance";
 import { changeComplianceItemPriority, changeComplianceItemStatus, createComplianceEvidence, createComplianceItem, updateComplianceItem } from "@/lib/compliance-actions";
-import { getPaymentData } from "@/lib/payment";
+import { getPaymentData } from "@/lib/payment-data";
 import { markPaymentSent, saveBillingData } from "@/lib/payment-actions";
 import { getCompanyAccessState, getOnboardingData } from "@/lib/onboarding";
 import { confirmOnboardingPayment, saveOnboardingCompany, saveOnboardingLocation, selectOnboardingPlan } from "@/lib/onboarding-actions";
+import { getCurrentUserContext } from "@/lib/current-user";
 
 type PageProps = {
   params: Promise<{ slug?: string[] }>;
@@ -69,7 +70,7 @@ type PageProps = {
 
 async function blockedWrite() {
   "use server";
-  throw new Error("Bitte schließen Sie die Einrichtung ab und bestätigen Sie die Zahlung, um diese Funktion zu nutzen.");
+  return { ok: false, message: "Bitte schließen Sie die Einrichtung ab und bestätigen Sie die Zahlung, um diese Funktion zu nutzen." };
 }
 
 async function blockedSettingsWrite() {
@@ -86,6 +87,19 @@ export default async function CompanyDashboardPage({ params }: PageProps) {
     notFound();
   }
 
+  const userContext = await getCurrentUserContext();
+  if (!userContext) {
+    redirect("/login");
+  }
+
+  if (userContext.role === "mitarbeiter" || userContext.role === "pflegefachkraft") {
+    redirect("/mitarbeiter/dashboard");
+  }
+
+  if (!route.roles.includes(userContext.role)) {
+    redirect("/dashboard");
+  }
+
   const access = await getCompanyAccessState();
   const writeBlocked = !access.canWrite;
 
@@ -93,7 +107,7 @@ export default async function CompanyDashboardPage({ params }: PageProps) {
     redirect("/dashboard");
   }
 
-  const overview = path === "/dashboard" ? await getDashboardOverview("inhaber") : null;
+  const overview = path === "/dashboard" ? await getDashboardOverview(userContext.role) : null;
   const locations = path === "/dashboard/standorte" ? await getLocationsData() : null;
   const employees = path === "/dashboard/mitarbeiter" ? await getEmployeesData() : null;
   const clients = path === "/dashboard/klienten" ? await getClientsData() : null;
@@ -117,9 +131,9 @@ export default async function CompanyDashboardPage({ params }: PageProps) {
 
   return (
     <DashboardShell
-      role="inhaber"
+      role={userContext.role}
       title={route.title}
-      routes={appRoutes.map(({ path, title }) => ({ path, title }))}
+      routes={appRoutes.filter((route) => route.roles.includes(userContext.role)).map(({ path, title }) => ({ path, title }))}
     >
       {writeBlocked && path !== "/dashboard/onboarding" ? (
         <div className={`dashboard-access-banner ${access.isOverdue ? "overdue" : ""}`}>
@@ -134,7 +148,7 @@ export default async function CompanyDashboardPage({ params }: PageProps) {
           <a className="button" href="/dashboard/onboarding">Einrichtung fortsetzen</a>
         </div>
       ) : null}
-      {overview ? <DashboardOverview data={overview} role="inhaber" /> : null}
+      {overview ? <DashboardOverview data={overview} role={userContext.role} /> : null}
       {locations ? <LocationsPage data={locations} /> : null}
       {careDocs ? <CareDocumentationPage data={careDocs} actions={writeBlocked ? { createCareDoc: blockedWrite, updateCareDoc: blockedWrite, reviewCareDoc: blockedWrite } : { createCareDoc, updateCareDoc, reviewCareDoc }} /> : null}
       {billing ? <BillingPage data={billing} actions={writeBlocked ? { createBillingItem: blockedWrite, updateBillingItem: blockedWrite, changeBillingItemStatus: blockedWrite, createInvoice: blockedWrite, updateInvoiceStatus: blockedWrite } : { createBillingItem, updateBillingItem, changeBillingItemStatus, createInvoice, updateInvoiceStatus }} /> : null}

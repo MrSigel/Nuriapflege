@@ -1,19 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { requireCompanyRole } from "@/lib/current-user";
 import { getSupabaseServerClient } from "@/lib/supabase-server";
 import type { ShiftStatus, ShiftType } from "@/lib/shifts";
 
 const statuses = ["planned", "in_progress", "completed", "cancelled"] as const;
 const shiftTypes = ["pflegeeinsatz", "hauswirtschaft", "beratung", "verwaltung", "bereitschaft", "sonstiges"] as const;
-
-function getCompanyId() {
-  return process.env.NURIA_DEV_COMPANY_ID ?? null;
-}
-
-function getUserId() {
-  return process.env.NURIA_DEV_USER_ID ?? null;
-}
 
 function sanitize(value: FormDataEntryValue | null) {
   const text = typeof value === "string" ? value.trim() : "";
@@ -76,35 +69,32 @@ async function parseShiftPayload(formData: FormData, companyId: string) {
 
 export async function createShift(formData: FormData) {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
-  const userId = getUserId();
-  if (!supabase || !companyId) return;
+  const context = await requireCompanyRole(["inhaber", "pdl", "verwaltung"]);
+  if (!supabase) return;
 
-  const payload = await parseShiftPayload(formData, companyId);
-  await supabase.from("shifts").insert({ ...payload, company_id: companyId, created_by: userId, updated_by: userId });
+  const payload = await parseShiftPayload(formData, context.companyId);
+  await supabase.from("shifts").insert({ ...payload, company_id: context.companyId, created_by: context.userId, updated_by: context.userId });
   revalidatePath("/dashboard/dienstplanung");
 }
 
 export async function updateShift(formData: FormData) {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
-  const userId = getUserId();
+  const context = await requireCompanyRole(["inhaber", "pdl", "verwaltung"]);
   const id = requireText(formData, "id");
-  if (!supabase || !companyId) return;
+  if (!supabase) return;
 
-  const payload = await parseShiftPayload(formData, companyId);
-  await supabase.from("shifts").update({ ...payload, updated_by: userId }).eq("id", id).eq("company_id", companyId);
+  const payload = await parseShiftPayload(formData, context.companyId);
+  await supabase.from("shifts").update({ ...payload, updated_by: context.userId }).eq("id", id).eq("company_id", context.companyId);
   revalidatePath("/dashboard/dienstplanung");
 }
 
 export async function changeShiftStatus(formData: FormData) {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
-  const userId = getUserId();
+  const context = await requireCompanyRole(["inhaber", "pdl", "verwaltung"]);
   const id = requireText(formData, "id");
   const status = validateStatus(sanitize(formData.get("status")));
-  if (!supabase || !companyId) return;
+  if (!supabase) return;
 
-  await supabase.from("shifts").update({ status, updated_by: userId }).eq("id", id).eq("company_id", companyId);
+  await supabase.from("shifts").update({ status, updated_by: context.userId }).eq("id", id).eq("company_id", context.companyId);
   revalidatePath("/dashboard/dienstplanung");
 }

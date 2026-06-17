@@ -2,16 +2,23 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Plus, X } from "lucide-react";
-import { useState } from "react";
+import { useActionState, useEffect, useState } from "react";
+
+type ActionResult = { ok: boolean; message?: string };
 
 type LocationCreateModalProps = {
-  action: (formData: FormData) => void;
+  action: (formData: FormData) => Promise<ActionResult>;
   buttonLabel: string;
   submitLabel: string;
 };
 
 export function LocationCreateModal({ action, buttonLabel, submitLabel }: LocationCreateModalProps) {
   const [open, setOpen] = useState(false);
+  const [state, formAction, pending] = useActionState(async (_: ActionResult, formData: FormData) => action(formData), { ok: false });
+
+  useEffect(() => {
+    if (state.ok) setOpen(false);
+  }, [state.ok]);
 
   return (
     <>
@@ -51,7 +58,7 @@ export function LocationCreateModal({ action, buttonLabel, submitLabel }: Locati
                 </button>
               </div>
 
-              <form action={action} className="location-form">
+              <form action={formAction} className="location-form">
                 <label>
                   Standortname
                   <input name="name" required />
@@ -108,8 +115,9 @@ export function LocationCreateModal({ action, buttonLabel, submitLabel }: Locati
                   Notizen
                   <textarea name="notes" rows={3} />
                 </label>
-                <motion.button className="button location-form-submit" type="submit" whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
-                  {submitLabel}
+                {state.message ? <p className={`form-status ${state.ok ? "success" : "error"}`}>{state.message}</p> : null}
+                <motion.button className="button location-form-submit" disabled={pending} type="submit" whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
+                  {pending ? "Speichern..." : submitLabel}
                 </motion.button>
               </form>
             </motion.div>

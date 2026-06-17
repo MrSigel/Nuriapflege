@@ -2,16 +2,19 @@
 
 import { motion } from "framer-motion";
 import { Download, Eye, KeyRound, Mail, UserRound, Users } from "lucide-react";
+import { useActionState } from "react";
 import type { Employee, EmployeesData, EmployeeRole, EmployeeStatus, InvitationStatus } from "@/lib/employees";
 import { EmployeeModal } from "@/components/employee-modal";
+
+type ActionResult = { ok: boolean; message?: string };
 
 type EmployeesPageProps = {
   data: EmployeesData;
   actions: {
-    inviteEmployee: (formData: FormData) => void;
-    createEmployee: (formData: FormData) => void;
-    updateEmployee: (formData: FormData) => void;
-    toggleEmployeeStatus: (formData: FormData) => void;
+    inviteEmployee: (formData: FormData) => Promise<ActionResult>;
+    createEmployee: (formData: FormData) => Promise<ActionResult>;
+    updateEmployee: (formData: FormData) => Promise<ActionResult>;
+    toggleEmployeeStatus: (formData: FormData) => Promise<ActionResult>;
   };
 };
 
@@ -37,6 +40,28 @@ const invitationLabels: Record<InvitationStatus, string> = {
   expired: "Abgelaufen",
 };
 
+function EmployeeStatusForm({
+  employee,
+  toggleEmployeeStatus,
+}: {
+  employee: Employee;
+  toggleEmployeeStatus: (formData: FormData) => Promise<ActionResult>;
+}) {
+  const [state, formAction, pending] = useActionState(async (_: ActionResult, formData: FormData) => toggleEmployeeStatus(formData), { ok: false });
+
+  return (
+    <form action={formAction}>
+      <input name="id" type="hidden" value={employee.id} />
+      <input name="status" type="hidden" value={employee.status} />
+      <input name="role" type="hidden" value={employee.role} />
+      <motion.button className="button secondary" disabled={pending} type="submit" whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
+        {pending ? "Speichern..." : employee.status === "active" ? "Inaktiv setzen" : "Aktiv setzen"}
+      </motion.button>
+      {state.message ? <p className={`form-status ${state.ok ? "success" : "error"}`}>{state.message}</p> : null}
+    </form>
+  );
+}
+
 function EmployeeCard({
   employee,
   locations,
@@ -45,8 +70,8 @@ function EmployeeCard({
 }: {
   employee: Employee;
   locations: EmployeesData["locations"];
-  updateEmployee: (formData: FormData) => void;
-  toggleEmployeeStatus: (formData: FormData) => void;
+  updateEmployee: (formData: FormData) => Promise<ActionResult>;
+  toggleEmployeeStatus: (formData: FormData) => Promise<ActionResult>;
 }) {
   const fullName = [employee.first_name, employee.last_name].filter(Boolean).join(" ") || "Ohne Namen";
   const locationText = employee.locations.length > 0 ? employee.locations.map((location) => location.name).join(", ") : "Noch kein Standort zugeordnet.";
@@ -79,14 +104,7 @@ function EmployeeCard({
           </div>
         </details>
         <EmployeeModal action={updateEmployee} buttonLabel="Bearbeiten" mode="edit" locations={locations} employee={employee} />
-        <form action={toggleEmployeeStatus}>
-          <input name="id" type="hidden" value={employee.id} />
-          <input name="status" type="hidden" value={employee.status} />
-          <input name="role" type="hidden" value={employee.role} />
-          <motion.button className="button secondary" type="submit" whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
-            {employee.status === "active" ? "Inaktiv setzen" : "Aktiv setzen"}
-          </motion.button>
-        </form>
+        <EmployeeStatusForm employee={employee} toggleEmployeeStatus={toggleEmployeeStatus} />
       </div>
     </motion.article>
   );

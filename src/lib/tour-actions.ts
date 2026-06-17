@@ -1,19 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { requireCompanyRole } from "@/lib/current-user";
 import { getSupabaseServerClient } from "@/lib/supabase-server";
 import type { TourStatus, TourStopStatus } from "@/lib/tours";
 
 const tourStatuses = ["planned", "in_progress", "completed", "cancelled"] as const;
 const stopStatuses = ["planned", "in_progress", "completed", "skipped", "cancelled"] as const;
-
-function getCompanyId() {
-  return process.env.NURIA_DEV_COMPANY_ID ?? null;
-}
-
-function getUserId() {
-  return process.env.NURIA_DEV_USER_ID ?? null;
-}
 
 function text(value: FormDataEntryValue | null) {
   const normalized = typeof value === "string" ? value.trim() : "";
@@ -73,8 +66,7 @@ async function tourPayload(formData: FormData, companyId: string) {
 
 export async function createTour(formData: FormData) {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
-  const userId = getUserId();
+  const { companyId, userId } = await requireCompanyRole(["inhaber", "pdl"]);
   if (!supabase || !companyId) return;
   await supabase.from("tours").insert({ ...(await tourPayload(formData, companyId)), company_id: companyId, created_by: userId, updated_by: userId });
   revalidatePath("/dashboard/tourenplanung");
@@ -82,8 +74,7 @@ export async function createTour(formData: FormData) {
 
 export async function updateTour(formData: FormData) {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
-  const userId = getUserId();
+  const { companyId, userId } = await requireCompanyRole(["inhaber", "pdl"]);
   const id = required(formData, "id");
   if (!supabase || !companyId) return;
   await supabase.from("tours").update({ ...(await tourPayload(formData, companyId)), updated_by: userId }).eq("id", id).eq("company_id", companyId);
@@ -92,8 +83,7 @@ export async function updateTour(formData: FormData) {
 
 export async function changeTourStatus(formData: FormData) {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
-  const userId = getUserId();
+  const { companyId, userId } = await requireCompanyRole(["inhaber", "pdl"]);
   const id = required(formData, "id");
   if (!supabase || !companyId) return;
   await supabase.from("tours").update({ status: tourStatus(text(formData.get("status"))), updated_by: userId }).eq("id", id).eq("company_id", companyId);
@@ -102,9 +92,9 @@ export async function changeTourStatus(formData: FormData) {
 
 export async function upsertTourStop(formData: FormData) {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
+  const { companyId } = await requireCompanyRole(["inhaber", "pdl"]);
   const id = text(formData.get("id"));
-  const tourId = await own("tours", companyId ?? "", required(formData, "tour_id"));
+  const tourId = await own("tours", companyId, required(formData, "tour_id"));
   if (!supabase || !companyId || !tourId) return;
   const payload = {
     company_id: companyId,
@@ -124,7 +114,7 @@ export async function upsertTourStop(formData: FormData) {
 
 export async function deleteTourStop(formData: FormData) {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
+  const { companyId } = await requireCompanyRole(["inhaber", "pdl"]);
   const id = required(formData, "id");
   if (!supabase || !companyId) return;
   await supabase.from("tour_stops").delete().eq("id", id).eq("company_id", companyId);
@@ -133,7 +123,7 @@ export async function deleteTourStop(formData: FormData) {
 
 export async function moveTourStop(formData: FormData) {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
+  const { companyId } = await requireCompanyRole(["inhaber", "pdl"]);
   const id = required(formData, "id");
   const sortOrder = Number(required(formData, "sort_order"));
   const direction = required(formData, "direction");

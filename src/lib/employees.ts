@@ -1,4 +1,5 @@
 import { getSupabaseServerClient } from "@/lib/supabase-server";
+import { companyId as currentCompanyId } from "@/lib/onboarding";
 
 export type EmployeeRole = "inhaber" | "pdl" | "verwaltung" | "mitarbeiter" | "pflegefachkraft";
 export type EmployeeStatus = "active" | "inactive" | "invited" | "pending";
@@ -42,13 +43,9 @@ export type EmployeesData = {
   };
 };
 
-function getCompanyId() {
-  return process.env.NURIA_DEV_COMPANY_ID ?? null;
-}
-
 export async function getEmployeesData(): Promise<EmployeesData> {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
+  const companyId = await currentCompanyId();
   const emptyStats = { total: 0, active: 0, inactive: 0, openInvitations: 0, pdl: 0, administration: 0, careStaff: 0 };
 
   if (!supabase || !companyId) {

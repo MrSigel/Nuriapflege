@@ -1,4 +1,5 @@
 import { getSupabaseServerClient } from "@/lib/supabase-server";
+import { companyId as currentCompanyId } from "@/lib/onboarding";
 
 export type ShiftStatus = "planned" | "in_progress" | "completed" | "cancelled";
 export type ShiftType = "pflegeeinsatz" | "hauswirtschaft" | "beratung" | "verwaltung" | "bereitschaft" | "sonstiges";
@@ -47,10 +48,6 @@ export type ShiftsData = {
   exportPrepared: boolean;
 };
 
-function getCompanyId() {
-  return process.env.NURIA_DEV_COMPANY_ID ?? null;
-}
-
 function toDateKey(date: Date) {
   return date.toISOString().slice(0, 10);
 }
@@ -66,7 +63,7 @@ function weekRange(today: Date) {
 
 export async function getShiftsData(): Promise<ShiftsData> {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
+  const companyId = await currentCompanyId();
   const now = new Date();
   const today = toDateKey(now);
   const currentWeek = weekRange(now);

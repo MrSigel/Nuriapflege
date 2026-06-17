@@ -79,6 +79,11 @@ function clearDashboardContextCookies() {
   document.cookie = `nuria_company_id=${options}`;
 }
 
+function hasDashboardContextCookies() {
+  return document.cookie.split("; ").some((cookie) => cookie.startsWith("nuria_user_id=")) &&
+    document.cookie.split("; ").some((cookie) => cookie.startsWith("nuria_company_id="));
+}
+
 const iconByPath = {
   "/dashboard": LayoutDashboard,
   "/dashboard/onboarding": ClipboardCheck,
@@ -275,6 +280,11 @@ export function DashboardShell({ role, routes, children }: DashboardShellProps) 
 
       if (!supabase) {
         if (active) {
+          if (hasDashboardContextCookies()) {
+            setProfileRole(role);
+            setProfileLoading(false);
+            return;
+          }
           setProfileError(true);
           setProfileLoading(false);
         }
@@ -290,6 +300,11 @@ export function DashboardShell({ role, routes, children }: DashboardShellProps) 
       }
 
       if (!user) {
+        if (hasDashboardContextCookies()) {
+          setProfileRole(role);
+          setProfileLoading(false);
+          return;
+        }
         window.location.assign("/login");
         return;
       }

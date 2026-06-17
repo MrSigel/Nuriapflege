@@ -1,4 +1,5 @@
 import { getSupabaseServerClient } from "@/lib/supabase-server";
+import { getCurrentUserContext } from "@/lib/current-user";
 
 export type ApplicantStatus = "new" | "contacted" | "interview_planned" | "interview_done" | "offer_sent" | "hired" | "rejected" | "archived";
 export type ApplicantRating = "none" | "interesting" | "strong" | "not_suitable";
@@ -53,13 +54,10 @@ export type ApplicantsData = {
   exportPrepared: boolean;
 };
 
-function getCompanyId() {
-  return process.env.NURIA_DEV_COMPANY_ID ?? null;
-}
-
 export async function getApplicantsData(): Promise<ApplicantsData> {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
+  const context = await getCurrentUserContext();
+  const companyId = context?.companyId ?? null;
 
   if (!supabase || !companyId) {
     return {

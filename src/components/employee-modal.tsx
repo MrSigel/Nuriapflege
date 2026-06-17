@@ -2,11 +2,13 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Plus, Send, X } from "lucide-react";
-import { useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import type { Employee, EmployeeLocationOption, EmployeeStatus, InvitationStatus } from "@/lib/employees";
 
+type ActionResult = { ok: boolean; message?: string };
+
 type EmployeeModalProps = {
-  action: (formData: FormData) => void;
+  action: (formData: FormData) => Promise<ActionResult>;
   buttonLabel: string;
   mode: "invite" | "create" | "edit";
   locations: EmployeeLocationOption[];
@@ -37,9 +39,14 @@ const invitationOptions: Array<[InvitationStatus, string]> = [
 
 export function EmployeeModal({ action, buttonLabel, mode, locations, employee }: EmployeeModalProps) {
   const [open, setOpen] = useState(false);
+  const [state, formAction, pending] = useActionState(async (_: ActionResult, formData: FormData) => action(formData), { ok: false });
   const selectedLocations = new Set(employee?.locations.map((location) => location.id) ?? []);
   const title = mode === "invite" ? "Mitarbeiter einladen" : mode === "edit" ? "Mitarbeiter bearbeiten" : "Mitarbeiter hinzufügen";
   const Icon = mode === "invite" ? Send : Plus;
+
+  useEffect(() => {
+    if (state.ok) setOpen(false);
+  }, [state.ok]);
 
   return (
     <>
@@ -68,7 +75,7 @@ export function EmployeeModal({ action, buttonLabel, mode, locations, employee }
                 </button>
               </div>
 
-              <form action={action} className="location-form">
+              <form action={formAction} className="location-form">
                 {employee ? <input name="id" type="hidden" value={employee.id} /> : null}
                 <label>
                   Vorname
@@ -143,8 +150,9 @@ export function EmployeeModal({ action, buttonLabel, mode, locations, employee }
                     <p>Noch keine Standorte vorhanden. Bitte zuerst einen Standort anlegen.</p>
                   )}
                 </fieldset>
-                <motion.button className="button location-form-submit" type="submit" whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
-                  {buttonLabel}
+                {state.message ? <p className={`form-status ${state.ok ? "success" : "error"}`}>{state.message}</p> : null}
+                <motion.button className="button location-form-submit" disabled={pending} type="submit" whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
+                  {pending ? "Speichern..." : buttonLabel}
                 </motion.button>
               </form>
             </motion.div>

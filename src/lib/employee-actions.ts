@@ -2,6 +2,9 @@
 
 import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
+import { requireCompanyManager } from "@/lib/current-user";
+import { createInviteToken, hashInviteToken, inviteLink } from "@/lib/invitations";
+import { sendMail } from "@/lib/mailer";
 import { getSupabaseServerClient } from "@/lib/supabase-server";
 import type { EmployeeRole, EmployeeStatus, InvitationStatus } from "@/lib/employees";
 
@@ -9,9 +12,7 @@ const roles = ["inhaber", "pdl", "verwaltung", "mitarbeiter", "pflegefachkraft"]
 const statuses = ["active", "inactive", "invited", "pending"] as const;
 const invitationStatuses = ["not_invited", "invited", "accepted", "expired"] as const;
 
-function getCompanyId() {
-  return process.env.NURIA_DEV_COMPANY_ID ?? null;
-}
+type ActionResult = { ok: boolean; message?: string };
 
 function sanitize(value: FormDataEntryValue | null) {
   const text = typeof value === "string" ? value.trim() : "";
@@ -80,40 +81,80 @@ async function activeOwnerCount(companyId: string) {
   return count ?? 0;
 }
 
-export async function inviteEmployee(formData: FormData) {
+export async function inviteEmployee(formData: FormData): Promise<ActionResult> {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
-  if (!supabase || !companyId) return;
+  const context = await requireCompanyManager().catch((error: Error) => ({ error }));
+  if (!supabase || "error" in context || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return { ok: false, message: "Einladung konnte nicht gespeichert werden." };
+  }
 
-  const id = randomUUID();
-  await supabase.from("profiles").insert({
+  const email = validateEmail(requireText(formData, "email"));
+  const token = createInviteToken();
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+  const password = randomUUID() + randomUUID();
+
+  const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: { role: sanitize(formData.get("role")) ?? "mitarbeiter" },
+  });
+
+  if (authError || !authUser.user?.id) {
+    return { ok: false, message: "Einladung konnte nicht gespeichert werden." };
+  }
+
+  const id = authUser.user.id;
+  const { error } = await supabase.from("profiles").insert({
     id,
-    company_id: companyId,
+    company_id: context.companyId,
     first_name: requireText(formData, "first_name"),
     last_name: requireText(formData, "last_name"),
-    email: validateEmail(requireText(formData, "email")),
+    email,
     role: validateRole(sanitize(formData.get("role"))),
     staff_code: validateStaffCode(requireText(formData, "staff_code")),
     phone: sanitize(formData.get("phone")),
     qualification: sanitize(formData.get("qualification")),
     status: "invited",
     invitation_status: "invited",
+    invited_by: context.userId,
     invited_at: new Date().toISOString(),
+    invitation_token_hash: hashInviteToken(token),
+    invitation_expires_at: expiresAt,
   });
 
-  await replaceEmployeeLocations(companyId, id, selectedLocationIds(formData));
+  if (error) {
+    await supabase.auth.admin.deleteUser(id);
+    return { ok: false, message: "Einladung konnte nicht gespeichert werden." };
+  }
+
+  await replaceEmployeeLocations(context.companyId, id, selectedLocationIds(formData));
+
+  const link = inviteLink(token);
+  const mail = await sendMail({
+    to: email,
+    subject: "Einladung zu Nuria Pflege",
+    text: `Sie wurden zu Nuria Pflege eingeladen. Einladung öffnen: ${link}`,
+    html: `<p>Sie wurden zu Nuria Pflege eingeladen.</p><p><a href="${link}">Einladung öffnen</a></p>`,
+  });
+
+  if (mail.ok) {
+    await supabase.from("profiles").update({ invitation_sent_at: new Date().toISOString() }).eq("id", id).eq("company_id", context.companyId);
+  }
+
   revalidatePath("/dashboard/mitarbeiter");
+  return mail.ok ? { ok: true, message: "Einladung wurde gespeichert und versendet." } : { ok: false, message: mail.message };
 }
 
-export async function createEmployee(formData: FormData) {
+export async function createEmployee(formData: FormData): Promise<ActionResult> {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
-  if (!supabase || !companyId) return;
+  const context = await requireCompanyManager().catch((error: Error) => ({ error }));
+  if (!supabase || "error" in context) return { ok: false, message: "Mitarbeiter konnte nicht gespeichert werden." };
 
   const id = randomUUID();
-  await supabase.from("profiles").insert({
+  const { error } = await supabase.from("profiles").insert({
     id,
-    company_id: companyId,
+    company_id: context.companyId,
     first_name: requireText(formData, "first_name"),
     last_name: requireText(formData, "last_name"),
     email: validateEmail(requireText(formData, "email")),
@@ -124,18 +165,20 @@ export async function createEmployee(formData: FormData) {
     status: validateStatus(sanitize(formData.get("status"))),
     invitation_status: "not_invited",
   });
+  if (error) return { ok: false, message: "Mitarbeiter konnte nicht gespeichert werden." };
 
-  await replaceEmployeeLocations(companyId, id, selectedLocationIds(formData));
+  await replaceEmployeeLocations(context.companyId, id, selectedLocationIds(formData));
   revalidatePath("/dashboard/mitarbeiter");
+  return { ok: true, message: "Mitarbeiter wurde gespeichert." };
 }
 
-export async function updateEmployee(formData: FormData) {
+export async function updateEmployee(formData: FormData): Promise<ActionResult> {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
+  const context = await requireCompanyManager().catch((error: Error) => ({ error }));
   const id = requireText(formData, "id");
-  if (!supabase || !companyId) return;
+  if (!supabase || "error" in context) return { ok: false, message: "Mitarbeiter konnte nicht gespeichert werden." };
 
-  await supabase
+  const { error } = await supabase
     .from("profiles")
     .update({
       first_name: requireText(formData, "first_name"),
@@ -148,29 +191,35 @@ export async function updateEmployee(formData: FormData) {
       invitation_status: validateInvitationStatus(sanitize(formData.get("invitation_status"))),
     })
     .eq("id", id)
-    .eq("company_id", companyId)
+    .eq("company_id", context.companyId)
     .neq("role", "admin");
+  if (error) return { ok: false, message: "Mitarbeiter konnte nicht gespeichert werden." };
 
-  await replaceEmployeeLocations(companyId, id, selectedLocationIds(formData));
+  await replaceEmployeeLocations(context.companyId, id, selectedLocationIds(formData));
   revalidatePath("/dashboard/mitarbeiter");
+  return { ok: true, message: "Mitarbeiter wurde gespeichert." };
 }
 
-export async function toggleEmployeeStatus(formData: FormData) {
+export async function toggleEmployeeStatus(formData: FormData): Promise<ActionResult> {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
+  const context = await requireCompanyManager().catch((error: Error) => ({ error }));
   const id = requireText(formData, "id");
   const status = validateStatus(sanitize(formData.get("status")));
   const role = validateRole(sanitize(formData.get("role")));
-  if (!supabase || !companyId) return;
+  if (!supabase || "error" in context) return { ok: false, message: "Status konnte nicht geändert werden." };
 
-  if (role === "inhaber" && status === "active" && (await activeOwnerCount(companyId)) <= 1) return;
+  if (role === "inhaber" && status === "active" && (await activeOwnerCount(context.companyId)) <= 1) {
+    return { ok: false, message: "Der letzte aktive Inhaber kann nicht deaktiviert werden." };
+  }
 
-  await supabase
+  const { error } = await supabase
     .from("profiles")
     .update({ status: status === "active" ? "inactive" : "active" })
     .eq("id", id)
-    .eq("company_id", companyId)
+    .eq("company_id", context.companyId)
     .neq("role", "admin");
+  if (error) return { ok: false, message: "Status konnte nicht geändert werden." };
 
   revalidatePath("/dashboard/mitarbeiter");
+  return { ok: true, message: "Status wurde geändert." };
 }

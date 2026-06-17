@@ -1,16 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { requireCompanyRole } from "@/lib/current-user";
 import { defaultCompanySettings } from "@/lib/settings";
 import { getSupabaseServerClient } from "@/lib/supabase-server";
-
-function getCompanyId() {
-  return process.env.NURIA_DEV_COMPANY_ID ?? null;
-}
-
-function getUserId() {
-  return process.env.NURIA_DEV_USER_ID ?? null;
-}
 
 function text(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -53,8 +46,15 @@ export type SettingsActionState = {
 
 export async function saveSettings(_state: SettingsActionState, formData: FormData): Promise<SettingsActionState> {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
-  const userId = getUserId();
+  let context;
+
+  try {
+    context = await requireCompanyRole(["inhaber", "pdl", "verwaltung"]);
+  } catch {
+    return { ok: false, message: "Keine Berechtigung fuer diese Aktion." };
+  }
+
+  const { companyId, userId } = context;
 
   if (!supabase || !companyId) {
     return { ok: false, message: "Einstellungen konnten nicht gespeichert werden." };

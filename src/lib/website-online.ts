@@ -1,4 +1,5 @@
 import { getSupabaseServerClient } from "@/lib/supabase-server";
+import { getCurrentUserContext } from "@/lib/current-user";
 
 export type WebsiteLeadType = "general" | "care_request" | "callback_request" | "job_application" | "cooperation" | "complaint" | "other";
 export type WebsiteLeadSource = "website" | "contact_form" | "phone" | "email" | "facebook" | "instagram" | "google" | "recommendation" | "manual" | "other";
@@ -23,12 +24,12 @@ export type WebsiteOnlineData = {
   exportPrepared: boolean;
 };
 
-function getCompanyId() { return process.env.NURIA_DEV_COMPANY_ID ?? null; }
 function nameOf(row: { first_name?: string | null; last_name?: string | null; email?: string | null }) { return [row.first_name, row.last_name].filter(Boolean).join(" ") || row.email || "Nicht hinterlegt"; }
 
 export async function getWebsiteOnlineData(): Promise<WebsiteOnlineData> {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
+  const context = await getCurrentUserContext();
+  const companyId = context?.companyId ?? null;
   const empty = { leads: [], tasks: [], locations: [], employees: [], stats: { totalLeads: 0, newLeads: 0, inProgress: 0, urgentLeads: 0, openTasks: 0, doneTasks: 0, openFollowUps: 0, archived: 0 }, exportPrepared: false };
   if (!supabase || !companyId) return empty;
 

@@ -1,19 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { requireCompanyRole } from "@/lib/current-user";
 import { getSupabaseServerClient } from "@/lib/supabase-server";
 import type { CareLevel, ClientStatus } from "@/lib/clients";
 
 const statuses = ["active", "inactive", "paused"] as const;
 const careLevels = ["none", "1", "2", "3", "4", "5", "applied", "unknown"] as const;
-
-function getCompanyId() {
-  return process.env.NURIA_DEV_COMPANY_ID ?? null;
-}
-
-function getUserId() {
-  return process.env.NURIA_DEV_USER_ID ?? null;
-}
 
 function sanitize(value: FormDataEntryValue | null) {
   const text = typeof value === "string" ? value.trim() : "";
@@ -87,35 +80,32 @@ async function parseClientPayload(formData: FormData, companyId: string) {
 
 export async function createClient(formData: FormData) {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
-  const userId = getUserId();
-  if (!supabase || !companyId) return;
+  const context = await requireCompanyRole(["inhaber", "pdl", "verwaltung"]);
+  if (!supabase) return;
 
-  const payload = await parseClientPayload(formData, companyId);
-  await supabase.from("clients").insert({ ...payload, company_id: companyId, created_by: userId, updated_by: userId });
+  const payload = await parseClientPayload(formData, context.companyId);
+  await supabase.from("clients").insert({ ...payload, company_id: context.companyId, created_by: context.userId, updated_by: context.userId });
   revalidatePath("/dashboard/klienten");
 }
 
 export async function updateClient(formData: FormData) {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
-  const userId = getUserId();
+  const context = await requireCompanyRole(["inhaber", "pdl", "verwaltung"]);
   const id = requireText(formData, "id");
-  if (!supabase || !companyId) return;
+  if (!supabase) return;
 
-  const payload = await parseClientPayload(formData, companyId);
-  await supabase.from("clients").update({ ...payload, updated_by: userId }).eq("id", id).eq("company_id", companyId);
+  const payload = await parseClientPayload(formData, context.companyId);
+  await supabase.from("clients").update({ ...payload, updated_by: context.userId }).eq("id", id).eq("company_id", context.companyId);
   revalidatePath("/dashboard/klienten");
 }
 
 export async function changeClientStatus(formData: FormData) {
   const supabase = getSupabaseServerClient();
-  const companyId = getCompanyId();
-  const userId = getUserId();
+  const context = await requireCompanyRole(["inhaber", "pdl", "verwaltung"]);
   const id = requireText(formData, "id");
   const status = validateStatus(sanitize(formData.get("status")));
-  if (!supabase || !companyId) return;
+  if (!supabase) return;
 
-  await supabase.from("clients").update({ status, updated_by: userId }).eq("id", id).eq("company_id", companyId);
+  await supabase.from("clients").update({ status, updated_by: context.userId }).eq("id", id).eq("company_id", context.companyId);
   revalidatePath("/dashboard/klienten");
 }

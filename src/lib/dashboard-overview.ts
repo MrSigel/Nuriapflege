@@ -62,6 +62,7 @@ type SupabaseQuery = any;
 
 const openStatuses = ["open", "pending", "planned", "missing"];
 const employeeRoles = ["pdl", "verwaltung", "mitarbeiter", "pflegefachkraft"];
+const staffRoles: Role[] = ["mitarbeiter", "pflegefachkraft"];
 
 function todayIsoDate() {
   return new Date().toISOString().slice(0, 10);
@@ -132,7 +133,7 @@ export function getQuickActions(role: Role): QuickAction[] {
     ];
   }
 
-  if (role === "mitarbeiter") {
+  if (staffRoles.includes(role)) {
     return [
       { label: "Meine Tour öffnen", href: "/mitarbeiter/tour" },
       { label: "Notiz hinzufügen", href: "/mitarbeiter/notizen" },
@@ -273,7 +274,8 @@ export async function getDashboardOverview(role: Role): Promise<DashboardOvervie
     today: todayIsoDate(),
   };
   const supabase = getSupabaseServerClient();
-  const emptyStats = role === "mitarbeiter" ? emptyStaffStats() : emptyCompanyStats();
+  const isStaff = staffRoles.includes(role);
+  const emptyStats = isStaff ? emptyStaffStats() : emptyCompanyStats();
 
   if (!supabase) {
     return {
@@ -285,7 +287,7 @@ export async function getDashboardOverview(role: Role): Promise<DashboardOvervie
   }
 
   const [stats, messages, news] = await Promise.all([
-    role === "mitarbeiter" ? getStaffStats(supabase, context) : getCompanyStats(supabase, context),
+    isStaff ? getStaffStats(supabase, context) : getCompanyStats(supabase, context),
     getMessages(supabase, context),
     getNews(supabase, context),
   ]);
