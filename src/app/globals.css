@@ -2001,18 +2001,21 @@ a {
 }
 
 .public-footer-brand {
-  align-items: start;
+  align-items: center;
   border: 0;
   display: grid;
   gap: 0;
-  justify-content: stretch;
+  justify-content: center;
   padding: 0;
 }
 
 .public-footer-brand-copy {
+  align-items: center;
   display: grid;
   gap: 12px;
+  justify-items: center;
   max-width: 380px;
+  text-align: center;
 }
 
 .public-footer-brand img {
@@ -2213,11 +2216,13 @@ button {
 .brand {
   align-items: center;
   display: flex;
+  justify-content: center;
   min-height: 32px;
 }
 
 .brand img {
   display: block;
+  filter: brightness(0) invert(1);
   height: 32px;
   max-width: 154px;
   object-fit: contain;
