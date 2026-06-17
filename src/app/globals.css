@@ -115,7 +115,8 @@ a {
   justify-content: space-between;
   min-height: 60px;
   padding: 0 clamp(16px, 5vw, 64px);
-  position: static;
+  position: sticky;
+  top: 0;
   z-index: 50;
 }
 
@@ -557,6 +558,9 @@ a {
   background: rgba(255, 255, 255, 0.86);
   border-bottom-color: rgba(15, 118, 110, 0.16);
   box-shadow: 0 10px 24px rgba(11, 53, 81, 0.045);
+  position: sticky;
+  top: 0;
+  z-index: 80;
 }
 
 .public-brand {
@@ -1843,13 +1847,13 @@ a {
 }
 
 .public-footer {
-  background:
-    radial-gradient(circle at 18% 0%, rgba(45, 212, 191, 0.12), transparent 30%),
-    linear-gradient(180deg, #081a2c 0%, #0b2034 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #ffffff;
+  border-top: 1px solid rgba(15, 118, 110, 0.14);
+  border-inline: 0;
+  border-bottom: 0;
   border-radius: 0;
-  box-shadow: none;
-  color: #f7fbfa;
+  box-shadow: 0 -18px 48px rgba(11, 31, 51, 0.045);
+  color: #071b2f;
   display: grid;
   align-items: start;
   column-gap: clamp(24px, 5vw, 54px);
@@ -1875,7 +1879,8 @@ a {
 }
 
 .public-footer-brand img {
-  background: rgba(255, 255, 255, 0.96);
+  background: #ffffff;
+  border: 1px solid rgba(15, 118, 110, 0.12);
   border-radius: 8px;
   height: 52px;
   object-fit: contain;
@@ -1884,7 +1889,7 @@ a {
 }
 
 .public-footer p {
-  color: #c6d5df;
+  color: #526579;
   font-size: 14px;
   line-height: 1.55;
   margin: 0;
@@ -1921,8 +1926,9 @@ a {
 
 .public-footer-column {
   align-content: start;
-  background: rgba(255, 255, 255, 0.045);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #ffffff;
+  border: 1px solid rgba(15, 118, 110, 0.11);
+  box-shadow: 0 12px 28px rgba(11, 31, 51, 0.035);
   border-radius: 8px;
   display: grid;
   gap: 7px;
@@ -1935,7 +1941,7 @@ a {
 }
 
 .public-footer-title {
-  color: #ffffff;
+  color: #071b2f;
   display: block;
   font-size: 13px;
   font-weight: 500;
@@ -1945,7 +1951,7 @@ a {
 
 .public-footer a {
   align-items: center;
-  color: #c6d5df;
+  color: #526579;
   display: inline-flex;
   font-size: 13.5px;
   font-weight: 450;
@@ -1957,12 +1963,12 @@ a {
 }
 
 .public-footer a:hover {
-  color: #5eead4;
+  color: #0f766e;
   transform: none;
 }
 
 .public-footer a svg {
-  color: #5eead4;
+  color: #0f766e;
   flex: 0 0 auto;
   height: 16px;
   stroke-width: 2;
@@ -1971,8 +1977,8 @@ a {
 
 .public-footer-bottom {
   align-items: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  color: #9fb1c0;
+  border-top: 1px solid rgba(15, 118, 110, 0.12);
+  color: #718293;
   display: flex;
   font-size: 13px;
   gap: 12px;
