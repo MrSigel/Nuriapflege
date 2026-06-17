@@ -895,7 +895,7 @@ const legalPages: Record<Exclude<LegalPageKey, "legal">, { title: string; intro:
     intro: "Anbieterkennzeichnung für Nuria Pflege nach aktueller deutscher Rechtslage.",
     sections: [
       { id: "anbieter", title: "Angaben nach § 5 DDG", list: operatorLines },
-      { id: "kontakt", title: "Kontakt", body: ["E-Mail: kontakt@nuria-pflege.de"], link: { href: "mailto:kontakt@nuria-pflege.de", label: "kontakt@nuria-pflege.de" } },
+      { id: "kontakt", title: "Kontakt", link: { href: "mailto:kontakt@nuria-pflege.de", label: "E-Mail schreiben" } },
       { id: "ustid", title: "Umsatzsteuer-ID", body: ["Umsatzsteuer-Identifikationsnummer gemäß § 27a Umsatzsteuergesetz: DE278597389."] },
       { id: "mstv", title: "Verantwortlich nach § 18 Abs. 2 MStV", body: ["Verantwortlich für journalistisch-redaktionelle Inhalte, soweit solche Inhalte angeboten werden: Enrico Gross, Gerther Straße 76, 44577 Castrop-Rauxel, Deutschland."] },
       { id: "streitschlichtung", title: "Streitbeilegung", body: ["Nuria Pflege ist nicht verpflichtet und nicht bereit, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen."] },
@@ -1009,7 +1009,7 @@ function LegalPage({ page }: { page: LegalPageKey }) {
   // Rechtliche Inhalte vor Veröffentlichung über eRecht24 final prüfen lassen.
   if (page === "legal") {
     return (
-      <PublicSubPage intro="Zentrale Übersicht rechtlicher Informationen und vertrauensbildender Grundlagen." title="Rechtliches & Vertrauen">
+      <PublicSubPage className="public-legal-subpage" hideBadge intro="Zentrale Übersicht rechtlicher Informationen und vertrauensbildender Grundlagen." title="Rechtliches & Vertrauen">
         <section className="public-section public-legal-page">
           <div className="public-legal-card-grid">
             {legalOverviewCards.map(([title, href, Icon, text]) => (
@@ -1042,7 +1042,7 @@ function LegalPage({ page }: { page: LegalPageKey }) {
   const content = legalPages[page];
 
   return (
-    <PublicSubPage intro={content.intro} title={content.title}>
+    <PublicSubPage className="public-legal-subpage" hideBadge intro={content.intro} title={content.title}>
       <section className="public-section public-legal-page">
         {content.sections.length > 3 ? (
           <nav className="public-legal-toc" aria-label="Abschnittsnavigation">
@@ -1074,12 +1074,12 @@ function LegalPage({ page }: { page: LegalPageKey }) {
   );
 }
 
-function PublicSubPage({ actions, badge = "Nuria Pflege", children, intro, title, visual }: { actions?: readonly [string, string, "primary" | "secondary"][]; badge?: string; children?: React.ReactNode; intro: string; title: string; visual?: React.ReactNode }) {
+function PublicSubPage({ actions, badge = "Nuria Pflege", children, className, hideBadge = false, intro, title, visual }: { actions?: readonly [string, string, "primary" | "secondary"][]; badge?: string; children?: React.ReactNode; className?: string; hideBadge?: boolean; intro: string; title: string; visual?: React.ReactNode }) {
   return (
     <>
-      <motion.section animate="visible" className="public-subhero" initial="hidden" variants={staggerContainer}>
+      <motion.section animate="visible" className={`public-subhero${className ? ` ${className}` : ""}`} initial="hidden" variants={staggerContainer}>
         <div className="public-subhero-copy">
-          <motion.span className="public-eyebrow" variants={fadeUp}>{badge}</motion.span>
+          {hideBadge ? null : <motion.span className="public-eyebrow" variants={fadeUp}>{badge}</motion.span>}
           <motion.h1 variants={fadeUp}>{title}</motion.h1>
           <motion.p variants={fadeUp}>{intro}</motion.p>
           {actions ? (

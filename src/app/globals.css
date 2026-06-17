@@ -1213,6 +1213,27 @@ a {
   text-align: left;
 }
 
+.public-legal-subpage {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  min-height: auto;
+  padding-bottom: 24px;
+  padding-top: clamp(42px, 6vw, 68px);
+  text-align: center;
+}
+
+.public-legal-subpage .public-subhero-copy {
+  justify-items: center;
+  margin-inline: auto;
+  max-width: 860px;
+  text-align: center;
+}
+
+.public-legal-subpage .public-subhero-copy > p {
+  margin-inline: auto;
+  max-width: 760px;
+}
+
 .public-subhero .public-actions {
   margin-top: 10px;
 }
@@ -1461,12 +1482,6 @@ a {
   width: min(calc(100% - 40px), 980px);
 }
 
-.public-subhero:has(+ .public-legal-page) {
-  min-height: auto;
-  padding-bottom: 24px;
-  padding-top: clamp(42px, 6vw, 68px);
-}
-
 .public-legal-toc {
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(15, 118, 110, 0.14);
@@ -1630,8 +1645,10 @@ a {
 }
 
 .legal-link-button {
-  justify-self: start;
+  justify-self: center;
+  margin-inline: auto;
   margin-top: 4px;
+  min-width: min(100%, 220px);
 }
 
 .public-static-faq {
