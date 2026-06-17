@@ -23,7 +23,6 @@ create table if not exists public.companies (
   phone text,
   status text not null default 'active',
   package_id text,
-  onboarding_status text not null default 'in_progress',
   payment_status public.nuria_payment_status not null default 'pending_payment',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -1992,9 +1991,7 @@ create policy compliance_evidence_insert_by_company on public.compliance_evidenc
 -- 20260615140000_payment_subscription.sql
 alter table public.companies
   add column if not exists billing_interval text,
-  add column if not exists onboarding_status text not null default 'in_progress',
   add column if not exists payment_marked_at timestamptz,
-  add column if not exists payment_due_until timestamptz,
   add column if not exists payment_due_check_at timestamptz,
   add column if not exists admin_confirmed_at timestamptz,
   add column if not exists locked_at timestamptz,
@@ -2005,10 +2002,6 @@ alter table public.companies
   add column if not exists city text,
   add column if not exists country text,
   add column if not exists billing_email text;
-
-alter table public.companies drop constraint if exists companies_onboarding_status_check;
-alter table public.companies
-  add constraint companies_onboarding_status_check check (onboarding_status in ('in_progress','completed'));
 
 create table if not exists public.company_subscriptions (
   id uuid primary key default gen_random_uuid(),
@@ -2931,3 +2924,75 @@ for all using (
   public.is_admin()
   or (company_id = public.current_profile_company_id() and public.current_profile_role() in ('inhaber', 'pdl', 'verwaltung'))
 );
+
+-- 20260616110000_onboarding_access_control.sql
+alter table public.companies
+  add column if not exists onboarding_status text not null default 'in_progress',
+  add column if not exists payment_due_until timestamptz;
+
+alter table public.companies drop constraint if exists companies_onboarding_status_check;
+alter table public.companies
+  add constraint companies_onboarding_status_check check (onboarding_status in ('in_progress','completed'));
+
+create index if not exists companies_onboarding_payment_idx
+  on public.companies(onboarding_status, payment_status, payment_due_until);
+
+-- 20260617120000_nuria_internal_admin.sql
+alter table public.companies
+  add column if not exists confirmed_by uuid references public.profiles(id) on delete set null;
+
+create table if not exists public.support_requests (
+  id uuid primary key default gen_random_uuid(),
+  company_id uuid references public.companies(id) on delete set null,
+  name text,
+  email text,
+  subject text not null,
+  message text not null,
+  status text not null default 'open',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint support_requests_status_check check (status in ('open','in_progress','done'))
+);
+
+create table if not exists public.support_replies (
+  id uuid primary key default gen_random_uuid(),
+  support_request_id uuid not null references public.support_requests(id) on delete cascade,
+  admin_user_id uuid references public.profiles(id) on delete set null,
+  body text not null,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.admin_logs (
+  id uuid primary key default gen_random_uuid(),
+  company_id uuid references public.companies(id) on delete set null,
+  admin_user_id uuid references public.profiles(id) on delete set null,
+  action text not null,
+  target_type text not null,
+  target_id uuid,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists support_requests_status_idx on public.support_requests(status, created_at desc);
+create index if not exists support_replies_request_idx on public.support_replies(support_request_id, created_at);
+create index if not exists admin_logs_created_idx on public.admin_logs(created_at desc);
+
+alter table public.support_requests enable row level security;
+alter table public.support_replies enable row level security;
+alter table public.admin_logs enable row level security;
+
+drop policy if exists support_requests_admin_all on public.support_requests;
+create policy support_requests_admin_all on public.support_requests
+for all using (public.is_admin()) with check (public.is_admin());
+
+drop policy if exists support_replies_admin_all on public.support_replies;
+create policy support_replies_admin_all on public.support_replies
+for all using (public.is_admin()) with check (public.is_admin());
+
+drop policy if exists admin_logs_admin_read on public.admin_logs;
+create policy admin_logs_admin_read on public.admin_logs
+for select using (public.is_admin());
+
+drop policy if exists admin_logs_admin_insert on public.admin_logs;
+create policy admin_logs_admin_insert on public.admin_logs
+for insert with check (public.is_admin());
