@@ -1,29 +1,11 @@
 import type { MetadataRoute } from "next";
-
-const publicRoutes = [
-  "",
-  "/funktionen",
-  "/tarifdetails",
-  "/registrieren",
-  "/login",
-  "/kontakt",
-  "/impressum",
-  "/datenschutz",
-  "/agb",
-  "/cookie-einstellungen",
-  "/widerruf",
-  "/av-vertrag",
-  "/tom",
-  "/rechtliches",
-];
+import { absoluteUrl, publicSeoEntries } from "@/lib/public-seo";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://nuria-pflege.de";
-
-  return publicRoutes.map((route) => ({
-    url: `${baseUrl}${route}`,
+  return publicSeoEntries.map((route) => ({
+    url: absoluteUrl(route.path),
     lastModified: new Date(),
-    changeFrequency: route === "" ? "weekly" : "monthly",
-    priority: route === "" ? 1 : 0.7,
+    changeFrequency: route.changeFrequency,
+    priority: route.priority,
   }));
 }

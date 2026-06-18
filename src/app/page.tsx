@@ -1,20 +1,14 @@
-import type { Metadata } from "next";
+import { PublicJsonLd } from "@/components/public-json-ld";
 import { PublicSite } from "@/components/public-site";
+import { createPublicMetadata } from "@/lib/public-seo";
 
-export const metadata: Metadata = {
-  title: "Nuria Pflege | Pflege Software für ambulante Pflegedienste",
-  description:
-    "Digitale Organisation für ambulante Pflegedienste mit Dienstplanung, Touren, Dokumenten, Zeiterfassung und Kommunikation.",
-  alternates: { canonical: "/" },
-  openGraph: {
-    title: "Nuria Pflege | Pflege Software für ambulante Pflegedienste",
-    description: "Digitale Organisation für ambulante Pflegedienste mit Dienstplanung, Touren, Dokumenten, Zeiterfassung und Kommunikation.",
-    url: "/",
-    siteName: "Nuria Pflege",
-    type: "website",
-  },
-};
+export const metadata = createPublicMetadata("home");
 
 export default function Home() {
-  return <PublicSite />;
+  return (
+    <>
+      <PublicJsonLd page="home" />
+      <PublicSite />
+    </>
+  );
 }

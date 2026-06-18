@@ -1,12 +1,14 @@
-import type { Metadata } from "next";
+import { PublicJsonLd } from "@/components/public-json-ld";
 import { PublicSite } from "@/components/public-site";
+import { createPublicMetadata } from "@/lib/public-seo";
 
-export const metadata: Metadata = {
-  title: "Datenschutz | Nuria Pflege",
-  description: "Datenschutzhinweise von Nuria Pflege.",
-  alternates: { canonical: "/datenschutz" },
-};
+export const metadata = createPublicMetadata("privacy");
 
 export default function PrivacyPage() {
-  return <PublicSite page="privacy" />;
+  return (
+    <>
+      <PublicJsonLd page="privacy" />
+      <PublicSite page="privacy" />
+    </>
+  );
 }

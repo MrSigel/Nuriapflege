@@ -1,18 +1,14 @@
-import type { Metadata } from "next";
+import { PublicJsonLd } from "@/components/public-json-ld";
 import { PublicSite } from "@/components/public-site";
+import { createPublicMetadata } from "@/lib/public-seo";
 
-export const metadata: Metadata = {
-  title: "Funktionen | Nuria Pflege",
-  description: "Überblick über die Funktionen von Nuria Pflege: Dienstplanung, Tourenplanung, Zeiterfassung, Dokumente, Kommunikation und rollenbasierte Mitarbeiterbereiche für ambulante Pflegedienste.",
-  alternates: { canonical: "/funktionen" },
-  openGraph: {
-    title: "Funktionen | Nuria Pflege",
-    description: "Überblick über Dienstplanung, Tourenplanung, Zeiterfassung, Dokumente, Kommunikation und rollenbasierte Mitarbeiterbereiche.",
-    url: "/funktionen",
-    siteName: "Nuria Pflege",
-  },
-};
+export const metadata = createPublicMetadata("features");
 
 export default function FeaturesPage() {
-  return <PublicSite page="features" />;
+  return (
+    <>
+      <PublicJsonLd page="features" />
+      <PublicSite page="features" />
+    </>
+  );
 }

@@ -189,12 +189,6 @@ const contactHelp = [
 ] as const;
 
 function PublicNav() {
-  // Logo with hover animation
-  const logoVariants = {
-    hover: { scale: 1.05 },
-    initial: { scale: 1 },
-  };
-
   const [open, setOpen] = useState(false);
 
   return (
@@ -302,7 +296,11 @@ function CookieConsentBanner() {
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   useEffect(() => {
-    setVisible(!document.cookie.split("; ").some((cookie) => cookie.startsWith(`${cookieConsentName}=`)));
+    const timer = window.setTimeout(() => {
+      setVisible(!document.cookie.split("; ").some((cookie) => cookie.startsWith(`${cookieConsentName}=`)));
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, []);
 
   function saveConsent(value: "accepted" | "rejected" | "necessary") {
@@ -754,18 +752,6 @@ function PricingPageContent() {
   );
 }
 
-function ContactPage() {
-  return (
-    <PublicSubPage title="Kontakt" intro="Nehmen Sie Kontakt mit Nuria Pflege auf.">
-      <div className="public-info-card">
-        <h2>Kontakt aufnehmen</h2>
-        <p>Für Fragen zur Pflege Software und zur digitalen Organisation Ihres Pflegedienstes erreichen Sie uns per E-Mail.</p>
-        <a className="public-button" href="mailto:kontakt@nuria-pflege.de">kontakt@nuria-pflege.de</a>
-      </div>
-    </PublicSubPage>
-  );
-}
-
 function ContactPageContent() {
   return (
     <>
@@ -826,54 +812,6 @@ function ContactPageContent() {
         secondaryLabel="Tarifdetails ansehen"
       />
     </>
-  );
-}
-
-function LegacyLegalPage({ page }: { page: "imprint" | "privacy" | "terms" | "cookies" }) {
-  const content = {
-    imprint: {
-      title: "Impressum",
-      intro: "Angaben gemäß § 5 TMG.",
-      lines: ["Nuria Pflege", "Enrico Gross", "Einzelunternehmen", "Gerther Straße 76", "44577 Castrop-Rauxel", "Deutschland", "kontakt@nuria-pflege.de"],
-    },
-    privacy: {
-      title: "Datenschutz",
-      intro: "Informationen zum Umgang mit personenbezogenen Daten.",
-      lines: [
-        "Nuria Pflege verarbeitet Daten zur Bereitstellung geschützter Softwarebereiche.",
-        "Interne Bereiche sind für registrierte Nutzer vorgesehen.",
-        "Dokumente und Pflegedienstinformationen werden nicht öffentlich dargestellt.",
-        "Anfragen zum Datenschutz können an kontakt@nuria-pflege.de gesendet werden.",
-      ],
-    },
-    terms: {
-      title: "AGB",
-      intro: "Allgemeine Hinweise zur Nutzung von Nuria Pflege.",
-      lines: [
-        "Nuria Pflege ist eine Software-Plattform für ambulante Pflegedienste.",
-        "Tarifdetails werden im Registrierungsprozess und im Tarifbereich angezeigt.",
-        "Die Nutzung interner Bereiche setzt ein registriertes Benutzerkonto voraus.",
-      ],
-    },
-    cookies: {
-      title: "Cookie-Einstellungen",
-      intro: "Hinweise zu Cookies und lokalen Einstellungen.",
-      lines: [
-        "Nuria Pflege setzt keine Tracking-Dienste auf der öffentlichen Website ein.",
-        "Für Login und interne Bereiche können technisch notwendige Sitzungsdaten verwendet werden.",
-        "Ein Cookie-Banner wird nicht erzwungen, solange keine Tracking-Cookies genutzt werden.",
-      ],
-    },
-  }[page];
-
-  return (
-    <PublicSubPage intro={content.intro} title={content.title}>
-      <div className="public-info-card">
-        {content.lines.map((line) => (
-          <p key={line}>{line}</p>
-        ))}
-      </div>
-    </PublicSubPage>
   );
 }
 
@@ -1112,21 +1050,6 @@ export function PublicSite({ page = "home" }: { page?: PublicPage }) {
         {page === "features" ? <FeaturesPageContent /> : null}
         {page === "pricing" ? <PricingPageContent /> : null}
         {page === "contact" ? <ContactPageContent /> : null}
-        {false ? (
-          <PublicSubPage intro="Pflege Software für Dienstplanung Pflege, Tourenplanung Pflege, Zeiterfassung Pflege und digitale Organisation." title="Funktionen">
-            <FeaturesSection />
-            <RolesSection />
-            <SecuritySection />
-          </PublicSubPage>
-        ) : null}
-        {false ? (
-          <PublicSubPage intro="Sachliche Tarifdetails für ambulante Pflegedienste." title="Tarifdetails">
-            <PricingSection />
-            <ProcessSection />
-            <FaqSection />
-          </PublicSubPage>
-        ) : null}
-        {false ? <ContactPage /> : null}
         {page === "imprint" || page === "privacy" || page === "terms" || page === "cookies" || page === "withdrawal" || page === "dpa" || page === "tom" || page === "legal" ? <LegalPage page={page} /> : null}
       </main>
       <PublicFooter />

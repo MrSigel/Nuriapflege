@@ -1,12 +1,14 @@
-import type { Metadata } from "next";
+import { PublicJsonLd } from "@/components/public-json-ld";
 import { PublicSite } from "@/components/public-site";
+import { createPublicMetadata } from "@/lib/public-seo";
 
-export const metadata: Metadata = {
-  title: "AGB | Nuria Pflege",
-  description: "Allgemeine Hinweise zur Nutzung von Nuria Pflege.",
-  alternates: { canonical: "/agb" },
-};
+export const metadata = createPublicMetadata("terms");
 
 export default function TermsPage() {
-  return <PublicSite page="terms" />;
+  return (
+    <>
+      <PublicJsonLd page="terms" />
+      <PublicSite page="terms" />
+    </>
+  );
 }

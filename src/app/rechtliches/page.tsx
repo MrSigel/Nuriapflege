@@ -1,12 +1,14 @@
-import type { Metadata } from "next";
+import { PublicJsonLd } from "@/components/public-json-ld";
 import { PublicSite } from "@/components/public-site";
+import { createPublicMetadata } from "@/lib/public-seo";
 
-export const metadata: Metadata = {
-  title: "Rechtliches & Vertrauen | Nuria Pflege",
-  description: "Übersicht rechtlicher Informationen und Vertrauensgrundlagen von Nuria Pflege.",
-  alternates: { canonical: "/rechtliches" },
-};
+export const metadata = createPublicMetadata("legal");
 
 export default function LegalOverviewPage() {
-  return <PublicSite page="legal" />;
+  return (
+    <>
+      <PublicJsonLd page="legal" />
+      <PublicSite page="legal" />
+    </>
+  );
 }

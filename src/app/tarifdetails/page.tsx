@@ -1,18 +1,14 @@
-import type { Metadata } from "next";
+import { PublicJsonLd } from "@/components/public-json-ld";
 import { PublicSite } from "@/components/public-site";
+import { createPublicMetadata } from "@/lib/public-seo";
 
-export const metadata: Metadata = {
-  title: "Tarifdetails | Nuria Pflege",
-  description: "Tarifdetails zu Nuria Pflege für ambulante Pflegedienste. Klare Laufzeitoptionen und zentrale Funktionen für digitale Organisation im Pflegealltag.",
-  alternates: { canonical: "/tarifdetails" },
-  openGraph: {
-    title: "Tarifdetails | Nuria Pflege",
-    description: "Klare Laufzeitoptionen und zentrale Funktionen für digitale Organisation im Pflegealltag.",
-    url: "/tarifdetails",
-    siteName: "Nuria Pflege",
-  },
-};
+export const metadata = createPublicMetadata("pricing");
 
 export default function PricingPage() {
-  return <PublicSite page="pricing" />;
+  return (
+    <>
+      <PublicJsonLd page="pricing" />
+      <PublicSite page="pricing" />
+    </>
+  );
 }

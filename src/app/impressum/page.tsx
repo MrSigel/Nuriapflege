@@ -1,12 +1,14 @@
-import type { Metadata } from "next";
+import { PublicJsonLd } from "@/components/public-json-ld";
 import { PublicSite } from "@/components/public-site";
+import { createPublicMetadata } from "@/lib/public-seo";
 
-export const metadata: Metadata = {
-  title: "Impressum | Nuria Pflege",
-  description: "Impressum von Nuria Pflege.",
-  alternates: { canonical: "/impressum" },
-};
+export const metadata = createPublicMetadata("imprint");
 
 export default function ImprintPage() {
-  return <PublicSite page="imprint" />;
+  return (
+    <>
+      <PublicJsonLd page="imprint" />
+      <PublicSite page="imprint" />
+    </>
+  );
 }

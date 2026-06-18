@@ -1,25 +1,61 @@
 import type { Metadata } from "next";
+import { publicSeoPages, siteUrl } from "@/lib/public-seo";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://nuria-pflege.de"),
+  metadataBase: new URL(siteUrl),
+  applicationName: "Nuria Pflege",
+  category: "Software",
   title: {
-    default: "Nuria Pflege | Pflege Software für ambulante Pflegedienste",
+    default: publicSeoPages.home.title,
     template: "%s | Nuria Pflege",
   },
-  description:
-    "Nuria Pflege ist eine Software für ambulante Pflegedienste zur digitalen Organisation von Dienstplanung, Tourenplanung, Zeiterfassung, Dokumenten und Kommunikation.",
+  description: publicSeoPages.home.description,
+  keywords: publicSeoPages.home.keywords,
+  creator: "Nuria Pflege",
+  publisher: "Nuria Pflege",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  alternates: {
+    canonical: "/",
+  },
+  icons: {
+    icon: "/logo_transparent.png",
+    apple: "/logo_transparent.png",
+  },
   openGraph: {
-    title: "Nuria Pflege | Pflege Software für ambulante Pflegedienste",
-    description:
-      "Digitale Organisation für ambulante Pflegedienste mit Dienstplanung, Touren, Mitarbeiter-Dashboard, Dokumenten und Kommunikation.",
+    title: publicSeoPages.home.title,
+    description: publicSeoPages.home.description,
+    url: "/",
     siteName: "Nuria Pflege",
     locale: "de_DE",
     type: "website",
+    images: [
+      {
+        url: "/logo_transparent.png",
+        alt: "Nuria Pflege",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary",
+    title: publicSeoPages.home.title,
+    description: publicSeoPages.home.description,
+    images: ["/logo_transparent.png"],
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
   },
 };
 

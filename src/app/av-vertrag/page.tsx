@@ -1,12 +1,14 @@
-import type { Metadata } from "next";
+import { PublicJsonLd } from "@/components/public-json-ld";
 import { PublicSite } from "@/components/public-site";
+import { createPublicMetadata } from "@/lib/public-seo";
 
-export const metadata: Metadata = {
-  title: "Auftragsverarbeitung | Nuria Pflege",
-  description: "Informationen zur Auftragsverarbeitung und zum AV-Vertrag bei Nuria Pflege.",
-  alternates: { canonical: "/av-vertrag" },
-};
+export const metadata = createPublicMetadata("dpa");
 
 export default function DataProcessingAgreementPage() {
-  return <PublicSite page="dpa" />;
+  return (
+    <>
+      <PublicJsonLd page="dpa" />
+      <PublicSite page="dpa" />
+    </>
+  );
 }
