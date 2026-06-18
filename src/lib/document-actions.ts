@@ -72,6 +72,10 @@ async function context() {
   return requireCompanyRole(["inhaber", "pdl", "verwaltung"]);
 }
 
+async function readContext() {
+  return requireCompanyRole(["inhaber", "pdl", "verwaltung"], { write: false });
+}
+
 export async function uploadDocument(formData: FormData) {
   const supabase = getSupabaseServerClient();
   const { companyId, userId } = await context();
@@ -147,7 +151,7 @@ export async function deleteDocument(formData: FormData) {
 
 export async function getDocumentSignedUrl(formData: FormData) {
   const supabase = getSupabaseServerClient();
-  const { companyId, userId } = await context();
+  const { companyId, userId } = await readContext();
   const id = required(formData, "id");
   if (!supabase || !companyId) return null;
 

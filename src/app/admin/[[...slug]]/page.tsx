@@ -1,4 +1,7 @@
 import { redirect } from "next/navigation";
+import { privateRobotsMetadata } from "@/lib/public-seo";
+
+export const metadata = privateRobotsMetadata;
 
 type PageProps = {
   params: Promise<{ slug?: string[] }>;

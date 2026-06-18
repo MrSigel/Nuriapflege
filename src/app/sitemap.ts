@@ -1,8 +1,8 @@
 import type { MetadataRoute } from "next";
-import { absoluteUrl, publicSeoEntries } from "@/lib/public-seo";
+import { absoluteUrl, publicSitemapEntries } from "@/lib/public-seo";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return publicSeoEntries.map((route) => ({
+  return publicSitemapEntries.map((route) => ({
     url: absoluteUrl(route.path),
     lastModified: new Date(),
     changeFrequency: route.changeFrequency,

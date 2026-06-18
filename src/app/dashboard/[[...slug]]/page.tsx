@@ -1,4 +1,6 @@
 import { notFound, redirect } from "next/navigation";
+import Link from "next/link";
+import { privateRobotsMetadata } from "@/lib/public-seo";
 import { DashboardOverview } from "@/components/dashboard-overview";
 import { DashboardPage } from "@/components/dashboard-page";
 import { DashboardShell } from "@/components/dashboard-shell";
@@ -63,6 +65,8 @@ import { markPaymentSent, saveBillingData } from "@/lib/payment-actions";
 import { getCompanyAccessState, getOnboardingData } from "@/lib/onboarding";
 import { confirmOnboardingPayment, saveOnboardingCompany, saveOnboardingLocation, selectOnboardingPlan } from "@/lib/onboarding-actions";
 import { getCurrentUserContext } from "@/lib/current-user";
+
+export const metadata = privateRobotsMetadata;
 
 type PageProps = {
   params: Promise<{ slug?: string[] }>;
@@ -145,7 +149,7 @@ export default async function CompanyDashboardPage({ params }: PageProps) {
                 : "Bitte schließen Sie die Einrichtung ab und bestätigen Sie die Zahlung, um Nuria Pflege vollständig zu nutzen."}
             </p>
           </div>
-          <a className="button" href="/dashboard/onboarding">Einrichtung fortsetzen</a>
+          <Link className="button" href="/dashboard/onboarding">Einrichtung fortsetzen</Link>
         </div>
       ) : null}
       {overview ? <DashboardOverview data={overview} role={userContext.role} /> : null}

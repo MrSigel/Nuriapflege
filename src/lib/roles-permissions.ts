@@ -33,27 +33,6 @@ export async function getRolePermissionData(): Promise<RolePermissionData> {
     return buildData([], [], enabled);
   }
 
-  await supabase.from("permissions").upsert(
-    permissions.map((permission) => ({
-      key: permission.key,
-      name: permission.name,
-      category: permission.category,
-      description: null,
-    })),
-    { onConflict: "key" },
-  );
-
-  await supabase.from("roles").upsert(
-    managedRoles.map((role) => ({
-      company_id: companyId,
-      key: role.key,
-      name: role.name,
-      description: role.description,
-      is_system_role: true,
-    })),
-    { onConflict: "company_id,key" },
-  );
-
   const [{ data: rolePermissions }, { data: employees }, { count: recentChanges }] = await Promise.all([
     supabase.from("role_permissions").select("role_key, permission_key, enabled").eq("company_id", companyId),
     supabase

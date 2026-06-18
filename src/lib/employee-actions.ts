@@ -143,6 +143,7 @@ export async function inviteEmployee(formData: FormData): Promise<ActionResult> 
   }
 
   revalidatePath("/dashboard/mitarbeiter");
+  if (!mail.ok && mail.configured === false) return { ok: true, message: mail.message };
   return mail.ok ? { ok: true, message: "Einladung wurde gespeichert und versendet." } : { ok: false, message: mail.message };
 }
 

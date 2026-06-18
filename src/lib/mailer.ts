@@ -10,15 +10,17 @@ type MailPayload = {
 };
 
 export function isSmtpConfigured() {
-  return Boolean(process.env.SMTP_USER && process.env.SMTP_PASSWORD && (process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER));
+  return Boolean(process.env.SMTP_USER && process.env.SMTP_PASSWORD && (process.env.SMTP_FROM_EMAIL || process.env.EMAIL_FROM || process.env.SMTP_USER));
 }
 
 export async function sendMail(payload: MailPayload) {
   if (!isSmtpConfigured()) {
-    return { ok: false, message: "E-Mail-Versand ist noch nicht konfiguriert. Die Einladung wurde gespeichert, aber nicht versendet." };
+    return { ok: false, configured: false, message: "E-Mail-Versand ist noch nicht konfiguriert. Die Einladung wurde gespeichert, aber nicht versendet." };
   }
 
   const port = Number(process.env.SMTP_PORT ?? "465");
+  const fromEmail = process.env.SMTP_FROM_EMAIL ?? process.env.EMAIL_FROM ?? process.env.SMTP_USER;
+  const from = process.env.SMTP_FROM_NAME && fromEmail ? `${process.env.SMTP_FROM_NAME} <${fromEmail}>` : fromEmail;
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST ?? "smtp.ionos.de",
     port,
@@ -31,14 +33,14 @@ export async function sendMail(payload: MailPayload) {
 
   try {
     await transporter.sendMail({
-      from: process.env.SMTP_FROM_EMAIL ?? process.env.SMTP_USER,
+      from,
       to: payload.to,
       subject: payload.subject,
       text: payload.text,
       html: payload.html,
     });
-    return { ok: true };
+    return { ok: true, configured: true };
   } catch {
-    return { ok: false, message: "E-Mail konnte nicht versendet werden. Die Einladung wurde gespeichert, aber nicht versendet." };
+    return { ok: false, configured: true, message: "E-Mail konnte nicht versendet werden. Die Einladung wurde gespeichert, aber nicht versendet." };
   }
 }

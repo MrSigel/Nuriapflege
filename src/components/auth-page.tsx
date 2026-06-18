@@ -271,8 +271,12 @@ export function AuthPage({ initialMode = "login" }: AuthPageProps) {
             <AnimatePresence mode="wait">
               <motion.div key={mode} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.18 }}>
                 <div className="auth-heading">
-                  <h1>{mode === "login" ? "Einloggen" : "Registrieren"}</h1>
-                  <p>{mode === "login" ? "Melden Sie sich mit Ihrem Zugang an." : "Für Pflegedienst-Inhaber."}</p>
+                  <h1>{mode === "login" ? "Einloggen" : "Pflegedienst registrieren"}</h1>
+                  <p>
+                    {mode === "login"
+                      ? "Melden Sie sich bei Nuria Pflege an und nutzen Sie Ihre Pflege Software für digitale Pflegedienst Verwaltung."
+                      : "Registrieren Sie Ihren ambulanten Pflegedienst für Pflege Software mit Dienstplanung, Tourenplanung, Zeiterfassung und Mitarbeiterverwaltung."}
+                  </p>
                 </div>
 
                 <AnimatePresence>
@@ -371,9 +375,6 @@ export function AuthPage({ initialMode = "login" }: AuthPageProps) {
 
       <motion.section className="auth-video-side" initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.26, delay: 0.04 }}>
         <div className="auth-video-frame">
-          <video aria-hidden autoPlay loop muted playsInline preload="none">
-            <source src="/videos/nuria-preview.mp4" type="video/mp4" />
-          </video>
           <motion.div className="auth-video-placeholder" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.18 }}>
             <div className="auth-preview-toolbar">
               <span />
@@ -381,8 +382,8 @@ export function AuthPage({ initialMode = "login" }: AuthPageProps) {
               <span />
             </div>
             <div className="video-play-mark"><Play size={22} fill="currentColor" /></div>
-            <strong>Videovorschau wird vorbereitet</strong>
-            <p>Hier wird später die Produktvorschau angezeigt.</p>
+            <strong>Nuria Pflege Überblick</strong>
+            <p>Digitale Organisation ambulanter Pflegedienste mit Rollen, Planung, Touren, Zeiten und interner Kommunikation.</p>
             <div className="auth-preview-metrics" aria-hidden>
               <span><UserRound size={15} /> Pflege</span>
               <span><Building2 size={15} /> Organisation</span>

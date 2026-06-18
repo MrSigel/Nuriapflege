@@ -52,12 +52,12 @@ const motionViewport = { once: true, amount: 0.2 };
 const cardHover = { y: -5, scale: 1.01 };
 
 const modules = [
-  ["Dienstplanung", "Dienste strukturiert planen und Einsätze klar koordinieren.", CalendarDays],
-  ["Tourenplanung", "Tourenplanung Pflege für einen geordneten Tagesablauf vorbereiten.", Route],
-  ["Mitarbeiter-Dashboard", "Mitarbeiter sehen eigene Dienste, Touren und relevante Aufgaben.", Users],
-  ["Klientenübersicht", "Klienteninformationen zentral verwalten und je Berechtigung zugänglich machen.", UserRound],
-  ["Zeiterfassung", "Arbeitszeiten digital erfassen und nachvollziehbar strukturieren.", Clock3],
-  ["Dokumente hochladen", "Dokumente intern ablegen, ohne sie öffentlich darzustellen.", FolderOpen],
+  ["Dienstplanung", "Dienstplanung Pflege strukturiert vorbereiten und Einsätze klar koordinieren.", CalendarDays],
+  ["Tourenplanung", "Tourenplanung Pflege für einen geordneten Tagesablauf und klare Mitarbeiteransichten vorbereiten.", Route],
+  ["Mitarbeiter-Dashboard", "Mitarbeiterverwaltung Pflege mit eigenen Diensten, Touren und relevanten Aufgaben verbinden.", Users],
+  ["Klientenübersicht", "Klientenverwaltung Pflege zentral strukturieren und je Berechtigung zugänglich machen.", UserRound],
+  ["Zeiterfassung", "Zeiterfassung Pflegedienst digital erfassen und nachvollziehbar strukturieren.", Clock3],
+  ["Dokumente hochladen", "Dokumentenverwaltung Pflege intern ablegen, ohne sie öffentlich darzustellen.", FolderOpen],
   ["Notizen & Übergaben", "Übergaben und interne Hinweise zentral sammeln.", FileText],
   ["Kommunikation", "Interne Nachrichten für Teams und einzelne Mitarbeiter bündeln.", MessagesSquare],
   ["Abwesenheiten / Urlaub", "Urlaub, Krankheit und Abwesenheiten im Mitarbeiterbereich abbilden.", CalendarOff],
@@ -74,9 +74,9 @@ const heroPoints = [
 ] as const;
 
 const explainCards = [
-  ["Planen", "Dienstplanung und Touren strukturiert vorbereiten.", ClipboardList],
-  ["Organisieren", "Mitarbeiter, Rollen, Standorte und Abläufe bündeln.", Building2],
-  ["Dokumentieren", "Dokumente, Zeiten und Übergaben zentral erfassen.", FileText],
+  ["Planen", "Dienstplanung Pflege und Tourenplanung Pflege strukturiert vorbereiten.", ClipboardList],
+  ["Organisieren", "Mitarbeiterverwaltung Pflege, Rollen, Standorte und Abläufe bündeln.", Building2],
+  ["Dokumentieren", "Dokumentenverwaltung Pflege, Zeiten und Übergaben zentral erfassen.", FileText],
 ] as const;
 
 const problems = [
@@ -123,12 +123,12 @@ const faqs = [
 ] as const;
 
 const featureModules = [
-  ["Dienstplanung", "Dienste planen, Einsätze strukturieren und Mitarbeiter übersichtlich einteilen.", CalendarDays],
-  ["Tourenplanung", "Touren vorbereiten, Stopps strukturieren und Mitarbeitern ihre eigene Touransicht bereitstellen.", Route],
-  ["Mitarbeiter-Dashboard", "Mitarbeiter sehen eigene Dienste, Touren, zugewiesene Patienten, Zeiten und interne Nachrichten.", Users],
-  ["Klientenübersicht", "Klienten strukturiert verwalten und relevante Informationen rollenbasiert zugänglich machen.", UserRound],
-  ["Zeiterfassung", "Arbeitszeiten, Tourzeiten und Einsatzzeiten nachvollziehbar erfassen.", Clock3],
-  ["Dokumente", "Dokumente und Verordnungen geschützt zu passenden Klienten oder Einsätzen ablegen.", FileText],
+  ["Dienstplanung", "Software Dienstplanung Pflegedienst: Dienste planen, Einsätze strukturieren und Mitarbeiter übersichtlich einteilen.", CalendarDays],
+  ["Tourenplanung", "Software Tourenplanung Pflegedienst: Touren vorbereiten, Stopps strukturieren und eigene Touransichten bereitstellen.", Route],
+  ["Mitarbeiter-Dashboard", "Mitarbeiterverwaltung Pflege mit eigenen Diensten, Touren, zugewiesenen Patienten, Zeiten und internen Nachrichten.", Users],
+  ["Klientenübersicht", "Klientenverwaltung Pflege strukturiert verwalten und relevante Informationen rollenbasiert zugänglich machen.", UserRound],
+  ["Zeiterfassung", "Zeiterfassung Pflegedienst für Arbeitszeiten, Tourzeiten und Einsatzzeiten nachvollziehbar erfassen.", Clock3],
+  ["Dokumente", "Dokumentenverwaltung Pflege: Dokumente und Verordnungen geschützt zu Klienten oder Einsätzen ablegen.", FileText],
   ["Notizen & Übergaben", "Hinweise, Beobachtungen und Übergaben zentral erfassen und intern sichtbar machen.", MessageSquareText],
   ["Kommunikation", "Interne Nachrichten für Teams, Touren, Übergaben und organisatorische Rückfragen.", MessagesSquare],
   ["Abwesenheiten / Urlaub", "Urlaub, Krankheit und Abwesenheiten strukturiert beantragen und verwalten.", CalendarOff],
@@ -148,11 +148,11 @@ const pricingFeatures = [
   "Inhaber-Dashboard",
   "PDL- und Verwaltungsbereiche",
   "Mitarbeiter-Dashboard",
-  "Dienstplanung",
-  "Tourenplanung",
+  "Dienstplanung Pflege",
+  "Tourenplanung Pflege",
   "Klientenübersicht",
-  "Zeiterfassung",
-  "Dokumente",
+  "Zeiterfassung Pflegedienst",
+  "Dokumentenverwaltung Pflege",
   "Notizen & Übergaben",
   "Kommunikation",
   "Abwesenheiten / Urlaub",
@@ -356,15 +356,16 @@ function Hero() {
         </motion.div>
         <motion.h1 variants={fadeUp}>Mehr Übersicht im <span>Pflege</span>alltag</motion.h1>
         <motion.p variants={fadeUp}>
-          Nuria Pflege ist die digitale Arbeitsfläche für ambulante Pflegedienste: Dienstplanung, Touren,
-          Mitarbeiterorganisation, Dokumente, Zeiterfassung und interne Kommunikation an einem Ort.
+          Nuria Pflege ist eine Pflege Software für ambulante Pflegedienste: Dienstplanung Pflege,
+          Tourenplanung Pflege, digitale Pflegeverwaltung, Dokumentenverwaltung, Zeiterfassung und interne
+          Kommunikation an einem Ort.
         </motion.p>
         <motion.div className="public-actions" variants={fadeUp}>
           <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
             <Link className="public-button" href="/registrieren">Pflegedienst registrieren</Link>
           </motion.div>
           <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
-            <Link className="public-button secondary" href="/funktionen">Arbeitsbereiche ansehen</Link>
+            <Link className="public-button secondary" href="/funktionen">Funktionen der Pflegesoftware ansehen</Link>
           </motion.div>
         </motion.div>
         <motion.div className="public-hero-points" variants={staggerContainer}>
@@ -401,8 +402,8 @@ function ExplainSection() {
   return (
     <motion.section className="public-section public-explain" initial="hidden" variants={staggerContainer} viewport={motionViewport} whileInView="visible">
       <motion.div className="public-section-heading center" variants={fadeUp}>
-        <h2>Eine Plattform für den Pflegealltag.</h2>
-        <p>Nuria Pflege unterstützt Pflegedienste dabei, interne Abläufe digital zu bündeln – von der Planung bis zur täglichen Mitarbeiteransicht.</p>
+        <h2>Eine Plattform für digitale Pflegeverwaltung.</h2>
+        <p>Nuria Pflege unterstützt ambulante Pflegedienste dabei, interne Abläufe digital zu bündeln – von der Planung bis zur täglichen Mitarbeiteransicht.</p>
       </motion.div>
       <div className="public-mini-grid">
         {explainCards.map(([title, text, Icon]) => (
@@ -440,7 +441,7 @@ function FeaturesSection() {
   return (
     <motion.section className="public-section" initial="hidden" variants={staggerContainer} viewport={motionViewport} whileInView="visible">
       <motion.div className="public-section-heading" variants={fadeUp}>
-        <h2>Wichtige Bereiche an einem Ort.</h2>
+        <h2>Wichtige Bereiche der Pflegedienst Software an einem Ort.</h2>
       </motion.div>
       <div className="public-card-grid">
         {modules.map(([title, text, Icon]) => (
@@ -498,8 +499,8 @@ function PricingSection() {
   return (
     <motion.section className="public-section public-pricing" initial="hidden" variants={staggerContainer} viewport={motionViewport} whileInView="visible">
       <motion.div className="public-section-heading" variants={fadeUp}>
-        <h2>Tarifdetails</h2>
-        <p>Nuria Pflege startet mit einem klaren Tarifmodell für ambulante Pflegedienste. Die Details werden transparent im Registrierungsprozess und im Tarifbereich angezeigt.</p>
+        <h2>Tarifdetails der Pflege Software</h2>
+        <p>Nuria Pflege startet mit einem klaren Tarifmodell für ambulante Pflegedienste. Die Kosten und Laufzeitoptionen werden transparent im Registrierungsprozess und im Tarifbereich angezeigt.</p>
       </motion.div>
       <motion.div className="public-price-card" variants={fadeUp} whileHover={cardHover}>
         <p className="price-title">Starttarif: 89 € / Monat</p>
@@ -576,8 +577,8 @@ function FaqSection() {
 function FinalCta() {
   return (
     <motion.section className="public-cta" initial="hidden" variants={staggerContainer} viewport={motionViewport} whileInView="visible">
-      <motion.h2 variants={fadeUp}>Starten Sie mit einer klaren digitalen Struktur für Ihren Pflegedienst.</motion.h2>
-      <motion.p variants={fadeUp}>Registrieren Sie Ihren Pflegedienst und richten Sie Schritt für Schritt Mitarbeiter, Rollen und zentrale Arbeitsbereiche ein.</motion.p>
+      <motion.h2 variants={fadeUp}>Starten Sie mit klarer Software für Pflegeorganisation.</motion.h2>
+      <motion.p variants={fadeUp}>Registrieren Sie Ihren Pflegedienst und richten Sie Schritt für Schritt Mitarbeiter, Rollen und zentrale Arbeitsbereiche für den Pflegealltag ein.</motion.p>
       <motion.div className="public-actions" variants={fadeUp}>
         <Link className="public-button" href="/registrieren">Jetzt registrieren</Link>
         <Link className="public-button secondary" href="/kontakt">Kontakt aufnehmen</Link>
@@ -621,14 +622,14 @@ function FeaturesPageContent() {
           ["Tarifdetails ansehen", "/tarifdetails", "secondary"],
         ]}
         badge="Funktionen"
-        intro="Nuria Pflege bündelt zentrale Arbeitsbereiche ambulanter Pflegedienste - von Dienstplanung und Touren bis zu Dokumenten, Zeiterfassung und interner Kommunikation."
-        title="Alles Wichtige für den Pflegealltag an einem Ort."
+        intro="Nuria Pflege bündelt zentrale Arbeitsbereiche ambulanter Pflegedienste - von Dienstplanung Pflege und Tourenplanung Pflege bis zu Dokumentenverwaltung, Zeiterfassung und interner Kommunikation."
+        title="Funktionen für digitale Organisation ambulanter Pflegedienste."
         visual={<SubHeroVisual items={[["Planung", CalendarDays], ["Touren", Route], ["Team", Users], ["Dokumente", FileText]]} />}
       />
       <motion.section className="public-section public-detail-section" initial="hidden" variants={staggerContainer} viewport={motionViewport} whileInView="visible">
         <motion.div className="public-section-heading center" variants={fadeUp}>
-          <h2>Zentrale Module für den Alltag.</h2>
-          <p>Die Bereiche greifen strukturiert ineinander und bleiben nach Rolle und Zuständigkeit übersichtlich nutzbar.</p>
+          <h2>Zentrale Module für den Pflegealltag.</h2>
+          <p>Die Bereiche der Pflegedienst Software greifen strukturiert ineinander und bleiben nach Rolle und Zuständigkeit übersichtlich nutzbar.</p>
         </motion.div>
         <div className="public-feature-detail-grid">
           {featureModules.map(([title, text, Icon]) => (
@@ -657,7 +658,7 @@ function FeaturesPageContent() {
         </div>
       </motion.section>
       <PublicPageCta
-        headline="Bereit für mehr Struktur im Pflegealltag?"
+        headline="Bereit für digitale Pflegedienst Verwaltung?"
         primaryHref="/registrieren"
         primaryLabel="Jetzt registrieren"
         secondaryHref="/kontakt"
@@ -678,7 +679,7 @@ function PricingPageContent() {
         ]}
         badge="Tarifdetails"
         intro="Nuria Pflege startet mit einem übersichtlichen Tarif für Pflegedienste, der zentrale Bereiche der digitalen Organisation bündelt."
-        title="Ein klares Tarifmodell für ambulante Pflegedienste."
+        title="Pflege Software Tarif für ambulante Pflegedienste."
         visual={<SubHeroVisual items={[["89 € / Monat", BadgeEuro], ["Laufzeiten", CalendarDays], ["Rollen", ShieldCheck], ["Zugang", LockKeyhole]]} />}
       />
       <motion.section className="public-section public-tariff-section" initial="hidden" variants={staggerContainer} viewport={motionViewport} whileInView="visible">
@@ -687,7 +688,7 @@ function PricingPageContent() {
             <span className="public-eyebrow">Starttarif</span>
             <h2>Nuria Pflege Starttarif</h2>
             <p className="public-tariff-price">89 € / Monat</p>
-            <p>Für ambulante Pflegedienste, die Dienstplanung, Touren, Mitarbeiterorganisation, Dokumente, Zeiterfassung und interne Kommunikation digital bündeln möchten.</p>
+            <p>Für ambulante Pflegedienste, die Dienstplanung Pflege, Tourenplanung Pflege, Mitarbeiterverwaltung, Dokumentenverwaltung, Zeiterfassung und Kommunikation digital bündeln möchten.</p>
             <Link className="public-button" href="/registrieren">Jetzt registrieren</Link>
           </div>
           <div className="public-price-includes">
@@ -716,7 +717,7 @@ function PricingPageContent() {
           <BadgeEuro size={22} />
           <div>
             <h2>Transparent vorbereitet</h2>
-            <p>Die Tarifauswahl und Zahlungsdetails werden im Registrierungsprozess angezeigt. Nach der Einrichtung kann die Zahlung bestätigt und der Zugang entsprechend dem gewählten Tarif genutzt werden.</p>
+            <p>Die Tarifauswahl, Laufzeiten und Zahlungsdetails werden im Registrierungsprozess angezeigt. Nach der Einrichtung kann die Zahlung bestätigt und der Zugang entsprechend dem gewählten Tarif genutzt werden.</p>
           </div>
         </motion.article>
         <div className="public-security-grid public-transparent-grid">
@@ -757,7 +758,7 @@ function ContactPageContent() {
     <>
       <PublicSubPage
         badge="Kontakt"
-        intro="Haben Sie Fragen zur Nutzung, Registrierung oder Einrichtung? Kontaktieren Sie uns gerne direkt."
+        intro="Haben Sie Fragen zur Pflege Software, Registrierung oder Einrichtung? Kontaktieren Sie Nuria Pflege direkt."
         title="Kontakt zu Nuria Pflege."
         visual={<SubHeroVisual items={[["E-Mail", Mail], ["Betreiber", UserRound], ["Standort", MapPin], ["Website", Globe]]} />}
       />

@@ -15,8 +15,8 @@ function required(formData: FormData, key: string) {
   return value;
 }
 
-async function context() {
-  return requireCompanyRole(["inhaber", "pdl", "verwaltung"]);
+async function context(options: { write?: boolean } = { write: true }) {
+  return requireCompanyRole(["inhaber", "pdl", "verwaltung"], options);
 }
 
 async function ownUser(companyId: string, id: string) {
@@ -126,7 +126,7 @@ export async function sendMessage(formData: FormData) {
 
 export async function markConversationRead(formData: FormData) {
   const supabase = getSupabaseServerClient();
-  const { companyId, userId } = await context();
+  const { companyId, userId } = await context({ write: false });
   const conversationId = required(formData, "conversation_id");
   if (!supabase || !companyId || !userId) return;
 

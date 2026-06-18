@@ -1,6 +1,9 @@
 import { redirect } from "next/navigation";
 import { loginNuriaAdmin } from "@/lib/nuria-admin-login-actions";
 import { hasValidNuriaAdminSession } from "@/lib/nuria-admin-auth";
+import { privateRobotsMetadata } from "@/lib/public-seo";
+
+export const metadata = privateRobotsMetadata;
 
 type PageProps = {
   searchParams: Promise<{ error?: string }>;

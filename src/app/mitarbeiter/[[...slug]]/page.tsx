@@ -1,4 +1,5 @@
 import { redirect, notFound } from "next/navigation";
+import { privateRobotsMetadata } from "@/lib/public-seo";
 import { DashboardOverview } from "@/components/dashboard-overview";
 import { DashboardPage } from "@/components/dashboard-page";
 import { DashboardShell } from "@/components/dashboard-shell";
@@ -14,6 +15,8 @@ import { StaffTourPage } from "@/components/staff-tour-page";
 import { getDashboardOverview } from "@/lib/dashboard-overview";
 import { routeByPath, staffRoutes } from "@/lib/nuria-config";
 import { getCurrentUserContext } from "@/lib/current-user";
+
+export const metadata = privateRobotsMetadata;
 
 type PageProps = {
   params: Promise<{ slug?: string[] }>;

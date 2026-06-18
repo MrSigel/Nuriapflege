@@ -1,12 +1,19 @@
 import { notFound } from "next/navigation";
 import { acceptEmployeeInvitation } from "@/lib/invite-accept-actions";
 import { hashInviteToken } from "@/lib/invitations";
+import { privateRobotsMetadata } from "@/lib/public-seo";
 import { getSupabaseServerClient } from "@/lib/supabase-server";
+
+export const metadata = privateRobotsMetadata;
 
 type PageProps = {
   params: Promise<{ token: string }>;
   searchParams: Promise<{ error?: string }>;
 };
+
+async function currentTimeMs() {
+  return Date.now();
+}
 
 export default async function EmployeeInvitationPage({ params, searchParams }: PageProps) {
   const { token } = await params;
@@ -22,7 +29,9 @@ export default async function EmployeeInvitationPage({ params, searchParams }: P
     .eq("invitation_status", "invited")
     .maybeSingle();
 
-  if (!profile?.id || (profile.invitation_expires_at && new Date(profile.invitation_expires_at).getTime() < Date.now())) {
+  const now = await currentTimeMs();
+
+  if (!profile?.id || (profile.invitation_expires_at && new Date(profile.invitation_expires_at).getTime() < now)) {
     notFound();
   }
 

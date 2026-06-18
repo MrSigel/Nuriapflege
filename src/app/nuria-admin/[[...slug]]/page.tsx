@@ -1,5 +1,8 @@
 import { NuriaAdminDashboard } from "@/components/nuria-admin-dashboard";
+import { privateRobotsMetadata } from "@/lib/public-seo";
 import { getNuriaAdminData, resolveNuriaAdminSection } from "@/lib/nuria-admin";
+
+export const metadata = privateRobotsMetadata;
 
 type PageProps = {
   params: Promise<{ slug?: string[] }>;

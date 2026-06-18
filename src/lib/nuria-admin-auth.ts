@@ -27,13 +27,16 @@ function adminPassword() {
   return normalizeEnvValue(process.env.NURIA_ADMIN_PASSWORD);
 }
 
+function sessionSecret() {
+  return normalizeEnvValue(process.env.NURIA_ADMIN_SESSION_SECRET) || `${adminEmail()}:${adminPassword()}`;
+}
+
 function base64Url(value: string) {
   return Buffer.from(value).toString("base64url");
 }
 
 function sign(payload: string) {
-  const secret = `${adminEmail()}:${adminPassword()}`;
-  return createHmac("sha256", secret).update(payload).digest("base64url");
+  return createHmac("sha256", sessionSecret()).update(payload).digest("base64url");
 }
 
 function hasAdminEnv() {

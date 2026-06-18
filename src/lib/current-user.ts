@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { getCompanyAccessStateForCompany } from "@/lib/onboarding";
 import { getSupabaseServerClient } from "@/lib/supabase-server";
 import type { Role } from "@/lib/nuria-config";
 
@@ -29,22 +30,32 @@ export async function getCurrentUserContext(): Promise<CurrentUserContext | null
   };
 }
 
-export async function requireCompanyManager() {
+type RequireOptions = {
+  write?: boolean;
+};
+
+async function requireWritableCompany(context: CurrentUserContext) {
+  const access = await getCompanyAccessStateForCompany(context.companyId);
+  if (!access.canWrite) throw new Error("Schreibzugriff ist aktuell gesperrt.");
+  return context;
+}
+
+export async function requireCompanyManager(options: RequireOptions = { write: true }) {
   const context = await getCurrentUserContext();
 
   if (!context || !["inhaber", "pdl"].includes(context.role)) {
     throw new Error("Keine Berechtigung für diese Aktion.");
   }
 
-  return context;
+  return options.write === false ? context : requireWritableCompany(context);
 }
 
-export async function requireCompanyRole(roles: Role[]) {
+export async function requireCompanyRole(roles: Role[], options: RequireOptions = { write: true }) {
   const context = await getCurrentUserContext();
 
   if (!context || !roles.includes(context.role)) {
     throw new Error("Keine Berechtigung für diese Aktion.");
   }
 
-  return context;
+  return options.write === false ? context : requireWritableCompany(context);
 }

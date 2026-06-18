@@ -68,20 +68,35 @@ export function canCompanyWrite(company: { onboarding_status?: string | null; pa
 }
 
 export function isCompanyPaymentOverdue(company: { payment_status?: string | null; admin_confirmed_at?: string | null; payment_due_until?: string | null; payment_due_check_at?: string | null } | null) {
+  if (company?.payment_status === "payment_overdue" || company?.payment_status === "locked") return true;
   const due = company?.payment_due_until ?? company?.payment_due_check_at;
   return Boolean(company?.payment_status === "payment_marked_as_sent" && due && !company.admin_confirmed_at && new Date(due).getTime() < Date.now());
 }
 
-export async function getCompanyAccessState() {
+export async function getCompanyAccessStateForCompany(cid: string | null) {
   const supabase = getSupabaseServerClient();
-  const cid = await companyId();
   if (!supabase || !cid) return { canWrite: false, isOverdue: false, company: null };
   const { data: company } = await supabase
     .from("companies")
     .select("id,onboarding_status,payment_status,payment_due_until,payment_due_check_at,admin_confirmed_at")
     .eq("id", cid)
     .maybeSingle();
+
+  if (isCompanyPaymentOverdue(company) && company?.payment_status === "payment_marked_as_sent") {
+    const now = new Date().toISOString();
+    await Promise.all([
+      supabase.from("companies").update({ payment_status: "payment_overdue", updated_at: now }).eq("id", cid),
+      supabase.from("company_subscriptions").update({ status: "overdue", updated_at: now }).eq("company_id", cid).eq("status", "payment_marked_as_sent"),
+    ]);
+
+    return { canWrite: false, isOverdue: true, company: { ...company, payment_status: "payment_overdue" } };
+  }
+
   return { canWrite: canCompanyWrite(company), isOverdue: isCompanyPaymentOverdue(company), company };
+}
+
+export async function getCompanyAccessState() {
+  return getCompanyAccessStateForCompany(await companyId());
 }
 
 export async function getOnboardingData(): Promise<OnboardingData> {

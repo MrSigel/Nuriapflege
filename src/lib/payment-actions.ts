@@ -17,13 +17,13 @@ function email(value: string | null) {
   return value;
 }
 
-async function context() {
-  return requireCompanyRole(["inhaber"]);
+async function context(options: { write?: boolean } = { write: true }) {
+  return requireCompanyRole(["inhaber"], options);
 }
 
 export async function markPaymentSent() {
   const supabase = getSupabaseServerClient();
-  const { companyId, userId } = await context();
+  const { companyId, userId } = await context({ write: false });
   if (!supabase || !companyId) return;
 
   const { data: company } = await supabase.from("companies").select("payment_status,billing_interval,package_id").eq("id", companyId).maybeSingle();
